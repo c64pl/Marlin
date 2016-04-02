@@ -363,3 +363,39 @@
   #endif // NEWPANEL
 
 #endif // ULTRA_LCD
+
+
+// For test
+
+//
+// Heaters / Fans
+//
+#define HEATER_1_PIN        5
+#define HEATER_2_PIN        6
+
+//
+// LCD / Controller
+//
+//#undef BEEPER_PIN
+//#define BEEPER_PIN         -1
+
+//#undef DOGLCD_A0
+//#define DOGLCD_A0          27
+
+//#undef DOGLCD_CS
+//#define DOGLCD_CS          25
+
+//#undef KILL_PIN
+//#define KILL_PIN           41
+
+//#undef BTN_EN1
+//#define BTN_EN1            31
+
+//#undef BTN_EN2
+//#define BTN_EN2            33
+
+//#undef BTN_ENC
+//#define BTN_ENC            35
+
+#define STAT_LED_RED_PIN   57
+#define STAT_LED_BLUE_PIN  58
