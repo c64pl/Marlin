@@ -80,6 +80,10 @@
   #elif ENABLED(DISPLAY_CHARSET_ISO10646_KANA)
     #include "dogm_font_data_ISO10646_Kana.h"
     #define FONT_MENU_NAME ISO10646_Kana_5x7
+  #elif ENABLED(DISPLAY_CHARSET_ISO10646_KANJI_AND_KANA)
+    #include "dogm_font_data_ISO10646_Kanji_and_Kana.h"
+    #define FONT_MENU_NAME ISO10646_Kanji_and_Kana
+    #define TALL_FONT_CORRECTION 1
   #elif ENABLED(DISPLAY_CHARSET_ISO10646_GREEK)
     #include "dogm_font_data_ISO10646_Greek.h"
     #define FONT_MENU_NAME ISO10646_Greek_5x7
