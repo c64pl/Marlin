@@ -41,6 +41,10 @@
   #define K2 (1.0-K1)
 #endif
 
+#if ENABLED(USE_SPI_LIB_FOR_THERMOCOUPLE)
+  #include <SPI.h>
+#endif
+
 #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
   static void* heater_ttbl_map[2] = {(void*)HEATER_0_TEMPTABLE, (void*)HEATER_1_TEMPTABLE };
   static uint8_t heater_ttbllen_map[2] = { HEATER_0_TEMPTABLE_LEN, HEATER_1_TEMPTABLE_LEN };
@@ -1009,6 +1013,116 @@ void Temperature::init() {
 
     OUT_WRITE(MAX6675_SS, HIGH);
 
+    #if ENABLED(MAX6675_IS_MAX31856)
+
+      #ifdef USE_SPI_LIB_FOR_THERMOCOUPLE
+        #define MAX6675_SPEED_BITS (F_CPU / 64) // clock ÷ 64
+        #define MAX6675_MODE_BITS SPI_MODE1 // SPI mode 1
+
+        SPI.beginTransaction(SPISettings(MAX6675_SPEED_BITS, MSBFIRST, MAX6675_MODE_BITS));
+
+        WRITE(MAX6675_SS, LOW); // enable TT_MAX6675
+
+        // ensure 100ns delay - a bit extra is fine
+        asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+        asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+
+        SPI.transfer(0x80); // Select configuration 0 register for writing
+        SPI.transfer(0x80 | 0x10); // Automatic Conversion mode, enable Open-Circuit Detection (Rs < 5k)
+
+        SPI.transfer(0x81); // Select configuration 1 register for writing
+        SPI.transfer(THERMOCOUPLE_TYPE); // Set thermocouple type
+
+        WRITE(MAX6675_SS, HIGH); // disable TT_MAX6675
+
+        SPI.endTransaction();
+      #else
+        #define MAX6675_SPEED_BITS (_BV(SPR1)) // clock ÷ 64
+        #define MAX6675_MODE_BITS (_BV(CPHA)) // SPI mode 1
+
+        CBI(
+          #ifdef PRR
+            PRR
+          #elif defined(PRR0)
+            PRR0
+          #endif
+            , PRSPI);
+        SPCR = _BV(SPE) | _BV(MSTR) | MAX6675_MODE_BITS | MAX6675_SPEED_BITS;
+
+        WRITE(MAX6675_SS, LOW); // enable TT_MAX6675
+
+        // ensure 100ns delay - a bit extra is fine
+        asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+        asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+
+        SPDR = 0x80; // Select configuration 0 register for writing
+        for (;!TEST(SPSR, SPIF););
+        SPDR = 0x80 | 0x10; // Automatic Conversion mode, enable Open-Circuit Detection (Rs < 5k)
+        for (;!TEST(SPSR, SPIF););
+
+        SPDR = 0x81; // Select configuration 1 register for writing
+        for (;!TEST(SPSR, SPIF););
+        SPDR = THERMOCOUPLE_TYPE; // Set thermocouple type
+        for (;!TEST(SPSR, SPIF););
+
+        #if ENABLED(MAX31856_ADDITIONAL_INITIALIZATION)
+          SPDR = 0x82;
+          for (;!TEST(SPSR, SPIF););
+          SPDR = 0xff;
+          for (;!TEST(SPSR, SPIF););
+
+          SPDR = 0x83;
+          for (;!TEST(SPSR, SPIF););
+          SPDR = 0x7f;
+          for (;!TEST(SPSR, SPIF););
+
+          SPDR = 0x84;
+          for (;!TEST(SPSR, SPIF););
+          SPDR = 0xc0;
+          for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x85;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x7f;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x86;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0xff;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x87;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x80;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x88;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x00;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x89;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x00;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x8a;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x00;
+          //for (;!TEST(SPSR, SPIF););
+
+          //SPDR = 0x8b;
+          //for (;!TEST(SPSR, SPIF););
+          //SPDR = 0x00;
+          //for (;!TEST(SPSR, SPIF););
+        #endif
+
+        WRITE(MAX6675_SS, HIGH); // disable TT_MAX6675
+      #endif
+
+      SPCR = _BV(SPE) | _BV(MSTR) | MAX6675_SPEED_BITS; // Restore SPI mode to 0
+    #endif
+
   #endif //HEATER_0_USES_MAX6675
 
   #ifdef DIDR2
@@ -1293,16 +1407,32 @@ void Temperature::disable_all_heaters() {
 
   #define MAX6675_HEAT_INTERVAL 250u
 
-  #if ENABLED(MAX6675_IS_MAX31855)
+  #if ENABLED(MAX6675_IS_MAX31856)
     uint32_t max6675_temp = 2000;
+    uint8_t fault_status = 0;
+    #define MAX6675_READ_SIZE 3
+    #define MAX6675_ERROR_MASK 0xff
+    #define MAX6675_DISCARD_BITS 10
+  #elif ENABLED(MAX6675_IS_MAX31855)
+    uint32_t max6675_temp = 2000;
+    #define MAX6675_READ_SIZE sizeof(max6675_temp)
     #define MAX6675_ERROR_MASK 7
     #define MAX6675_DISCARD_BITS 18
-    #define MAX6675_SPEED_BITS (_BV(SPR1)) // clock ÷ 64
+    #ifdef USE_SPI_LIB_FOR_THERMOCOUPLE
+      #define MAX6675_SPEED_BITS (F_CPU / 64) // clock ÷ 64
+    #else
+      #define MAX6675_SPEED_BITS (_BV(SPR1)) // clock ÷ 64
+    #endif
   #else
     uint16_t max6675_temp = 2000;
+    #define MAX6675_READ_SIZE sizeof(max6675_temp)
     #define MAX6675_ERROR_MASK 4
     #define MAX6675_DISCARD_BITS 3
-    #define MAX6675_SPEED_BITS (_BV(SPR0)) // clock ÷ 16
+    #ifdef USE_SPI_LIB_FOR_THERMOCOUPLE
+      #define MAX6675_SPEED_BITS (F_CPU / 16) // clock ÷ 16
+    #else
+      #define MAX6675_SPEED_BITS (_BV(SPR0)) // clock ÷ 16
+    #endif
   #endif
 
   int Temperature::read_max6675() {
@@ -1315,16 +1445,10 @@ void Temperature::disable_all_heaters() {
 
     next_max6675_ms = ms + MAX6675_HEAT_INTERVAL;
 
-    CBI(
-      #ifdef PRR
-        PRR
-      #elif defined(PRR0)
-        PRR0
-      #endif
-        , PRSPI);
-    SPCR = _BV(MSTR) | _BV(SPE) | MAX6675_SPEED_BITS;
+#ifdef USE_SPI_LIB_FOR_THERMOCOUPLE
+    SPI.beginTransaction(SPISettings(MAX6675_SPEED_BITS, MSBFIRST, MAX6675_MODE_BITS));
 
-    WRITE(MAX6675_SS, 0); // enable TT_MAX6675
+    WRITE(MAX6675_SS, LOW); // enable TT_MAX6675
 
     // ensure 100ns delay - a bit extra is fine
     asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
@@ -1332,19 +1456,102 @@ void Temperature::disable_all_heaters() {
 
     // Read a big-endian temperature value
     max6675_temp = 0;
-    for (uint8_t i = sizeof(max6675_temp); i--;) {
+
+    #if ENABLED(MAX6675_IS_MAX31856)
+      SPI.transfer(0x0c); // Select Linearized TC Temperature register for reading
+    #endif
+    for (uint8_t i = MAX6675_READ_SIZE; i--;) {
+      max6675_temp |= SPI.transfer(0xff);
+      if (i > 0) max6675_temp <<= 8; // shift left if not the last byte
+    }
+    #if ENABLED(MAX6675_IS_MAX31856)
+#if ENABLED(MAX31856_ERROR_DETECTION)
+      SPI.transfer(0x0f); // Select Fault Status register for reading
+      fault_status = SPI.transfer(0xff);
+#endif
+    #endif
+
+    WRITE(MAX6675_SS, HIGH); // disable TT_MAX6675
+
+    SPI.endTransaction();
+#else
+    CBI(
+      #ifdef PRR
+        PRR
+      #elif defined(PRR0)
+        PRR0
+      #endif
+        , PRSPI);
+    SPCR = _BV(SPE) | _BV(MSTR)
+      #if ENABLED(MAX6675_IS_MAX31856)
+        | MAX6675_MODE_BITS
+      #endif
+        | MAX6675_SPEED_BITS;
+
+    WRITE(MAX6675_SS, LOW); // enable TT_MAX6675
+
+    // ensure 100ns delay - a bit extra is fine
+    asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+    asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
+
+    // Read a big-endian temperature value
+    max6675_temp = 0;
+
+    #if ENABLED(MAX6675_IS_MAX31856)
+      SPDR = 0x0c; // Select Linearized TC Temperature register for reading
+      for (;!TEST(SPSR, SPIF););
+    #endif
+    for (uint8_t i = MAX6675_READ_SIZE; i--;) {
       SPDR = 0;
       for (;!TEST(SPSR, SPIF););
       max6675_temp |= SPDR;
       if (i > 0) max6675_temp <<= 8; // shift left if not the last byte
     }
+    #if ENABLED(MAX6675_IS_MAX31856)
+#if ENABLED(MAX31856_ERROR_DETECTION)
+      SPDR = 0x0f; // Select Fault Status register for reading
+      for (;!TEST(SPSR, SPIF););
+      SPDR = 0;
+      for (;!TEST(SPSR, SPIF););
+      fault_status = SPDR;
+#endif
+    #endif
 
-    WRITE(MAX6675_SS, 1); // disable TT_MAX6675
+    WRITE(MAX6675_SS, HIGH); // disable TT_MAX6675
+#endif
 
-    if (max6675_temp & MAX6675_ERROR_MASK) {
+    #if ENABLED(MAX6675_IS_MAX31856)
+      SPCR = _BV(SPE) | _BV(MSTR) | MAX6675_SPEED_BITS; // Restore SPI mode to 0
+    #endif
+    
+    if (
+      #if ENABLED(MAX6675_IS_MAX31856)
+        fault_status
+      #else
+        (max6675_temp & MAX6675_ERROR_MASK)
+      #endif
+      ) {
       SERIAL_ERROR_START;
       SERIAL_ERRORPGM("Temp measurement error! ");
-      #if MAX6675_ERROR_MASK == 7
+      #if MAX6675_ERROR_MASK == 0xff
+        SERIAL_ERRORPGM("MAX31856 ");
+        if (fault_status & 0x01)
+          SERIAL_ERRORLNPGM("Open Circuit");
+        if (fault_status & 0x02)
+          SERIAL_ERRORLNPGM("Over-voltage or Undervoltage");
+        if (fault_status & 0x04)
+          SERIAL_ERRORLNPGM("Thermocouple Temperature Low Fault");
+        if (fault_status & 0x08)
+          SERIAL_ERRORLNPGM("Thermocouple Temperature High Fault");
+        if (fault_status & 0x10)
+          SERIAL_ERRORLNPGM("Cold-Junction Low Fault");
+        if (fault_status & 0x20)
+          SERIAL_ERRORLNPGM("Cold-Junction High Fault");
+        if (fault_status & 0x40)
+          SERIAL_ERRORLNPGM("Thermocouple Out-of-Range");
+        if (fault_status & 0x80)
+          SERIAL_ERRORLNPGM("Cold Junction Out-of-Range");
+      #elif MAX6675_ERROR_MASK == 7
         SERIAL_ERRORPGM("MAX31855 ");
         if (max6675_temp & 1)
           SERIAL_ERRORLNPGM("Open Circuit");
@@ -1359,7 +1566,7 @@ void Temperature::disable_all_heaters() {
     }
     else
       max6675_temp >>= MAX6675_DISCARD_BITS;
-      #if ENABLED(MAX6675_IS_MAX31855)
+      #if ENABLED(MAX6675_IS_MAX31855) || ENABLED(MAX6675_IS_MAX31856)
         // Support negative temperature
         if (max6675_temp & 0x00002000) max6675_temp |= 0xffffc000;
       #endif
