@@ -57,7 +57,7 @@
 #define E2_STEP_PIN        51
 #define E2_DIR_PIN         53
 #define E2_ENABLE_PIN      49
-#define E1_CS_PIN          35
+#define E2_CS_PIN          35
 
 // For Extension Board V2
 // http://doku.radds.org/dokumentation/extension-board
