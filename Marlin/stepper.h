@@ -113,8 +113,8 @@ class Stepper {
         static uint32_t old_OCR0A;
         static volatile uint32_t eISR_Rate;
       #else
-        static unsigned char old_OCR0A;
-        static volatile unsigned char eISR_Rate;
+        static uint8_t old_OCR0A;
+        static volatile uint8_t eISR_Rate;
       #endif
       #if ENABLED(LIN_ADVANCE)
         static volatile int e_steps[E_STEPPERS];

@@ -100,8 +100,8 @@ volatile uint32_t Stepper::step_events_completed = 0; // The number of step even
     uint32_t Stepper::old_OCR0A = 0;
     volatile uint32_t Stepper::eISR_Rate = 200 * EXTRUDER_TIMER_FACTOR; // Keep the ISR at a low rate until needed
   #else
-    unsigned char Stepper::old_OCR0A = 0;
-    volatile unsigned char Stepper::eISR_Rate = 200; // Keep the ISR at a low rate until needed
+    uint8_t Stepper::old_OCR0A = 0;
+    volatile uint8_t Stepper::eISR_Rate = 200; // Keep the ISR at a low rate until needed
   #endif
 
   #if ENABLED(LIN_ADVANCE)
@@ -363,12 +363,12 @@ void Stepper::set_directions() {
 
 void Stepper::isr() {
   if (cleaning_buffer_counter) {
+    --cleaning_buffer_counter;
     current_block = NULL;
     planner.discard_current_block();
     #ifdef SD_FINISHED_RELEASECOMMAND
-      if ((cleaning_buffer_counter == 1) && (SD_FINISHED_STEPPERRELEASE)) enqueue_and_echo_commands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
+      if (!cleaning_buffer_counter && (SD_FINISHED_STEPPERRELEASE)) enqueue_and_echo_commands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
-    cleaning_buffer_counter--;
     #ifdef __SAM3X8E__
       HAL_TIMER_SET_STEPPER_COUNT(200 * STEPPER_TIMER_FACTOR); // Run at max speed - 10 KHz
     #else
@@ -645,11 +645,6 @@ void Stepper::isr() {
   #endif
 
   // Calculate new timer value
-  #ifdef __SAM3X8E__
-    HAL_TIMER_TYPE timer, step_rate;
-  #else
-    uint16_t timer, step_rate;
-  #endif
   if (step_events_completed <= (uint32_t)current_block->accelerate_until) {
 
     #ifdef __SAM3X8E__
@@ -663,10 +658,11 @@ void Stepper::isr() {
     NOMORE(acc_step_rate, current_block->nominal_rate);
 
     // step_rate to timer interval
-    timer = calc_timer(acc_step_rate);
     #ifdef __SAM3X8E__
+      HAL_TIMER_TYPE timer = calc_timer(acc_step_rate);
       HAL_TIMER_SET_STEPPER_COUNT(timer);
     #else
+      uint16_t timer = calc_timer(acc_step_rate);
       OCR1A = timer;
     #endif
     acceleration_time += timer;
@@ -714,8 +710,10 @@ void Stepper::isr() {
   }
   else if (step_events_completed > (uint32_t)current_block->decelerate_after) {
     #ifdef __SAM3X8E__
+      HAL_TIMER_TYPE step_rate;
       MultiU32X32toH32(step_rate, deceleration_time, current_block->acceleration_rate);
     #else
+      uint16_t step_rate;
       MultiU24X32toH16(step_rate, deceleration_time, current_block->acceleration_rate);
     #endif
 
@@ -727,10 +725,11 @@ void Stepper::isr() {
       step_rate = current_block->final_rate;
 
     // step_rate to timer interval
-    timer = calc_timer(step_rate);
     #ifdef __SAM3X8E__
+      HAL_TIMER_TYPE timer = calc_timer(step_rate);
       HAL_TIMER_SET_STEPPER_COUNT(timer);
     #else
+      uint16_t timer = calc_timer(step_rate);
       OCR1A = timer;
     #endif
     deceleration_time += timer;
@@ -948,6 +947,11 @@ void Stepper::init() {
   // Init TMC Steppers
   #if ENABLED(HAVE_TMCDRIVER)
     tmc_init();
+  #endif
+
+  // Init TMC2130 Steppers
+  #if ENABLED(HAVE_TMC2130DRIVER)
+    tmc2130_init();
   #endif
 
   // Init L6470 Steppers
