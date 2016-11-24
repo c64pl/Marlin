@@ -544,6 +544,16 @@ static uint8_t target_extruder;
   ;
 #endif
 
+#if ENABLED(ULTIPANEL) && HAS_CASE_LIGHT
+  bool case_light_on =
+    #if ENABLED(CASE_LIGHT_DEFAULT_ON)
+      true
+    #else
+      false
+    #endif
+  ;
+#endif
+
 #if ENABLED(DELTA)
 
   #define SIN_60 0.8660254037844386
@@ -3565,7 +3575,7 @@ inline void gcode_G28() {
 
   inline void _mbl_goto_xy(float x, float y) {
     float old_feedrate_mm_s = feedrate_mm_s;
-    feedrate_mm_s = homing_feedrate_mm_s[X_AXIS];
+    feedrate_mm_s = homing_feedrate_mm_s[Z_AXIS];
 
     current_position[Z_AXIS] = MESH_HOME_SEARCH_Z
       #if Z_CLEARANCE_BETWEEN_PROBES > Z_HOMING_HEIGHT
@@ -3576,11 +3586,13 @@ inline void gcode_G28() {
     ;
     line_to_current_position();
 
+    feedrate_mm_s = MMM_TO_MMS(XY_PROBE_SPEED);
     current_position[X_AXIS] = LOGICAL_X_POSITION(x);
     current_position[Y_AXIS] = LOGICAL_Y_POSITION(y);
     line_to_current_position();
 
     #if Z_CLEARANCE_BETWEEN_PROBES > 0 || Z_HOMING_HEIGHT > 0
+      feedrate_mm_s = homing_feedrate_mm_s[Z_AXIS];
       current_position[Z_AXIS] = LOGICAL_Z_POSITION(MESH_HOME_SEARCH_Z);
       line_to_current_position();
     #endif
@@ -5902,7 +5914,7 @@ inline void gcode_M115() {
 
     // PROGRESS (M530 S L, M531 <file>, M532 X L)
     SERIAL_PROTOCOLPGM("Cap:");
-    SERIAL_PROTOCOLPGM("PROGRESS:0");
+    SERIAL_PROTOCOLLNPGM("PROGRESS:0");
 
     // AUTOLEVEL (G29)
     SERIAL_PROTOCOLPGM("Cap:");
@@ -7352,11 +7364,6 @@ inline void gcode_M907() {
    *   P<byte>  Set case light brightness (PWM pin required)
    */
   inline void gcode_M355() {
-    static bool case_light_on
-      #if ENABLED(CASE_LIGHT_DEFAULT_ON)
-        = true
-      #endif
-    ;
     static uint8_t case_light_brightness = 255;
     if (code_seen('P')) case_light_brightness = code_value_byte();
     if (code_seen('S')) {
