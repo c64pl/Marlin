@@ -667,11 +667,7 @@ static void lcd_implementation_status_screen() {
     if (!PAGE_CONTAINS(row_y1, row_y2)) return;
 
     uint8_t n = LCD_WIDTH - (START_COL) - 2;
-    #ifdef __SAM3X8E__
-      while ((char c = pgm_read_byte(pstr)) != 0) {
-    #else
-      while (char c = pgm_read_byte(pstr)) {
-    #endif
+    while (char c = pgm_read_byte(pstr)) {
       n -= lcd_print_and_count(c);
       pstr++;
     }
@@ -697,11 +693,7 @@ static void lcd_implementation_status_screen() {
     const uint8_t vallen = (pgm ? lcd_strlen_P(data) : (lcd_strlen((char*)data)));
     uint8_t n = LCD_WIDTH - (START_COL) - 2 - vallen;
 
-    #ifdef __SAM3X8E__
-      while ((char c = pgm_read_byte(pstr)) != 0) {
-    #else
-      while (char c = pgm_read_byte(pstr)) {
-    #endif
+    while (char c = pgm_read_byte(pstr)) {
       n -= lcd_print_and_count(c);
       pstr++;
     }
