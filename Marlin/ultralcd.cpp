@@ -110,9 +110,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   #if HAS_POWER_SWITCH
     extern bool powersupply;
   #endif
-  #if HAS_CASE_LIGHT
-    extern bool case_light_on;
-  #endif
+
   const float manual_feedrate_mm_m[] = MANUAL_FEEDRATE;
   void lcd_main_menu();
   void lcd_tune_menu();
@@ -120,8 +118,8 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   void lcd_move_menu();
   void lcd_control_menu();
   void lcd_control_temperature_menu();
-  void lcd_control_temperature_preheat_pla_settings_menu();
-  void lcd_control_temperature_preheat_abs_settings_menu();
+  void lcd_control_temperature_preheat_material1_settings_menu();
+  void lcd_control_temperature_preheat_material2_settings_menu();
   void lcd_control_motion_menu();
   void lcd_control_volumetric_menu();
 
@@ -215,6 +213,10 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     #define ENCODER_PULSES_PER_STEP 1
   #endif
 
+  #ifndef TALL_FONT_CORRECTION
+    #define TALL_FONT_CORRECTION 0
+  #endif
+
   /**
    * START_SCREEN_OR_MENU generates init code for a screen or menu
    *
@@ -238,7 +240,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
 
   #define SCREEN_OR_MENU_LOOP() \
     int8_t _menuLineNr = encoderTopLine, _thisItemNr; \
-    for (int8_t _lcdLineNr = 0; _lcdLineNr < LCD_HEIGHT; _lcdLineNr++, _menuLineNr++) { \
+    for (int8_t _lcdLineNr = 0; _lcdLineNr < LCD_HEIGHT - TALL_FONT_CORRECTION; _lcdLineNr++, _menuLineNr++) { \
       _thisItemNr = 0
 
   /**
@@ -249,7 +251,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
    *               Scroll as-needed to keep the selected line in view.
    */
   #define START_SCREEN() \
-    START_SCREEN_OR_MENU(LCD_HEIGHT); \
+    START_SCREEN_OR_MENU(LCD_HEIGHT - TALL_FONT_CORRECTION); \
     encoderTopLine = encoderLine; \
     bool _skipStatic = false; \
     SCREEN_OR_MENU_LOOP()
@@ -265,9 +267,10 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
 
     #define START_MENU() \
       START_SCREEN_OR_MENU(1); \
+      screen_changed = false; \
       NOMORE(encoderTopLine, encoderLine); \
-      if (encoderLine >= encoderTopLine + LCD_HEIGHT) { \
-        encoderTopLine = encoderLine - (LCD_HEIGHT - 1); \
+      if (encoderLine >= encoderTopLine + LCD_HEIGHT - TALL_FONT_CORRECTION) { \
+        encoderTopLine = encoderLine - (LCD_HEIGHT - TALL_FONT_CORRECTION - 1); \
       } \
       bool _skipStatic = true; \
       BACK_TO_PARENT(); \
@@ -275,9 +278,10 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   #else
     #define START_MENU() \
       START_SCREEN_OR_MENU(1); \
+      screen_changed = false; \
       NOMORE(encoderTopLine, encoderLine); \
-      if (encoderLine >= encoderTopLine + LCD_HEIGHT) { \
-        encoderTopLine = encoderLine - (LCD_HEIGHT - 1); \
+      if (encoderLine >= encoderTopLine + LCD_HEIGHT - TALL_FONT_CORRECTION) { \
+        encoderTopLine = encoderLine - (LCD_HEIGHT - TALL_FONT_CORRECTION - 1); \
       } \
       bool _skipStatic = true; \
       SCREEN_OR_MENU_LOOP()
@@ -314,7 +318,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
 
   #define _MENU_ITEM_PART_2(TYPE, ...) \
         menu_action_ ## TYPE(__VA_ARGS__); \
-        return; \
+        if (screen_changed) return; \
       } \
     } \
     ++_thisItemNr
@@ -401,6 +405,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
 
   menuPosition screen_history[10];
   uint8_t screen_history_depth = 0;
+  bool screen_changed;
 
   // LCD and menu clicks
   bool lcd_clicked, lcd_backclicked, wait_for_unclick, defer_return_to_status;
@@ -428,12 +433,13 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
         lcd_set_custom_characters(screen == lcd_status_screen);
       #endif
       lcdDrawUpdate = LCDVIEW_CALL_REDRAW_NEXT;
+      screen_changed = true;
     }
   }
 
   void lcd_return_to_status() { lcd_goto_screen(lcd_status_screen); }
 
-  inline void lcd_save_previous_menu() {
+  void lcd_save_previous_screen() {
     if (screen_history_depth < COUNT(screen_history)) {
       screen_history[screen_history_depth].menu_function = currentScreen;
       screen_history[screen_history_depth].encoder_position = encoderPosition;
@@ -596,6 +602,19 @@ void kill_screen(const char* lcd_msg) {
 
   #endif //SDSUPPORT
 
+  #if HAS_CASE_LIGHT && ENABLED(MENU_ITEM_CASE_LIGHT)
+
+    extern bool case_light_on;
+    extern void update_case_light();
+
+    void toggle_case_light() {
+      case_light_on = !case_light_on;
+      lcdDrawUpdate = LCDVIEW_CALL_REDRAW_NEXT;
+      update_case_light();
+    }
+
+  #endif // MENU_ITEM_CASE_LIGHT
+
   /**
    *
    * "Main" menu
@@ -610,10 +629,10 @@ void kill_screen(const char* lcd_msg) {
     // Switch case light on/off
     //
     #if HAS_CASE_LIGHT && ENABLED(MENU_ITEM_CASE_LIGHT)
-      if (case_light_on == 0)
-        MENU_ITEM(gcode, MSG_LIGHTS_ON, PSTR("M355 S1"));
+      if (case_light_on)
+        MENU_ITEM(function, MSG_LIGHTS_OFF, toggle_case_light);
       else
-        MENU_ITEM(gcode, MSG_LIGHTS_OFF, PSTR("M355 S0"));
+        MENU_ITEM(function, MSG_LIGHTS_ON, toggle_case_light);
     #endif
 
     #if ENABLED(BLTOUCH)
@@ -903,13 +922,15 @@ void kill_screen(const char* lcd_msg) {
     }
   #endif
 
+  constexpr int heater_maxtemp[HOTENDS] = ARRAY_BY_HOTENDS(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP);
+
   /**
    *
    * "Prepare" submenu items
    *
    */
   void _lcd_preheat(int endnum, const float temph, const float tempb, const int fan) {
-    if (temph > 0) thermalManager.setTargetHotend(temph, endnum);
+    if (temph > 0) thermalManager.setTargetHotend(min(heater_maxtemp[endnum], temph), endnum);
     #if TEMP_SENSOR_BED != 0
       thermalManager.setTargetBed(tempb);
     #else
@@ -928,23 +949,23 @@ void kill_screen(const char* lcd_msg) {
   }
 
   #if TEMP_SENSOR_0 != 0
-    void lcd_preheat_pla0() { _lcd_preheat(0, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
-    void lcd_preheat_abs0() { _lcd_preheat(0, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
+    void lcd_preheat_material1_hotend0() { _lcd_preheat(0, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
+    void lcd_preheat_material2_hotend0() { _lcd_preheat(0, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
   #endif
 
   #if HOTENDS > 1
-    void lcd_preheat_pla1() { _lcd_preheat(1, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
-    void lcd_preheat_abs1() { _lcd_preheat(1, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
+    void lcd_preheat_material1_hotend1() { _lcd_preheat(1, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
+    void lcd_preheat_material2_hotend1() { _lcd_preheat(1, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
     #if HOTENDS > 2
-      void lcd_preheat_pla2() { _lcd_preheat(2, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
-      void lcd_preheat_abs2() { _lcd_preheat(2, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
+      void lcd_preheat_material1_hotend2() { _lcd_preheat(2, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
+      void lcd_preheat_material2_hotend2() { _lcd_preheat(2, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
       #if HOTENDS > 3
-        void lcd_preheat_pla3() { _lcd_preheat(3, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
-        void lcd_preheat_abs3() { _lcd_preheat(3, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
+        void lcd_preheat_material1_hotend3() { _lcd_preheat(3, lcd_preheat_hotend_temp[0], lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
+        void lcd_preheat_material2_hotend3() { _lcd_preheat(3, lcd_preheat_hotend_temp[1], lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
       #endif
     #endif
 
-    void lcd_preheat_pla0123() {
+    void lcd_preheat_material1_hotend0123() {
       #if HOTENDS > 1
         thermalManager.setTargetHotend(lcd_preheat_hotend_temp[0], 1);
         #if HOTENDS > 2
@@ -954,9 +975,9 @@ void kill_screen(const char* lcd_msg) {
           #endif
         #endif
       #endif
-      lcd_preheat_pla0();
+      lcd_preheat_material1_hotend0();
     }
-    void lcd_preheat_abs0123() {
+    void lcd_preheat_material2_hotend0123() {
       #if HOTENDS > 1
         thermalManager.setTargetHotend(lcd_preheat_hotend_temp[1], 1);
         #if HOTENDS > 2
@@ -966,58 +987,58 @@ void kill_screen(const char* lcd_msg) {
           #endif
         #endif
       #endif
-      lcd_preheat_abs0();
+      lcd_preheat_material2_hotend0();
     }
 
   #endif // HOTENDS > 1
 
   #if TEMP_SENSOR_BED != 0
-    void lcd_preheat_pla_bedonly() { _lcd_preheat(0, 0, lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
-    void lcd_preheat_abs_bedonly() { _lcd_preheat(0, 0, lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
+    void lcd_preheat_material1_bedonly() { _lcd_preheat(0, 0, lcd_preheat_bed_temp[0], lcd_preheat_fan_speed[0]); }
+    void lcd_preheat_material2_bedonly() { _lcd_preheat(0, 0, lcd_preheat_bed_temp[1], lcd_preheat_fan_speed[1]); }
   #endif
 
   #if TEMP_SENSOR_0 != 0 && (TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_3 != 0 || TEMP_SENSOR_BED != 0)
 
-    void lcd_preheat_pla_menu() {
+    void lcd_preheat_material1_menu() {
       START_MENU();
       MENU_BACK(MSG_PREPARE);
       #if HOTENDS == 1
-        MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
+        MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_material1_hotend0);
       #else
-        MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H1, lcd_preheat_pla0);
-        MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H2, lcd_preheat_pla1);
+        MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H1, lcd_preheat_material1_hotend0);
+        MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H2, lcd_preheat_material1_hotend1);
         #if HOTENDS > 2
-          MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H3, lcd_preheat_pla2);
+          MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H3, lcd_preheat_material1_hotend2);
           #if HOTENDS > 3
-            MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H4, lcd_preheat_pla3);
+            MENU_ITEM(function, MSG_PREHEAT_1_N MSG_H4, lcd_preheat_material1_hotend3);
           #endif
         #endif
-        MENU_ITEM(function, MSG_PREHEAT_1_ALL, lcd_preheat_pla0123);
+        MENU_ITEM(function, MSG_PREHEAT_1_ALL, lcd_preheat_material1_hotend0123);
       #endif
       #if TEMP_SENSOR_BED != 0
-        MENU_ITEM(function, MSG_PREHEAT_1_BEDONLY, lcd_preheat_pla_bedonly);
+        MENU_ITEM(function, MSG_PREHEAT_1_BEDONLY, lcd_preheat_material1_bedonly);
       #endif
       END_MENU();
     }
 
-    void lcd_preheat_abs_menu() {
+    void lcd_preheat_material2_menu() {
       START_MENU();
       MENU_BACK(MSG_PREPARE);
       #if HOTENDS == 1
-        MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
+        MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_material2_hotend0);
       #else
-        MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H1, lcd_preheat_abs0);
-        MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H2, lcd_preheat_abs1);
+        MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H1, lcd_preheat_material2_hotend0);
+        MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H2, lcd_preheat_material2_hotend1);
         #if HOTENDS > 2
-          MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H3, lcd_preheat_abs2);
+          MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H3, lcd_preheat_material2_hotend2);
           #if HOTENDS > 3
-            MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H4, lcd_preheat_abs3);
+            MENU_ITEM(function, MSG_PREHEAT_2_N MSG_H4, lcd_preheat_material2_hotend3);
           #endif
         #endif
-        MENU_ITEM(function, MSG_PREHEAT_2_ALL, lcd_preheat_abs0123);
+        MENU_ITEM(function, MSG_PREHEAT_2_ALL, lcd_preheat_material2_hotend0123);
       #endif
       #if TEMP_SENSOR_BED != 0
-        MENU_ITEM(function, MSG_PREHEAT_2_BEDONLY, lcd_preheat_abs_bedonly);
+        MENU_ITEM(function, MSG_PREHEAT_2_BEDONLY, lcd_preheat_material2_bedonly);
       #endif
       END_MENU();
     }
@@ -1293,11 +1314,11 @@ void kill_screen(const char* lcd_msg) {
     //
     #if TEMP_SENSOR_0 != 0
       #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_3 != 0 || TEMP_SENSOR_BED != 0
-        MENU_ITEM(submenu, MSG_PREHEAT_1, lcd_preheat_pla_menu);
-        MENU_ITEM(submenu, MSG_PREHEAT_2, lcd_preheat_abs_menu);
+        MENU_ITEM(submenu, MSG_PREHEAT_1, lcd_preheat_material1_menu);
+        MENU_ITEM(submenu, MSG_PREHEAT_2, lcd_preheat_material2_menu);
       #else
-        MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_pla0);
-        MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_abs0);
+        MENU_ITEM(function, MSG_PREHEAT_1, lcd_preheat_material1_hotend0);
+        MENU_ITEM(function, MSG_PREHEAT_2, lcd_preheat_material2_hotend0);
       #endif
     #endif
 
@@ -1607,7 +1628,6 @@ void kill_screen(const char* lcd_msg) {
 
     #if ENABLED(PIDTEMP)
       int autotune_temp[HOTENDS] = ARRAY_BY_HOTENDS1(150);
-      const int heater_maxtemp[HOTENDS] = ARRAY_BY_HOTENDS(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP);
     #endif
 
     #if ENABLED(PIDTEMPBED)
@@ -1800,23 +1820,36 @@ void kill_screen(const char* lcd_msg) {
     #endif //PIDTEMP
 
     //
-    // Preheat PLA conf
+    // Preheat Material 1 conf
     //
-    MENU_ITEM(submenu, MSG_PREHEAT_1_SETTINGS, lcd_control_temperature_preheat_pla_settings_menu);
+    MENU_ITEM(submenu, MSG_PREHEAT_1_SETTINGS, lcd_control_temperature_preheat_material1_settings_menu);
 
     //
-    // Preheat ABS conf
+    // Preheat Material 2 conf
     //
-    MENU_ITEM(submenu, MSG_PREHEAT_2_SETTINGS, lcd_control_temperature_preheat_abs_settings_menu);
+    MENU_ITEM(submenu, MSG_PREHEAT_2_SETTINGS, lcd_control_temperature_preheat_material2_settings_menu);
     END_MENU();
   }
 
   void _lcd_control_temperature_preheat_settings_menu(uint8_t material) {
+    #if HOTENDS > 3
+      #define MINTEMP_ALL MIN4(HEATER_0_MINTEMP, HEATER_1_MINTEMP, HEATER_2_MINTEMP, HEATER_3_MINTEMP)
+      #define MAXTEMP_ALL MAX4(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP, HEATER_3_MAXTEMP)
+    #elif HOTENDS > 2
+      #define MINTEMP_ALL MIN3(HEATER_0_MINTEMP, HEATER_1_MINTEMP, HEATER_2_MINTEMP)
+      #define MAXTEMP_ALL MAX3(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP, HEATER_2_MAXTEMP)
+    #elif HOTENDS > 1
+      #define MINTEMP_ALL min(HEATER_0_MINTEMP, HEATER_1_MINTEMP)
+      #define MAXTEMP_ALL max(HEATER_0_MAXTEMP, HEATER_1_MAXTEMP)
+    #else
+      #define MINTEMP_ALL HEATER_0_MINTEMP
+      #define MAXTEMP_ALL HEATER_0_MAXTEMP
+    #endif
     START_MENU();
     MENU_BACK(MSG_TEMPERATURE);
     MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &lcd_preheat_fan_speed[material], 0, 255);
     #if TEMP_SENSOR_0 != 0
-      MENU_ITEM_EDIT(int3, MSG_NOZZLE, &lcd_preheat_hotend_temp[material], HEATER_0_MINTEMP, HEATER_0_MAXTEMP - 15);
+      MENU_ITEM_EDIT(int3, MSG_NOZZLE, &lcd_preheat_hotend_temp[material], MINTEMP_ALL, MAXTEMP_ALL - 15);
     #endif
     #if TEMP_SENSOR_BED != 0
       MENU_ITEM_EDIT(int3, MSG_BED, &lcd_preheat_bed_temp[material], BED_MINTEMP, BED_MAXTEMP - 15);
@@ -1829,17 +1862,17 @@ void kill_screen(const char* lcd_msg) {
 
   /**
    *
-   * "Temperature" > "Preheat PLA conf" submenu
+   * "Temperature" > "Preheat Material 1 conf" submenu
    *
    */
-  void lcd_control_temperature_preheat_pla_settings_menu() { _lcd_control_temperature_preheat_settings_menu(0); }
+  void lcd_control_temperature_preheat_material1_settings_menu() { _lcd_control_temperature_preheat_settings_menu(0); }
 
   /**
    *
-   * "Temperature" > "Preheat ABS conf" submenu
+   * "Temperature" > "Preheat Material 2 conf" submenu
    *
    */
-  void lcd_control_temperature_preheat_abs_settings_menu() { _lcd_control_temperature_preheat_settings_menu(1); }
+  void lcd_control_temperature_preheat_material2_settings_menu() { _lcd_control_temperature_preheat_settings_menu(1); }
 
   void _reset_acceleration_rates() { planner.reset_acceleration_rates(); }
   void _planner_refresh_positioning() { planner.refresh_positioning(); }
@@ -2349,7 +2382,7 @@ void kill_screen(const char* lcd_msg) {
     void menu_edit_ ## _name () { _menu_edit_ ## _name(); } \
     void menu_edit_callback_ ## _name () { if (_menu_edit_ ## _name ()) (*callbackFunc)(); } \
     void _menu_action_setting_edit_ ## _name (const char* pstr, _type* ptr, _type minValue, _type maxValue) { \
-      lcd_save_previous_menu(); \
+      lcd_save_previous_screen(); \
       \
       lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; \
       \
@@ -2440,7 +2473,7 @@ void kill_screen(const char* lcd_msg) {
    *
    */
   void _menu_action_back() { lcd_goto_previous_menu(); }
-  void menu_action_submenu(screenFunc_t func) { lcd_save_previous_menu(); lcd_goto_screen(func); }
+  void menu_action_submenu(screenFunc_t func) { lcd_save_previous_screen(); lcd_goto_screen(func); }
   void menu_action_gcode(const char* pgcode) { enqueue_and_echo_commands_P(pgcode); }
   void menu_action_function(screenFunc_t func) { (*func)(); }
 
