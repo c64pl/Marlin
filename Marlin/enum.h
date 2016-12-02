@@ -203,4 +203,17 @@ enum LCDViewAction {
   };
 #endif
 
+#if ENABLED(MAX6675_IS_MAX31856)
+  enum ThermocoupleType {
+    THERMOCOUPLE_TYPE_B,
+    THERMOCOUPLE_TYPE_E,
+    THERMOCOUPLE_TYPE_J,
+    THERMOCOUPLE_TYPE_K,
+    THERMOCOUPLE_TYPE_N,
+    THERMOCOUPLE_TYPE_R,
+    THERMOCOUPLE_TYPE_S,
+    THERMOCOUPLE_TYPE_T,
+  };
+#endif
+
 #endif // __ENUM_H__

@@ -1015,6 +1015,8 @@ void Temperature::init() {
 
     #if ENABLED(MAX6675_IS_MAX31856)
 
+      #define _THERM_TYPE(TYPE) _CAT(THERMOCOUPLE_TYPE_, TYPE)
+
       #ifdef USE_SPI_LIB_FOR_THERMOCOUPLE
         #define MAX6675_SPEED_BITS (F_CPU / 64) // clock ÷ 64
         #define MAX6675_MODE_BITS SPI_MODE1 // SPI mode 1
@@ -1031,7 +1033,7 @@ void Temperature::init() {
         SPI.transfer(0x80 | 0x10); // Automatic Conversion mode, enable Open-Circuit Detection (Rs < 5k)
 
         SPI.transfer(0x81); // Select configuration 1 register for writing
-        SPI.transfer(THERMOCOUPLE_TYPE); // Set thermocouple type
+        SPI.transfer(_THERM_TYPE(THERMOCOUPLE_TYPE)); // Set thermocouple type
 
         WRITE(MAX6675_SS, HIGH); // disable TT_MAX6675
 
@@ -1062,7 +1064,7 @@ void Temperature::init() {
 
         SPDR = 0x81; // Select configuration 1 register for writing
         for (;!TEST(SPSR, SPIF););
-        SPDR = THERMOCOUPLE_TYPE; // Set thermocouple type
+        SPDR = _THERM_TYPE(THERMOCOUPLE_TYPE); // Set thermocouple type
         for (;!TEST(SPSR, SPIF););
 
         #if ENABLED(MAX31856_ADDITIONAL_INITIALIZATION)

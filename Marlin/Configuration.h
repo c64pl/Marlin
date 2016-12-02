@@ -256,9 +256,13 @@
 #define TEMP_SENSOR_3 0
 #define TEMP_SENSOR_BED 0
 
-// Select thermocouple type when use a MAX31856
-// :{ '0': B Type, '1': E Type, '2': J Type, '3': K Type, '4': N Type, '5': R Type, '6': S Type, '7': T Type }
-#define THERMOCOUPLE_TYPE 3
+//
+// Select thermocouple type when using MAX31856
+//
+// Options are: B, E, J, K, N, R, S, or T
+//
+// :[ 'B', 'E', 'J', 'K', 'N', 'R', 'S', 'T' ]
+#define THERMOCOUPLE_TYPE K
 
 // Dummy thermistor constant temperature readings, for use with 998 and 999
 #define DUMMY_THERMISTOR_998_VALUE 25

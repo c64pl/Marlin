@@ -233,7 +233,7 @@
     #define MAX6675_TMIN -210
     #define MAX6675_TMAX 1800
     #ifndef THERMOCOUPLE_TYPE
-      #define THERMOCOUPLE_TYPE 3
+      #define THERMOCOUPLE_TYPE K
     #endif
   #elif TEMP_SENSOR_0 == -3
     #define HEATER_0_USES_MAX6675
