@@ -1606,6 +1606,13 @@ void Temperature::set_current_temp_raw() {
 #endif
 
 void Temperature::isr() {
+  //Allow UART and stepper ISRs
+  #ifdef __SAM3X8E__
+    DISABLE_TEMP_INTERRUPT(); //Disable Temperature ISR
+  #else
+    CBI(TIMSK0, OCIE0B); //Disable Temperature ISR
+  #endif
+  sei();
 
   static uint8_t temp_count = 0;
   static TempState temp_state = StartupDelay;
@@ -2119,5 +2126,11 @@ void Temperature::isr() {
       endstop_monitor_count &= 0x7F;
       if (!endstop_monitor_count) endstop_monitor();  // report changes in endstop status
     }
+  #endif
+  
+  #ifdef __SAM3X8E__
+    ENABLE_TEMP_INTERRUPT(); //re-enable Temperature ISR
+  #else
+    SBI(TIMSK0, OCIE0B); //re-enable Temperature ISR
   #endif
 }

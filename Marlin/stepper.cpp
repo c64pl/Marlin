@@ -362,6 +362,22 @@ void Stepper::set_directions() {
 #endif
 
 void Stepper::isr() {
+  //Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
+  #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+    #ifdef __SAM3X8E__
+      DISABLE_EXTRUDER_INTERRUPT();
+    #else
+      CBI(TIMSK0, OCIE0A); //estepper ISR
+    #endif
+  #endif
+  #ifdef __SAM3X8E__
+    DISABLE_TEMP_INTERRUPT();
+  #else
+    CBI(TIMSK0, OCIE0B); //Temperature ISR
+  #endif
+  DISABLE_STEPPER_DRIVER_INTERRUPT();
+  sei();
+  
   if (cleaning_buffer_counter) {
     --cleaning_buffer_counter;
     current_block = NULL;
@@ -374,6 +390,20 @@ void Stepper::isr() {
     #else
       OCR1A = 200; // Run at max speed - 10 KHz
     #endif
+    //re-enable ISRs
+    #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+      #ifdef __SAM3X8E__
+        ENABLE_EXTRUDER_INTERRUPT();
+      #else
+        SBI(TIMSK0, OCIE0A);
+      #endif
+    #endif
+    #ifdef __SAM3X8E__
+      ENABLE_TEMP_INTERRUPT();
+    #else
+      SBI(TIMSK0, OCIE0B);
+    #endif
+    ENABLE_STEPPER_DRIVER_INTERRUPT();
     return;
   }
 
@@ -413,6 +443,19 @@ void Stepper::isr() {
           #else
             OCR1A = 2000; // Run at slow speed - 1 KHz
           #endif
+          #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+            #ifdef __SAM3X8E__
+              ENABLE_EXTRUDER_INTERRUPT();
+            #else
+              SBI(TIMSK0, OCIE0A);
+            #endif
+          #endif
+          #ifdef __SAM3X8E__
+            ENABLE_TEMP_INTERRUPT();
+          #else
+            SBI(TIMSK0, OCIE0B);
+          #endif
+          ENABLE_STEPPER_DRIVER_INTERRUPT();
           return;
         }
       #endif
@@ -427,6 +470,19 @@ void Stepper::isr() {
       #else
         OCR1A = 2000; // Run at slow speed - 1 KHz
       #endif
+      #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+        #ifdef __SAM3X8E__
+          ENABLE_EXTRUDER_INTERRUPT();
+        #else
+          SBI(TIMSK0, OCIE0A);
+        #endif
+      #endif
+      #ifdef __SAM3X8E__
+        ENABLE_TEMP_INTERRUPT();
+      #else
+        SBI(TIMSK0, OCIE0B);
+      #endif
+      ENABLE_STEPPER_DRIVER_INTERRUPT();
       return;
     }
   }
@@ -451,12 +507,6 @@ void Stepper::isr() {
   // Take multiple steps per interrupt (For high speed moves)
   bool all_steps_done = false;
   for (int8_t i = 0; i < step_loops; i++) {
-    #ifndef __SAM3X8E__
-      #ifndef USBCON
-        customizedSerial.checkRx(); // Check for serial chars.
-      #endif
-    #endif
-
     #if ENABLED(LIN_ADVANCE)
 
       counter_E += current_block->steps[E_AXIS];
@@ -810,6 +860,19 @@ void Stepper::isr() {
     current_block = NULL;
     planner.discard_current_block();
   }
+  #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+    #ifdef __SAM3X8E__
+      ENABLE_EXTRUDER_INTERRUPT();
+    #else
+      SBI(TIMSK0, OCIE0A);
+    #endif
+  #endif
+  #ifdef __SAM3X8E__
+    ENABLE_TEMP_INTERRUPT();
+  #else
+    SBI(TIMSK0, OCIE0B);
+  #endif
+  ENABLE_STEPPER_DRIVER_INTERRUPT();
 }
 
 #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)

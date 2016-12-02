@@ -211,8 +211,8 @@
  * Extruder auto fans automatically turn on when their extruders'
  * temperatures go above EXTRUDER_AUTO_FAN_TEMPERATURE.
  *
- * Your board's pins file specifies the recommended pins.
- * Override those here. Set to -1 to disable unused fans.
+ * Your board's pins file specifies the recommended pins. Override those here
+ * or set to -1 to disable completely.
  *
  * Multiple extruders can be assigned to the same pin in which case
  * the fan will turn on when any selected extruder is above the threshold.
@@ -226,8 +226,11 @@
 
 // Define a pin to turn case light on/off
 //#define CASE_LIGHT_PIN 4
-//#define CASE_LIGHT_DEFAULT_ON   // Uncomment to set default state to on
-//#define MENU_ITEM_CASE_LIGHT    // Uncomment to have a Case Light On / Off entry in main menu
+#if PIN_EXISTS(CASE_LIGHT)
+  #define INVERT_CASE_LIGHT false   // Set to true if HIGH is the OFF state (active low)
+  //#define CASE_LIGHT_DEFAULT_ON   // Uncomment to set default state to on
+  //#define MENU_ITEM_CASE_LIGHT    // Uncomment to have a Case Light On / Off entry in main menu
+#endif
 
 //===========================================================================
 //============================ Mechanical Settings ==========================
@@ -976,7 +979,6 @@
 #endif // HAVE_TMC2130DRIVER
 
 // @section L6470
-
 
 /**
  * Enable this section if you have L6470 motor drivers.
