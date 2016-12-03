@@ -54,6 +54,14 @@
   #endif
 
   #if ENABLED(DELTA_FAST_SQRT)
+    #undef ATAN2
+    #undef FABS
+    #undef POW
+    #undef SQRT
+    #undef CEIL
+    #undef FLOOR
+    #undef LROUND
+    #undef FMOD
     #define ATAN2(y, x) atan2f(y, x)
     #define FABS(x) fabsf(x)
     #define POW(x, y) powf(x, y)
@@ -62,17 +70,7 @@
     #define FLOOR(x) floorf(x)
     #define LROUND(x) lroundf(x)
     #define FMOD(x, y) fmodf(x, y)
-  #else
-    #define ATAN2(y, x) atan2(y, x)
-    #define FABS(x) fabs(x)
-    #define POW(x, y) pow(x, y)
-    #define SQRT(x) sqrt(x)
-    #define CEIL(x) ceil(x)
-    #define FLOOR(x) floor(x)
-    #define LROUND(x) lround(x)
-    #define FMOD(x, y) fmod(x, y)
   #endif
-  #define HYPOT(x,y) SQRT(HYPOT2(x,y))
 
   // timers
   #define NUM_HARDWARE_TIMERS 9

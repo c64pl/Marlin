@@ -33,10 +33,12 @@ void watchdog_init();
 
 // Reset watchdog. MUST be called at least every 4 seconds after the
 // first watchdog_init or AVR will go into emergency procedures.
-#ifdef __SAM3X8E__
-  inline void watchdog_reset() { watchdogReset(); }
-#else
-  inline void watchdog_reset() { wdt_reset(); }
-#endif
+inline void watchdog_reset() {
+  #ifdef __SAM3X8E__
+    watchdogReset();
+  #else
+    wdt_reset();
+  #endif
+}
 
 #endif
