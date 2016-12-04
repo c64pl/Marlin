@@ -983,7 +983,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   
   #if ENABLED(ENSURE_SMOOTH_MOVES)
     #if DISABLED(SLOWDOWN)
-      unsigned long segment_time = lround(1000000.0 / inverse_mm_s);
+      unsigned long segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     #endif
     if (segment_time < (MIN_BLOCK_TIME) * 1000UL) {
       // buffer will be draining, set to MIN_BLOCK_TIME.
@@ -1175,7 +1175,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
         if (cos_theta > -0.95) {
           // Compute maximum junction velocity based on maximum acceleration and junction deviation
           float sin_theta_d2 = SQRT(0.5 * (1.0 - cos_theta)); // Trig half angle identity. Always positive. // This line is different from official RCBugFix: search tag: __SAM3X8E__
-          NOMORE(vmax_junction, sqrt(block->acceleration * junction_deviation * sin_theta_d2 / (1.0 - sin_theta_d2)));
+          NOMORE(vmax_junction, SQRT(block->acceleration * junction_deviation * sin_theta_d2 / (1.0 - sin_theta_d2))); // This line is different from official RCBugFix: search tag: __SAM3X8E__
         }
       }
     }
@@ -1306,7 +1306,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
     }
     else {
       block->use_advance_lead = true;
-      block->abs_adv_steps_multiplier8 = lround(extruder_advance_k * (de_float / mm_D_float) * block->nominal_speed / (float)block->nominal_rate * axis_steps_per_mm[E_AXIS] * 256.0);
+      block->abs_adv_steps_multiplier8 = LROUND(extruder_advance_k * (de_float / mm_D_float) * block->nominal_speed / (float)block->nominal_rate * axis_steps_per_mm[E_AXIS] * 256.0); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     }
 
   #elif ENABLED(ADVANCE)

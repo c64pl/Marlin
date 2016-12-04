@@ -120,7 +120,7 @@ class Nozzle {
 
           for (int i = (objects << 1); i > -1; i--) {
             float const x = start.x + i * P;
-            float const y = start.y + (A/P) * (P - FABS(fmod((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
+            float const y = start.y + (A/P) * (P - FABS(FMOD((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
             do_blocking_move_to_xy(x, y);
           }

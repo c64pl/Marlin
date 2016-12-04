@@ -4354,7 +4354,7 @@ inline void gcode_G28() {
     float retract_mm[XYZ];
     LOOP_XYZ(i) {
       float dist = destination[i] - current_position[i];
-      retract_mm[i] = fabs(dist) < G38_MINIMUM_MOVE ? 0 : home_bump_mm((AxisEnum)i) * (dist > 0 ? -1 : 1);
+      retract_mm[i] = FABS(dist) < G38_MINIMUM_MOVE ? 0 : home_bump_mm((AxisEnum)i) * (dist > 0 ? -1 : 1); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     }
 
     stepper.synchronize();  // wait until the machine is idle
@@ -4417,7 +4417,7 @@ inline void gcode_G28() {
 
     // If any axis has enough movement, do the move
     LOOP_XYZ(i)
-      if (fabs(destination[i] - current_position[i]) >= G38_MINIMUM_MOVE) {
+      if (FABS(destination[i] - current_position[i]) >= G38_MINIMUM_MOVE) { // This line is different from official RCBugFix: search tag: __SAM3X8E__
         if (!code_seen('F')) feedrate_mm_s = homing_feedrate_mm_s[i];
         // If G38.2 fails throw an error
         if (!G38_run_probe() && is_38_2) {
@@ -5020,7 +5020,7 @@ inline void gcode_M42() {
       for (uint8_t j = 0; j <= n; j++)
         sum += sq(sample_set[j] - mean);
 
-      sigma = sqrt(sum / (n + 1));
+      sigma = SQRT(sum / (n + 1)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
       if (verbose_level > 0) {
         if (verbose_level > 1) {
           SERIAL_PROTOCOL(n + 1);
@@ -8617,8 +8617,8 @@ void ok_to_send() {
           ratio_y = y / bilinear_grid_spacing[Y_AXIS];
 
     // Whole units for the grid line indices. Constrained within bounds.
-    const int gridx = constrain(floor(ratio_x), 0, ABL_GRID_POINTS_X - 1),
-              gridy = constrain(floor(ratio_y), 0, ABL_GRID_POINTS_Y - 1),
+    const int gridx = constrain(FLOOR(ratio_x), 0, ABL_GRID_POINTS_X - 1), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+              gridy = constrain(FLOOR(ratio_y), 0, ABL_GRID_POINTS_Y - 1), // This line is different from official RCBugFix: search tag: __SAM3X8E__
               nextx = min(gridx + 1, ABL_GRID_POINTS_X - 1),
               nexty = min(gridy + 1, ABL_GRID_POINTS_Y - 1);
 
@@ -8641,7 +8641,7 @@ void ok_to_send() {
 
     /*
     static float last_offset = 0;
-    if (fabs(last_offset - offset) > 0.2) {
+    if (FABS(last_offset - offset) > 0.2) { // This line is different from official RCBugFix: search tag: __SAM3X8E__
       SERIAL_ECHOPGM("Sudden Shift at ");
       SERIAL_ECHOPAIR("x=", x);
       SERIAL_ECHOPAIR(" / ", bilinear_grid_spacing[X_AXIS]);
