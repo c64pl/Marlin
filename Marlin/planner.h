@@ -440,7 +440,7 @@ class Planner {
      * 'distance'.
      */
     static float max_allowable_speed(const float &accel, const float &target_velocity, const float &distance) {
-      return SQRT(sq(target_velocity) - 2 * accel * distance);
+      return SQRT(sq(target_velocity) - 2 * accel * distance); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     }
 
     static void calculate_trapezoid_for_block(block_t* const block, const float &entry_factor, const float &exit_factor);

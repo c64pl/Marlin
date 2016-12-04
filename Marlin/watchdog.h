@@ -37,7 +37,7 @@ inline void watchdog_reset() {
   #ifdef __SAM3X8E__
     watchdogReset();
   #else
-    wdt_reset();
+    wdt_reset(); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   #endif
 }
 

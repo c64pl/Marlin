@@ -171,23 +171,23 @@ void Planner::init() {
  * by the provided factors.
  */
 void Planner::calculate_trapezoid_for_block(block_t* const block, const float &entry_factor, const float &exit_factor) {
-  uint32_t initial_rate = CEIL(block->nominal_rate * entry_factor),
-           final_rate = CEIL(block->nominal_rate * exit_factor); // (steps per second)
+  uint32_t initial_rate = CEIL(block->nominal_rate * entry_factor), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+           final_rate = CEIL(block->nominal_rate * exit_factor); // (steps per second) // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
   // Limit minimal step rate (Otherwise the timer will overflow.)
   NOLESS(initial_rate, MINIMAL_STEP_RATE);
   NOLESS(final_rate, MINIMAL_STEP_RATE);
 
   int32_t accel = block->acceleration_steps_per_s2,
-          accelerate_steps = CEIL(estimate_acceleration_distance(initial_rate, block->nominal_rate, accel)),
-          decelerate_steps = FLOOR(estimate_acceleration_distance(block->nominal_rate, final_rate, -accel)),
+          accelerate_steps = CEIL(estimate_acceleration_distance(initial_rate, block->nominal_rate, accel)), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+          decelerate_steps = FLOOR(estimate_acceleration_distance(block->nominal_rate, final_rate, -accel)), // This line is different from official RCBugFix: search tag: __SAM3X8E__
           plateau_steps = block->step_event_count - accelerate_steps - decelerate_steps;
 
   // Is the Plateau of Nominal Rate smaller than nothing? That means no cruising, and we will
   // have to use intersection_distance() to calculate when to abort accel and start braking
   // in order to reach the final_rate exactly at the end of this block.
   if (plateau_steps < 0) {
-    accelerate_steps = CEIL(intersection_distance(initial_rate, final_rate, accel, block->step_event_count));
+    accelerate_steps = CEIL(intersection_distance(initial_rate, final_rate, accel, block->step_event_count)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     NOLESS(accelerate_steps, 0); // Check limits due to numerical round-off
     accelerate_steps = min((uint32_t)accelerate_steps, block->step_event_count);//(We can cast here to unsigned, because the above line ensures that we are above zero)
     plateau_steps = 0;
@@ -214,8 +214,8 @@ void Planner::calculate_trapezoid_for_block(block_t* const block, const float &e
 // This method will calculate the junction jerk as the euclidean distance between the nominal
 // velocities of the respective blocks.
 //inline float junction_jerk(block_t *before, block_t *after) {
-//  return SQRT(
-//    POW((before->speed_x-after->speed_x), 2)+POW((before->speed_y-after->speed_y), 2));
+//  return SQRT( // This line is different from official RCBugFix: search tag: __SAM3X8E__
+//    POW((before->speed_x-after->speed_x), 2)+POW((before->speed_y-after->speed_y), 2)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 //}
 
 
@@ -647,10 +647,10 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Calculate target position in absolute steps
   //this should be done after the wait, because otherwise a M92 code within the gcode disrupts this calculation somehow
   long target[XYZE] = {
-    LROUND(a * axis_steps_per_mm[X_AXIS]),
-    LROUND(b * axis_steps_per_mm[Y_AXIS]),
-    LROUND(c * axis_steps_per_mm[Z_AXIS]),
-    LROUND(e * axis_steps_per_mm[E_AXIS])
+    LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+    LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+    LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+    LROUND(e * axis_steps_per_mm[E_AXIS]) // This line is different from official RCBugFix: search tag: __SAM3X8E__
   };
   
   #if ENABLED(LIN_ADVANCE)
@@ -944,10 +944,10 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   delta_mm[E_AXIS] = esteps_float * steps_to_mm[E_AXIS];
 
   if (block->steps[X_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Y_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Z_AXIS] < MIN_STEPS_PER_SEGMENT) {
-    block->millimeters = FABS(delta_mm[E_AXIS]);
+    block->millimeters = FABS(delta_mm[E_AXIS]); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   }
   else {
-    block->millimeters = SQRT(
+    block->millimeters = SQRT( // This line is different from official RCBugFix: search tag: __SAM3X8E__
       #if CORE_IS_XY
         sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_AXIS])
       #elif CORE_IS_XZ
@@ -969,13 +969,13 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Slow down when the buffer starts to empty, rather than wait at the corner for a buffer refill
   #if ENABLED(SLOWDOWN)
     // Segment time im micro seconds
-    unsigned long segment_time = LROUND(1000000.0 / inverse_mm_s);
+    unsigned long segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (moves_queued > 1 && moves_queued < (BLOCK_BUFFER_SIZE) / 2) {
       if (segment_time < min_segment_time) {
         // buffer is draining, add extra time.  The amount of time added increases if the buffer is still emptied more.
-        inverse_mm_s = 1000000.0 / (segment_time + LROUND(2 * (min_segment_time - segment_time) / moves_queued));
+        inverse_mm_s = 1000000.0 / (segment_time + LROUND(2 * (min_segment_time - segment_time) / moves_queued)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
         #if defined(XY_FREQUENCY_LIMIT) || ENABLED(ENSURE_SMOOTH_MOVES)
-          segment_time = LROUND(1000000.0 / inverse_mm_s);
+          segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: __SAM3X8E__
         #endif
       }
     }
@@ -995,7 +995,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   #endif
 
   block->nominal_speed = block->millimeters * inverse_mm_s; // (mm/sec) Always > 0
-  block->nominal_rate = CEIL(block->step_event_count * inverse_mm_s); // (step/sec) Always > 0
+  block->nominal_rate = CEIL(block->step_event_count * inverse_mm_s); // (step/sec) Always > 0 // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
   #if ENABLED(FILAMENT_WIDTH_SENSOR)
     static float filwidth_e_count = 0, filwidth_delay_dist = 0;
@@ -1034,7 +1034,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Calculate and limit speed in mm/sec for each axis
   float current_speed[NUM_AXIS], speed_factor = 1.0; // factor <1 decreases speed
   LOOP_XYZE(i) {
-    float cs = FABS(current_speed[i] = delta_mm[i] * inverse_mm_s);
+    float cs = FABS(current_speed[i] = delta_mm[i] * inverse_mm_s); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (cs > max_feedrate_mm_s[i]) NOMORE(speed_factor, max_feedrate_mm_s[i] / cs);
   }
 
@@ -1044,7 +1044,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
     // Check and limit the xy direction change frequency
     unsigned char direction_change = block->direction_bits ^ old_direction_bits;
     old_direction_bits = block->direction_bits;
-    segment_time = LROUND((float)segment_time / speed_factor);
+    segment_time = LROUND((float)segment_time / speed_factor); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     long xs0 = axis_segment_time[X_AXIS][0],
          xs1 = axis_segment_time[X_AXIS][1],
@@ -1088,7 +1088,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   uint32_t accel;
   if (!block->steps[X_AXIS] && !block->steps[Y_AXIS] && !block->steps[Z_AXIS]) {
     // convert to: acceleration steps/sec^2
-    accel = CEIL(retract_acceleration * steps_per_mm);
+    accel = CEIL(retract_acceleration * steps_per_mm); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   }
   else {
     #define LIMIT_ACCEL_LONG(AXIS) do{ \
@@ -1106,7 +1106,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
     }while(0)
 
     // Start with print or travel acceleration
-    accel = CEIL((esteps ? acceleration : travel_acceleration) * steps_per_mm);
+    accel = CEIL((esteps ? acceleration : travel_acceleration) * steps_per_mm); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Limit acceleration per axis
     if (block->step_event_count <= cutoff_long){
@@ -1174,7 +1174,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
         // Skip and avoid divide by zero for straight junctions at 180 degrees. Limit to min() of nominal speeds.
         if (cos_theta > -0.95) {
           // Compute maximum junction velocity based on maximum acceleration and junction deviation
-          float sin_theta_d2 = SQRT(0.5 * (1.0 - cos_theta)); // Trig half angle identity. Always positive.
+          float sin_theta_d2 = SQRT(0.5 * (1.0 - cos_theta)); // Trig half angle identity. Always positive. // This line is different from official RCBugFix: search tag: __SAM3X8E__
           NOMORE(vmax_junction, sqrt(block->acceleration * junction_deviation * sin_theta_d2 / (1.0 - sin_theta_d2)));
         }
       }
@@ -1193,7 +1193,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   float safe_speed = block->nominal_speed;
   bool limited = false;
   LOOP_XYZE(i) {
-    float jerk = FABS(current_speed[i]);
+    float jerk = FABS(current_speed[i]); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (jerk > max_jerk[i]) {
       // The actual jerk is lower if it has been limited by the XY jerk.
       if (limited) {
@@ -1354,10 +1354,10 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
  */
 
 void Planner::_set_position_mm(const float &a, const float &b, const float &c, const float &e) {
-  long na = position[X_AXIS] = LROUND(a * axis_steps_per_mm[X_AXIS]),
-       nb = position[Y_AXIS] = LROUND(b * axis_steps_per_mm[Y_AXIS]),
-       nc = position[Z_AXIS] = LROUND(c * axis_steps_per_mm[Z_AXIS]),
-       ne = position[E_AXIS] = LROUND(e * axis_steps_per_mm[E_AXIS]);
+  long na = position[X_AXIS] = LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+       nb = position[Y_AXIS] = LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+       nc = position[Z_AXIS] = LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: __SAM3X8E__
+       ne = position[E_AXIS] = LROUND(e * axis_steps_per_mm[E_AXIS]); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   stepper.set_position(na, nb, nc, ne);
   previous_nominal_speed = 0.0; // Resets planner junction speeds. Assumes start from rest.
 
@@ -1391,7 +1391,7 @@ void Planner::sync_from_steppers() {
  * Setters for planner position (also setting stepper position).
  */
 void Planner::set_position_mm(const AxisEnum axis, const float& v) {
-  position[axis] = LROUND(v * axis_steps_per_mm[axis]);
+  position[axis] = LROUND(v * axis_steps_per_mm[axis]); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   stepper.set_position(axis, v);
   previous_speed[axis] = 0.0;
 }

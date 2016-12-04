@@ -31,10 +31,10 @@ void watchdog_init() {
   #if ENABLED(WATCHDOG_RESET_MANUAL)
     // We enable the watchdog timer, but only for the interrupt.
     // Take care, as this requires the correct order of operation, with interrupts disabled. See the datasheet of any AVR chip for details.
-    watchdog_reset();
+    watchdog_reset(); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     #ifdef __SAM3X8E__
       HAL_watchdog_timer_enable_interrupt(4000U);
-    #else
+    #else // This section is different from official RCBugFix: search tag: __SAM3X8E__
       _WD_CONTROL_REG = _BV(_WD_CHANGE_BIT) | _BV(WDE);
       _WD_CONTROL_REG = _BV(WDIE) | WDTO_4S;
     #endif

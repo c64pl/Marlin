@@ -1253,7 +1253,7 @@ inline bool code_value_bool() { return !code_has_value() || code_value_byte() > 
         linear_unit_factor = 1.0;
         break;
     }
-    volumetric_unit_factor = POW(linear_unit_factor, 3.0);
+    volumetric_unit_factor = POW(linear_unit_factor, 3.0); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   }
 
   inline float axis_unit_factor(int axis) {
@@ -2593,7 +2593,7 @@ static void homeaxis(AxisEnum axis) {
 
   #if ENABLED(Z_DUAL_ENDSTOPS)
     if (axis == Z_AXIS) {
-      float adj = FABS(z_endstop_adj);
+      float adj = FABS(z_endstop_adj); // This line is different from official RCBugFix: search tag: __SAM3X8E__
       bool lockZ1;
       if (axis_home_dir > 0) {
         adj = -adj;
@@ -2935,7 +2935,7 @@ inline void gcode_G0_G1(
           const float e = clockwise ^ (r < 0) ? -1 : 1,           // clockwise -1/1, counterclockwise 1/-1
                       dx = x2 - x1, dy = y2 - y1,                 // X and Y differences
                       d = HYPOT(dx, dy),                          // Linear distance between the points
-                      h = SQRT(sq(r) - sq(d * 0.5)),              // Distance to the arc pivot-point
+                      h = SQRT(sq(r) - sq(d * 0.5)),              // Distance to the arc pivot-point // This line is different from official RCBugFix: search tag: __SAM3X8E__
                       mx = (x1 + x2) * 0.5, my = (y1 + y2) * 0.5, // Point between the two points
                       sx = -dy / d, sy = dx / d,                  // Slope of the perpendicular bisector
                       cx = mx + e * h * sx, cy = my + e * h * sy; // Pivot-point of the arc
@@ -2998,10 +2998,10 @@ inline void gcode_G4() {
       gcode_get_destination();
 
       float offset[] = {
-        code_seen('I') ? code_value_axis_units(X_AXIS) : 0.0f,
-        code_seen('J') ? code_value_axis_units(Y_AXIS) : 0.0f,
-        code_seen('P') ? code_value_axis_units(X_AXIS) : 0.0f,
-        code_seen('Q') ? code_value_axis_units(Y_AXIS) : 0.0f
+        code_seen('I') ? code_value_axis_units(X_AXIS) : 0.0f, // This line is different from official RCBugFix: search tag: __SAM3X8E__
+        code_seen('J') ? code_value_axis_units(Y_AXIS) : 0.0f, // This line is different from official RCBugFix: search tag: __SAM3X8E__
+        code_seen('P') ? code_value_axis_units(X_AXIS) : 0.0f, // This line is different from official RCBugFix: search tag: __SAM3X8E__
+        code_seen('Q') ? code_value_axis_units(Y_AXIS) : 0.0f // This line is different from official RCBugFix: search tag: __SAM3X8E__
       };
 
       plan_cubic_move(offset);
@@ -3090,7 +3090,7 @@ inline void gcode_G4() {
     float mlx = max_length(X_AXIS),
           mly = max_length(Y_AXIS),
           mlratio = mlx > mly ? mly / mlx : mlx / mly,
-          fr_mm_s = min(homing_feedrate_mm_s[X_AXIS], homing_feedrate_mm_s[Y_AXIS]) * SQRT(sq(mlratio) + 1.0);
+          fr_mm_s = min(homing_feedrate_mm_s[X_AXIS], homing_feedrate_mm_s[Y_AXIS]) * SQRT(sq(mlratio) + 1.0); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * home_dir(Y_AXIS), fr_mm_s);
     endstops.hit_on_purpose(); // clear endstop hit flags
@@ -3986,8 +3986,8 @@ inline void gcode_G28() {
           float xBase = left_probe_bed_position + xGridSpacing * xCount,
                 yBase = front_probe_bed_position + yGridSpacing * yCount;
 
-          xProbe = FLOOR(xBase + (xBase < 0 ? 0 : 0.5));
-          yProbe = FLOOR(yBase + (yBase < 0 ? 0 : 0.5));
+          xProbe = FLOOR(xBase + (xBase < 0 ? 0 : 0.5)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
+          yProbe = FLOOR(yBase + (yBase < 0 ? 0 : 0.5)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
           #if ENABLED(AUTO_BED_LEVELING_LINEAR)
             indexIntoAB[xCount][yCount] = ++probePointCounter;
@@ -4781,7 +4781,7 @@ inline void gcode_M42() {
     int first_pin = 0, last_pin = NUM_DIGITAL_PINS - 1;
     if (code_seen('P')) {
       first_pin = last_pin = code_value_byte();
-      if (first_pin > (int)(NUM_DIGITAL_PINS - 1)) return;
+      if (first_pin > (int)(NUM_DIGITAL_PINS - 1)) return; // This line is different from official RCBugFix: search tag: __SAM3X8E__
     }
 
     bool ignore_protection = code_seen('I') ? code_value_bool() : false;
@@ -5390,7 +5390,7 @@ inline void gcode_M109() {
 
     #if TEMP_RESIDENCY_TIME > 0
 
-      float temp_diff = FABS(theTarget - temp);
+      float temp_diff = FABS(theTarget - temp); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
       if (!residency_start_ms) {
         // Start the TEMP_RESIDENCY_TIME timer when we reach target temp for the first time.
@@ -5509,7 +5509,7 @@ inline void gcode_M109() {
 
       #if TEMP_BED_RESIDENCY_TIME > 0
 
-        float temp_diff = FABS(theTarget - temp);
+        float temp_diff = FABS(theTarget - temp); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
         if (!residency_start_ms) {
           // Start the TEMP_BED_RESIDENCY_TIME timer when we reach target temp for the first time.
@@ -8685,7 +8685,7 @@ void ok_to_send() {
     delta_diagonal_rod_2_tower_3 = sq(diagonal_rod + delta_diagonal_rod_trim_tower_3);
   }
 
-  #if ENABLED(DELTA_FAST_SQRT) && !defined(__SAM3X8E__)
+  #if ENABLED(DELTA_FAST_SQRT) && !defined(__SAM3X8E__) // This line is different from official RCBugFix: search tag: __SAM3X8E__
     /**
      * Fast inverse sqrt from Quake III Arena
      * See: https://en.wikipedia.org/wiki/Fast_inverse_square_root
@@ -8708,7 +8708,7 @@ void ok_to_send() {
 
   #else
 
-    #define _SQRT(n) SQRT(n)
+    #define _SQRT(n) SQRT(n) // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
   #endif
 
@@ -8815,7 +8815,7 @@ void ok_to_send() {
     float p12[3] = { delta_tower2_x - delta_tower1_x, delta_tower2_y - delta_tower1_y, z2 - z1 };
 
     // Get the Magnitude of vector.
-    float d = SQRT( sq(p12[0]) + sq(p12[1]) + sq(p12[2]) );
+    float d = SQRT( sq(p12[0]) + sq(p12[1]) + sq(p12[2]) ); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Create unit vector by dividing by magnitude.
     float ex[3] = { p12[0] / d, p12[1] / d, p12[2] / d };
@@ -8834,7 +8834,7 @@ void ok_to_send() {
     float ey[3] = { p13[0] - iex[0], p13[1] - iex[1], p13[2] - iex[2] };
 
     // The magnitude of Y component
-    float j = SQRT( sq(ey[0]) + sq(ey[1]) + sq(ey[2]) );
+    float j = SQRT( sq(ey[0]) + sq(ey[1]) + sq(ey[2]) ); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Convert to a unit vector
     ey[0] /= j; ey[1] /= j;  ey[2] /= j;
@@ -8851,7 +8851,7 @@ void ok_to_send() {
     // Plug them into the equations defined in Wikipedia for Xnew, Ynew and Znew
     float Xnew = (delta_diagonal_rod_2_tower_1 - delta_diagonal_rod_2_tower_2 + sq(d)) / (d * 2),
           Ynew = ((delta_diagonal_rod_2_tower_1 - delta_diagonal_rod_2_tower_3 + HYPOT2(i, j)) / 2 - i * Xnew) / j,
-          Znew = SQRT(delta_diagonal_rod_2_tower_1 - HYPOT2(Xnew, Ynew));
+          Znew = SQRT(delta_diagonal_rod_2_tower_1 - HYPOT2(Xnew, Ynew)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Start from the origin of the old coordinates and add vectors in the
     // old coords that represent the Xnew, Ynew and Znew to find the point
@@ -9067,7 +9067,7 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
     LOOP_XYZE(i) difference[i] = ltarget[i] - current_position[i];
 
     // Get the linear distance in XYZ
-    float cartesian_mm = SQRT(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS]));
+    float cartesian_mm = SQRT(sq(difference[X_AXIS]) + sq(difference[Y_AXIS]) + sq(difference[Z_AXIS])); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // If the move is very short, check the E move distance
     if (UNEAR_ZERO(cartesian_mm)) cartesian_mm = abs(difference[E_AXIS]);
@@ -9372,7 +9372,7 @@ void prepare_move_to_destination() {
           rt_Y = logical[Y_AXIS] - center_Y;
 
     // CCW angle of rotation between position and target from the circle center. Only one atan2() trig computation required.
-    float angular_travel = ATAN2(r_X * rt_Y - r_Y * rt_X, r_X * rt_X + r_Y * rt_Y);
+    float angular_travel = ATAN2(r_X * rt_Y - r_Y * rt_X, r_X * rt_X + r_Y * rt_Y); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (angular_travel < 0) angular_travel += RADIANS(360);
     if (clockwise) angular_travel -= RADIANS(360);
 
@@ -9380,10 +9380,10 @@ void prepare_move_to_destination() {
     if (angular_travel == 0 && current_position[X_AXIS] == logical[X_AXIS] && current_position[Y_AXIS] == logical[Y_AXIS])
       angular_travel += RADIANS(360);
 
-    float mm_of_travel = HYPOT(angular_travel * radius, FABS(linear_travel));
+    float mm_of_travel = HYPOT(angular_travel * radius, FABS(linear_travel)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (mm_of_travel < 0.001) return;
 
-    uint16_t segments = FLOOR(mm_of_travel / (MM_PER_ARC_SEGMENT));
+    uint16_t segments = FLOOR(mm_of_travel / (MM_PER_ARC_SEGMENT)); // This line is different from official RCBugFix: search tag: __SAM3X8E__
     if (segments == 0) segments = 1;
 
     /**
@@ -9583,7 +9583,7 @@ void prepare_move_to_destination() {
     else
       C2 = (HYPOT2(sx, sy) - (L1_2 + L2_2)) / (2.0 * L1 * L2);
 
-    S2 = SQRT(sq(C2) - 1);
+    S2 = SQRT(sq(C2) - 1); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
     SK1 = L1 + L2 * C2;
@@ -9592,10 +9592,10 @@ void prepare_move_to_destination() {
     SK2 = L2 * S2;
 
     // Angle of Arm1 is the difference between Center-to-End angle and the Center-to-Elbow
-    THETA = ATAN2(SK1, SK2) - ATAN2(sx, sy);
+    THETA = ATAN2(SK1, SK2) - ATAN2(sx, sy); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     // Angle of Arm2
-    PSI = ATAN2(S2, C2);
+    PSI = ATAN2(S2, C2); // This line is different from official RCBugFix: search tag: __SAM3X8E__
 
     delta[A_AXIS] = DEGREES(THETA);        // theta is support arm angle
     delta[B_AXIS] = DEGREES(THETA + PSI);  // equal to sub arm angle (inverted motor)
@@ -9992,7 +9992,7 @@ void kill(const char* lcd_msg) {
   disable_all_steppers();
 
   #if HAS_POWER_SWITCH
-    SET_INPUT(PS_ON_PIN);
+    SET_INPUT(PS_ON_PIN); // This line is different from official RCBugFix: search tag: __SAM3X8E__
   #endif
 
   suicide();
@@ -10020,7 +10020,7 @@ void stop() {
 
 /**
  * Marlin entry-point: Set up before the program loop
- *  - [Due Only] Set up Alligator Board pins
+ *  - [Due Only] Set up Alligator Board pins // This line is different from official RCBugFix: search tag: __SAM3X8E__
  *  - Set up the kill pin, filament runout, power hold
  *  - Start the serial port
  *  - Print startup messages and diagnostics
