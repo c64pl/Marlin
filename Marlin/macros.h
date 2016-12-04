@@ -31,11 +31,9 @@
 #define FORCE_INLINE __attribute__((always_inline)) inline
 
 // Bracket code that shouldn't be interrupted
-#ifndef __SAM3X8E__
-  #ifndef CRITICAL_SECTION_START
-    #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
-    #define CRITICAL_SECTION_END    SREG = _sreg;
-  #endif
+#if !defined(__SAM3X8E__) && !defined(CRITICAL_SECTION_START)
+  #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
+  #define CRITICAL_SECTION_END    SREG = _sreg;
 #endif
 
 // Clock speed factor
@@ -61,9 +59,6 @@
 #define RADIANS(d) ((d)*M_PI/180.0)
 #define DEGREES(r) ((r)*180.0/M_PI)
 #define HYPOT2(x,y) (sq(x)+sq(y))
-#ifndef __SAM3X8E__
-  #define HYPOT(x,y) sqrt(HYPOT2(x,y))
-#endif
 
 // Macros to contrain values
 #define NOLESS(v,n) do{ if (v < n) v = n; }while(0)
@@ -140,5 +135,18 @@
 #define NEAR(x,y) NEAR_ZERO((x)-(y))
 
 #define RECIPROCAL(x) (NEAR_ZERO(x) ? 0.0 : 1.0 / (x))
+
+//
+// Maths macros that can be overridden by HAL.h
+//
+#define ATAN2(y, x) atan2(y, x)
+#define FABS(x)     fabs(x)
+#define POW(x, y)   pow(x, y)
+#define SQRT(x)     sqrt(x)
+#define CEIL(x)     ceil(x)
+#define FLOOR(x)    floor(x)
+#define LROUND(x)   lround(x)
+#define FMOD(x, y)  fmod(x, y)
+#define HYPOT(x,y)  SQRT(HYPOT2(x,y))
 
 #endif //__MACROS_H
