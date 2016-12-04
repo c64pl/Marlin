@@ -24,15 +24,15 @@
 // ARDUINO_ARCH_SAM
 // **************************************************************************
 
-#ifndef _HAL_H
-  #define _HAL_H
+#ifndef _HAL_DUE_H
+  #define _HAL_DUE_H
 
   #include <stdint.h>
   #include "Arduino.h"
 #if 0
   #include "types.h"
 #endif
-  #include "fastio.h"
+  #include "../fastio_wrapper.h"
 
   // --------------------------------------------------------------------------
   // Defines
@@ -327,4 +327,4 @@
   void setAdcFreerun(void);
   void stopAdcFreerun(adc_channel_num_t chan);
 
-#endif // _HAL_H
+#endif // _HAL_DUE_H

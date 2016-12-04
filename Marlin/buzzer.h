@@ -24,7 +24,11 @@
 #define __BUZZER_H__
 
 #include "types.h"
-#include "fastio.h"
+#ifdef __SAM3X8E__
+  #include "src/HAL/fastio_wrapper.h"
+#else
+  #include "fastio.h"
+#endif
 #include "circularqueue.h"
 #include "temperature.h"
 

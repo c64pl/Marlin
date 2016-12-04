@@ -20,32 +20,22 @@
  *
  */
 
-#ifndef MARLIN_CONFIG_H
-#define MARLIN_CONFIG_H
+/**
+  This code contributed by Triffid_Hunter and modified by Kliment
+  why double up on these macros? see http://gcc.gnu.org/onlinedocs/cpp/Stringification.html
+*/
 
-#ifdef __SAM3X8E__
-  #include "src/HAL/fastio_wrapper.h"
+#ifndef _FASTIO_ARDUINO_H
+#define _FASTIO_ARDUINO_H
+
+#ifdef ARDUINO_ARCH_SAM
+  #include "HAL_DUE/fastio_Due.h"
+/*
+#elif defined(ARDUINO_ARCH_AVR)
+  #include "HAL_AVR/fastio_AVR.h"
+*/
 #else
-  #include "fastio.h"
-#endif
-#include "macros.h"
-#include "boards.h"
-#include "Version.h"
-#include "Configuration.h"
-#include "Conditionals_LCD.h"
-#include "Configuration_adv.h"
-#include "pins.h"
-#ifdef __SAM3X8E__
-  #include "src/HAL/spi_pins.h"
-#endif
-#ifndef USBCON
-  #define HardwareSerial_h // trick to disable the standard HWserial
-#endif
-#include "Arduino.h"
-#include "Conditionals_post.h"
-#include "SanityCheck.h"
-#ifdef __SAM3X8E__
-  #include "src/HAL/HAL.h"
+  #error Unsupported Platform!
 #endif
 
-#endif // MARLIN_CONFIG_H
+#endif // _FASTIO_ARDUINO_H
