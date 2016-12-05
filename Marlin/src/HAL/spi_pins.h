@@ -25,7 +25,7 @@
   #include "HAL_DUE/spi_pins_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)
-  #include "HAL_AVR/fastio_AVR.h"
+  #include "HAL_AVR/spi_pins_AVR.h"
 */
 #else
   #error Unsupported Platform!
