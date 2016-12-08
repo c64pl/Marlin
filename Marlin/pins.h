@@ -166,6 +166,12 @@
   #include "pins_MEGACONTROLLER.h"
 #elif MB(BQ_ZUM_MEGA_3D)
   #include "pins_BQ_ZUM_MEGA_3D.h"
+#elif MB(AJ4P)
+  #include "pins_AJ4P.h"
+#elif MB(MKS_13)
+  #include "pins_MKS_13.h"
+#elif MB(SAINSMART_2IN1)
+  #include "pins_SAINSMART_2IN1.h"
 #elif MB(DUE3DOM)
   #include "pins_DUE3DOM.h"
 #elif MB(DUE3DOM_MINI)
@@ -223,14 +229,6 @@
   #include "pins_RAMPS4DUE.h"
 #elif MB(ALLIGATOR)
   #include "pins_ALLIGATOR_R2.h"
-#elif MB(99)
-  #include "pins_99.h"
-#elif MB(AJ4P)
-  #include "pins_AJ4P.h"
-#elif MB(MKS_13)
-  #include "pins_MKS_13.h"
-#elif MB(SAINSMART_2IN1)
-  #include "pins_SAINSMART_2IN1.h"
 #else
   #error "Unknown MOTHERBOARD value set in Configuration.h"
 #endif

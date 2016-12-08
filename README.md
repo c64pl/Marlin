@@ -5,7 +5,7 @@
 
 <img align="top" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
 
-## Marlin Duo 1.1.0-RCBugFix - 26 July 2016
+## Marlin Duo 1.1.0-RCBugFix - 6 Dec 2016
 
 ## Information
 Marlin Duo is modified version of [Marlin](https://github.com/MarlinFirmware/Marlin/tree/RCBugFix).
