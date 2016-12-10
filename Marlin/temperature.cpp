@@ -1354,12 +1354,20 @@ void Temperature::disable_all_heaters() {
     uint32_t max6675_temp = 2000;
     #define MAX6675_ERROR_MASK 7
     #define MAX6675_DISCARD_BITS 18
-    #define MAX6675_SPEED_BITS (_BV(SPR1)) // clock ÷ 64
+    #ifdef ARDUINO_ARCH_SAM
+      #define MAX6675_SPEED 2 // clock ÷ 42
+    #else
+      #define MAX6675_SPEED_BITS (_BV(SPR1)) // clock ÷ 64
+    #endif
   #else
     uint16_t max6675_temp = 2000;
     #define MAX6675_ERROR_MASK 4
     #define MAX6675_DISCARD_BITS 3
-    #define MAX6675_SPEED_BITS (_BV(SPR0)) // clock ÷ 16
+    #ifdef ARDUINO_ARCH_SAM
+      #define MAX6675_SPEED 2 // clock ÷ 42
+    #else
+      #define MAX6675_SPEED_BITS (_BV(SPR0)) // clock ÷ 16
+    #endif
   #endif
 
   int Temperature::read_max6675() {
@@ -1374,7 +1382,7 @@ void Temperature::disable_all_heaters() {
 
     #ifdef ARDUINO_ARCH_SAM
       spiBegin();
-      spiInit(2);
+      spiInit(MAX6675_SPEED);
     #else
       CBI(
         #ifdef PRR
