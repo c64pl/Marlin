@@ -28,7 +28,7 @@
   #include "HAL_AVR/HAL_spi_pins_AVR.h"
 */
 #else
-  #error Unsupported Platform!
+  #error "Unsupported Platform!"
 #endif
 
 #endif // HAL_SPI_PINS_H

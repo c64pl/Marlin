@@ -35,7 +35,7 @@
   #include "HAL_AVR/HAL_watchdog_AVR.h"
 */
 #else
-  #error Unsupported Platform!
+  #error "Unsupported Platform!"
 #endif
 
 #endif // HAL_WATCHDOG_H
