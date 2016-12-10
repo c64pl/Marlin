@@ -90,9 +90,9 @@
 
 // SPI for Max6675 or Max31855 Thermocouple
 #if DISABLED(SDSUPPORT)
-  #define MAX6675_SS        53
+  #define MAX6675_SS        5 // shared with SERVO0_PIN
 #else
-  #define MAX6675_SS        49
+  #define MAX6675_SS        5 // shared with SERVO0_PIN
 #endif
 
 //
