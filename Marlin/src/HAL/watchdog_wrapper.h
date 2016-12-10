@@ -20,17 +20,22 @@
  *
  */
 
-#ifndef WATCHDOG_H
-#define WATCHDOG_H
+/**
+  This code contributed by Triffid_Hunter and modified by Kliment
+  why double up on these macros? see http://gcc.gnu.org/onlinedocs/cpp/Stringification.html
+*/
 
-#include "Marlin.h"
-#include <avr/wdt.h>
+#ifndef WATCHDOG_WRAPPER_H
+#define WATCHDOG_WRAPPER_H
 
-// Initialize watchdog with a 4 second interrupt time
-void watchdog_init();
-
-// Reset watchdog. MUST be called at least every 4 seconds after the
-// first watchdog_init or AVR will go into emergency procedures.
-inline void watchdog_reset() { wdt_reset(); }
-
+#ifdef ARDUINO_ARCH_SAM
+  #include "HAL_DUE/watchdog_Due.h"
+/*
+#elif defined(ARDUINO_ARCH_AVR)
+  #include "HAL_AVR/watchdog_AVR.h"
+*/
+#else
+  #error Unsupported Platform!
 #endif
+
+#endif // WATCHDOG_WRAPPER_H

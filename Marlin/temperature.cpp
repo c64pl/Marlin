@@ -37,7 +37,11 @@
 #endif
 
 #if ENABLED(USE_WATCHDOG)
-  #include "watchdog.h"
+  #ifdef ARDUINO_ARCH_SAM
+    #include "src/HAL/watchdog_wrapper.h"
+  #else
+    #include "watchdog.h"
+  #endif
 #endif
 
 #ifdef K1 // Defined in Configuration.h in the PID settings
