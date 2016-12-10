@@ -113,10 +113,8 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
   #if defined(BTN_ENC) && BTN_ENC >= 0
     PIN_SAY(BTN_ENC);
   #endif
-  #ifdef ARDUINO_ARCH_SAM
-    #if defined(BTN_BACK) && BTN_BACK >= 0
-      PIN_SAY(BTN_BACK);
-    #endif
+  #if defined(ARDUINO_ARCH_SAM) && defined(BTN_BACK) && BTN_BACK >= 0
+    PIN_SAY(BTN_BACK);
   #endif
   #if defined(BTN_HOME) && BTN_HOME >= 0
     PIN_SAY(BTN_HOME);
@@ -371,10 +369,8 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
   #if PIN_EXISTS(LED)
     PIN_SAY(LED_PIN);
   #endif
-  #ifdef ARDUINO_ARCH_SAM
-    #if PIN_EXISTS(LED_GREEN)
-      PIN_SAY(LED_GREEN_PIN);
-    #endif
+  #if defined(ARDUINO_ARCH_SAM) && PIN_EXISTS(LED_GREEN)
+    PIN_SAY(LED_GREEN_PIN);
   #endif
   #if PIN_EXISTS(CASE_LIGHT)
     PIN_SAY(CASE_LIGHT_PIN);

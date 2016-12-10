@@ -77,11 +77,9 @@
     #define EN_A (_BV(BLEN_A))
     #define EN_B (_BV(BLEN_B))
     #define EN_C (_BV(BLEN_C))
-    #ifdef ARDUINO_ARCH_SAM
-      #if BUTTON_EXISTS(BACK)
-        #define BLEN_D 3
-        #define EN_D (_BV(BLEN_D))
-      #endif
+    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+      #define BLEN_D 3
+      #define EN_D (_BV(BLEN_D))
     #endif
 
     extern volatile uint8_t buttons;  //the last checked buttons in a bit array.
@@ -149,10 +147,8 @@
     #define LCD_CLICKED ((buttons & EN_C) || (buttons_reprapworld_keypad & EN_REPRAPWORLD_KEYPAD_F1))
   #elif ENABLED(NEWPANEL)
     #define LCD_CLICKED (buttons & EN_C)
-    #ifdef ARDUINO_ARCH_SAM
-      #if BUTTON_EXISTS(BACK)
-        #define LCD_BACK_CLICKED (buttons & EN_D)
-      #endif
+    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+      #define LCD_BACK_CLICKED (buttons & EN_D)
     #endif
   #else
     #define LCD_CLICKED false

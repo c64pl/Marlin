@@ -48,10 +48,8 @@
 #include "stepper.h"
 #include "endstops.h"
 #include "planner.h"
-#ifdef ARDUINO_ARCH_SAM
-  #if MB(ALLIGATOR)
-    #include "dac_dac084s085.h"
-  #endif
+#if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #include "dac_dac084s085.h"
 #endif
 #include "temperature.h"
 #include "ultralcd.h"
@@ -414,10 +412,8 @@ void Stepper::isr() {
     if (current_block) {
       trapezoid_generator_reset();
 
-      #ifdef ARDUINO_ARCH_SAM
-        #if STEPPER_DIRECTION_DELAY > 0
-          delayMicroseconds(STEPPER_DIRECTION_DELAY);
-        #endif
+      #if defined(ARDUINO_ARCH_SAM) && (STEPPER_DIRECTION_DELAY > 0)
+        delayMicroseconds(STEPPER_DIRECTION_DELAY);
       #endif
 
       // Initialize Bresenham counters to 1/2 the ceiling
@@ -662,11 +658,9 @@ void Stepper::isr() {
       all_steps_done = true;
       break;
     }
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM) && STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
       // For a minimum pulse time wait before stopping low pulses
-      #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
-        if (i < step_loops - 1) while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_CODE) / STEPPER_TIMER_PRESCALE) { /* nada */ }
-      #endif
+      if (i < step_loops - 1) while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_CODE) / STEPPER_TIMER_PRESCALE) { /* nada */ }
     #endif
   }
 
@@ -972,11 +966,9 @@ void Stepper::isr() {
         #endif
       #endif
 
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM) && (STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E)
         // For a minimum pulse time wait before stopping low pulses
-        #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E
-          if (i < step_loops - 1) while (HAL_timer_get_current_count(EXTRUDER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / EXTRUDER_TIMER_PRESCALE) { /* nada */ }
-        #endif
+        if (i < step_loops - 1) while (HAL_timer_get_current_count(EXTRUDER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / EXTRUDER_TIMER_PRESCALE) { /* nada */ }
       #endif
     }
 
@@ -991,16 +983,14 @@ void Stepper::init() {
     digipot_init();
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
-    #if MB(ALLIGATOR)
-      const float motor_current[] = MOTOR_CURRENT;
-      unsigned int digipot_motor = 0;
-      for (uint8_t i = 0; i < 3 + EXTRUDERS; i++) {
-        digipot_motor = 255 * (motor_current[i] / 2.5);
-        dac084s085::setValue(i, digipot_motor);
-      }
-    #endif//MB(ALLIGATOR)
-  #endif
+  #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+    const float motor_current[] = MOTOR_CURRENT;
+    unsigned int digipot_motor = 0;
+    for (uint8_t i = 0; i < 3 + EXTRUDERS; i++) {
+      digipot_motor = 255 * (motor_current[i] / 2.5);
+      dac084s085::setValue(i, digipot_motor);
+    }
+  #endif // defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
 
   // Init Microstepping Pins
   #if HAS_MICROSTEPS
@@ -1577,10 +1567,8 @@ void Stepper::report_positions() {
       case 4: microstep_ms(driver, MICROSTEP4); break;
       case 8: microstep_ms(driver, MICROSTEP8); break;
       case 16: microstep_ms(driver, MICROSTEP16); break;
-      #ifdef ARDUINO_ARCH_SAM
-        #if MB(ALLIGATOR)
-          case 32: microstep_ms(driver, MICROSTEP32); break;
-        #endif
+      #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+        case 32: microstep_ms(driver, MICROSTEP32); break;
       #endif
     }
   }

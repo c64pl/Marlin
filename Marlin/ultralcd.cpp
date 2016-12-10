@@ -259,14 +259,10 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     bool _skipStatic = false; \
     SCREEN_OR_MENU_LOOP()
 
-  #ifdef ARDUINO_ARCH_SAM
-    #if BUTTON_EXISTS(BACK)
-      #define BACK_TO_PARENT() do { \
-        if (lcd_backclicked) return menu_action_back(); \
-        } while(0)
-    #else
-      #define BACK_TO_PARENT() do {} while(0)
-    #endif
+  #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+    #define BACK_TO_PARENT() do { \
+      if (lcd_backclicked) return menu_action_back(); \
+      } while(0)
 
     #define START_MENU() \
       START_SCREEN_OR_MENU(1); \
@@ -2626,11 +2622,9 @@ void lcd_init() {
       #endif
     #endif
 
-    #ifdef ARDUINO_ARCH_SAM
-      #if BUTTON_EXISTS(BACK)
-        SET_INPUT(BTN_BACK);
-        PULLUP(BTN_BACK, HIGH);
-      #endif
+    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+      SET_INPUT(BTN_BACK);
+      PULLUP(BTN_BACK, HIGH);
     #endif
 
     #if ENABLED(REPRAPWORLD_KEYPAD)
@@ -2765,23 +2759,15 @@ void lcd_update() {
     lcd_buttons_update();
 
     // If the action button is pressed...
-    #ifdef ARDUINO_ARCH_SAM
-      #if BUTTON_EXISTS(BACK)
-        if (LCD_CLICKED || LCD_BACK_CLICKED) {
-      #else
-        if (LCD_CLICKED) {
-      #endif
+    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+      if (LCD_CLICKED || LCD_BACK_CLICKED) {
     #else
       if (LCD_CLICKED) {
     #endif
       if (!wait_for_unclick) {           // If not waiting for a debounce release:
         wait_for_unclick = true;         //  Set debounce flag to ignore continous clicks
-        #ifdef ARDUINO_ARCH_SAM
-          #if BUTTON_EXISTS(BACK)
-            LCD_CLICKED ? lcd_clicked = !wait_for_user : lcd_backclicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
-          #else
-            lcd_clicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
-          #endif
+        #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+          LCD_CLICKED ? lcd_clicked = !wait_for_user : lcd_backclicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
         #else
           lcd_clicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
         #endif
@@ -3123,10 +3109,8 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
           if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
         #endif
 
-        #ifdef ARDUINO_ARCH_SAM
-          #if BUTTON_EXISTS(BACK)
-            if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
-          #endif
+        #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+          if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
         #endif
 
         #if LCD_HAS_DIRECTIONAL_BUTTONS

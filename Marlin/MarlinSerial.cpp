@@ -528,4 +528,4 @@ MarlinSerial customizedSerial;
 
 #endif
 
-#endif //ARDUINO_ARCH_SAM
+#endif // ARDUINO_ARCH_SAM

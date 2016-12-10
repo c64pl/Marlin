@@ -221,10 +221,8 @@
 
 #include "ultralcd.h"
 #include "planner.h"
-#ifdef ARDUINO_ARCH_SAM
-  #if MB(ALLIGATOR)
-    #include "dac_dac084s085.h"
-  #endif
+#if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #include "dac_dac084s085.h"
 #endif
 #include "stepper.h"
 #include "endstops.h"
@@ -871,18 +869,16 @@ bool enqueue_and_echo_command(const char* cmd, bool say_ok/*=false*/) {
   return false;
 }
 
-#ifdef ARDUINO_ARCH_SAM
-  #if MB(ALLIGATOR)
-    void setup_alligator_board() {
-      // Init Expansion Port Voltage logic Selector
-      SET_OUTPUT(EXP_VOLTAGE_LEVEL_PIN);
-      WRITE(EXP_VOLTAGE_LEVEL_PIN, UI_VOLTAGE_LEVEL);
-      dac084s085::begin(); //initialize ExternalDac
-      #if HAS_BUZZER
-        buzz(10,10);
-      #endif
-    }
-  #endif
+#if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  void setup_alligator_board() {
+    // Init Expansion Port Voltage logic Selector
+    SET_OUTPUT(EXP_VOLTAGE_LEVEL_PIN);
+    WRITE(EXP_VOLTAGE_LEVEL_PIN, UI_VOLTAGE_LEVEL);
+    dac084s085::begin(); //initialize ExternalDac
+    #if HAS_BUZZER
+      buzz(10,10);
+    #endif
+  }
 #endif
 
 void setup_killpin() {
@@ -9707,14 +9703,10 @@ void prepare_move_to_destination() {
       ) {
         lastMotorOn = ms; //... set time to NOW so the fan will turn on
       }
-      #ifdef ARDUINO_ARCH_SAM
-        #if ENABLED(INVERTED_FAN_PINS)
-          uint8_t speed = (!lastMotorOn || ELAPSED(ms, lastMotorOn + (CONTROLLERFAN_SECS) * 1000UL)) ? 255 : (255 - CONTROLLERFAN_SPEED);
-        #else
-          uint8_t speed = (!lastMotorOn || ELAPSED(ms, lastMotorOn + (CONTROLLERFAN_SECS) * 1000UL)) ? 0 : CONTROLLERFAN_SPEED;
-        #endif
+      // Fan off if no steppers have been enabled for CONTROLLERFAN_SECS seconds
+      #if defined(ARDUINO_ARCH_SAM) && ENABLED(INVERTED_FAN_PINS)
+        uint8_t speed = (!lastMotorOn || ELAPSED(ms, lastMotorOn + (CONTROLLERFAN_SECS) * 1000UL)) ? 255 : (255 - CONTROLLERFAN_SPEED);
       #else
-        // Fan off if no steppers have been enabled for CONTROLLERFAN_SECS seconds
         uint8_t speed = (!lastMotorOn || ELAPSED(ms, lastMotorOn + (CONTROLLERFAN_SECS) * 1000UL)) ? 0 : CONTROLLERFAN_SPEED;
       #endif
       // allows digital or PWM fan output to be used (see M42 handling)
@@ -10230,10 +10222,8 @@ void stop() {
  */
 void setup() {
 
-  #ifdef ARDUINO_ARCH_SAM
-    #if MB(ALLIGATOR)
-      setup_alligator_board();// Initialize Alligator Board
-    #endif
+  #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+    setup_alligator_board();// Initialize Alligator Board
   #endif
 
   #ifdef DISABLE_JTAG

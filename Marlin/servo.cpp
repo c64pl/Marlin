@@ -145,7 +145,7 @@ uint8_t ServoCount = 0;                                     // the total number 
 
 
   #endif //!WIRING
-#endif //ARDUINO_ARCH_SAM
+#endif // ARDUINO_ARCH_SAM
 
 
 #ifdef ARDUINO_ARCH_SAM
@@ -225,7 +225,7 @@ uint8_t ServoCount = 0;                                     // the total number 
     // Enables the timer clock and performs a software reset to start the counting
     TC_Start(tc, channel);
   }
-#endif //ARDUINO_ARCH_SAM
+#endif // ARDUINO_ARCH_SAM
 
 static void initISR(timer16_Sequence_t timer) {
   #ifdef ARDUINO_ARCH_SAM
@@ -306,7 +306,7 @@ static void initISR(timer16_Sequence_t timer) {
         TIMSK5 =  _BV(OCIE5A) ; // enable the output compare interrupt
       }
     #endif
-  #endif //ARDUINO_ARCH_SAM
+  #endif // ARDUINO_ARCH_SAM
 }
 
 static void finISR(timer16_Sequence_t timer) {
@@ -353,7 +353,7 @@ static void finISR(timer16_Sequence_t timer) {
       // For arduino - in future: call here to a currently undefined function to reset the timer
       UNUSED(timer);
     #endif
-  #endif //ARDUINO_ARCH_SAM
+  #endif // ARDUINO_ARCH_SAM
 }
 
 static boolean isTimerActive(timer16_Sequence_t timer) {

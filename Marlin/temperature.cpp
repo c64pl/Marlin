@@ -26,10 +26,8 @@
 
 #include "Marlin.h"
 #include "ultralcd.h"
-#ifdef ARDUINO_ARCH_SAM
-  #if MB(ALLIGATOR)
-    #include "dac_dac084s085.h"
-  #endif
+#if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #include "dac_dac084s085.h"
 #endif
 #include "temperature.h"
 #include "thermistortables.h"
@@ -1863,6 +1861,8 @@ void Temperature::isr() {
       raw_temp_bed_value += temp_read; \
       max_temp[HOTENDS] = max(max_temp[HOTENDS], temp_read); \
       min_temp[HOTENDS] = min(min_temp[HOTENDS], temp_read)
+
+    #define START_ADC(pin) // nothing todo for Due
   #else
     #define SET_ADMUX_ADCSRA(pin) ADMUX = _BV(REFS0) | (pin & 0x07); SBI(ADCSRA, ADSC)
     #ifdef MUX5
@@ -1876,11 +1876,7 @@ void Temperature::isr() {
   switch (temp_state) {
     case PrepareTemp_0:
       #if HAS_TEMP_0
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(TEMP_0_PIN);
-        #endif
+        START_ADC(TEMP_0_PIN);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_0;
@@ -1898,11 +1894,7 @@ void Temperature::isr() {
 
     case PrepareTemp_BED:
       #if HAS_TEMP_BED
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(TEMP_BED_PIN);
-        #endif
+        START_ADC(TEMP_BED_PIN);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_BED;
@@ -1920,11 +1912,7 @@ void Temperature::isr() {
 
     case PrepareTemp_1:
       #if HAS_TEMP_1
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(TEMP_1_PIN);
-        #endif
+        START_ADC(TEMP_1_PIN);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_1;
@@ -1942,11 +1930,7 @@ void Temperature::isr() {
 
     case PrepareTemp_2:
       #if HAS_TEMP_2
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(TEMP_2_PIN);
-        #endif
+        START_ADC(TEMP_2_PIN);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_2;
@@ -1964,11 +1948,7 @@ void Temperature::isr() {
 
     case PrepareTemp_3:
       #if HAS_TEMP_3
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(TEMP_3_PIN);
-        #endif
+        START_ADC(TEMP_3_PIN);
       #endif
       lcd_buttons_update();
       temp_state = MeasureTemp_3;
@@ -1986,11 +1966,7 @@ void Temperature::isr() {
 
     case Prepare_FILWIDTH:
       #if ENABLED(FILAMENT_WIDTH_SENSOR)
-        #ifdef ARDUINO_ARCH_SAM
-          // nothing todo for Due
-        #else
-          START_ADC(FILWIDTH_PIN);
-        #endif
+        START_ADC(FILWIDTH_PIN);
       #endif
       lcd_buttons_update();
       temp_state = Measure_FILWIDTH;

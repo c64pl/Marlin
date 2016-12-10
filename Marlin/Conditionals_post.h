@@ -201,13 +201,9 @@
   #define MICROSTEP2 HIGH,LOW
   #define MICROSTEP4 LOW,HIGH
   #define MICROSTEP8 HIGH,HIGH
-  #ifdef ARDUINO_ARCH_SAM
-    #if MB(ALLIGATOR)
-      #define MICROSTEP16 LOW,LOW
-      #define MICROSTEP32 HIGH,HIGH
-    #else
-      #define MICROSTEP16 HIGH,HIGH
-    #endif
+  #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+    #define MICROSTEP16 LOW,LOW
+    #define MICROSTEP32 HIGH,HIGH
   #else
     #define MICROSTEP16 HIGH,HIGH
   #endif
@@ -586,7 +582,7 @@
         #endif
       #endif
     #endif
-  #else //ARDUINO_ARCH_SAM
+  #else // !ARDUINO_ARCH_SAM
     #define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, v)
     #if HOTENDS > 1 || ENABLED(HEATERS_PARALLEL)
       #define WRITE_HEATER_1(v) WRITE(HEATER_1_PIN, v)
@@ -597,19 +593,15 @@
         #endif
       #endif
     #endif
-  #endif //ARDUINO_ARCH_SAM
+  #endif // ARDUINO_ARCH_SAM
   #if ENABLED(HEATERS_PARALLEL)
     #define WRITE_HEATER_0(v) { WRITE_HEATER_0P(v); WRITE_HEATER_1(v); }
   #else
     #define WRITE_HEATER_0(v) WRITE_HEATER_0P(v)
   #endif
   #if HAS_HEATER_BED
-    #ifdef ARDUINO_ARCH_SAM
-      #if ENABLED(INVERTED_BED_PINS)
-        #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN,!v)
-      #else
-        #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN,v)
-      #endif
+    #if defined(ARDUINO_ARCH_SAM) && ENABLED(INVERTED_BED_PINS)
+      #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN, !v)
     #else
       #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN, v)
     #endif
@@ -644,7 +636,7 @@
     #if HAS_FAN2
       #define WRITE_FAN2(v) _WRITE_FAN(FAN2_PIN, v)
     #endif
-  #else //ARDUINO_ARCH_SAM
+  #else // !ARDUINO_ARCH_SAM
     #if HAS_FAN0
       #define WRITE_FAN(v) WRITE(FAN_PIN, v)
       #define WRITE_FAN0(v) WRITE_FAN(v)
@@ -655,7 +647,7 @@
     #if HAS_FAN2
       #define WRITE_FAN2(v) WRITE(FAN2_PIN, v)
     #endif
-  #endif //ARDUINO_ARCH_SAM
+  #endif // ARDUINO_ARCH_SAM
   #define WRITE_FAN_N(n, v) WRITE_FAN##n(v)
 
   /**
