@@ -39,7 +39,7 @@
 #include "SdFatConfig.h"
 #include "SdInfo.h"
 //------------------------------------------------------------------------------
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   // On Due, SPI rate = MCLK / n
   // where MCK = 84 MHz
 
@@ -139,7 +139,7 @@ uint8_t const SD_CARD_TYPE_SDHC = 3;
  * define SOFTWARE_SPI to use bit-bang SPI
  */
 //------------------------------------------------------------------------------
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   #if MEGA_SOFT_SPI && (defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__))
     #define SOFTWARE_SPI
   #elif USE_SOFTWARE_SPI
@@ -230,7 +230,7 @@ class Sd2Card {
   bool readData(uint8_t* dst);
   bool readStart(uint32_t blockNumber);
   bool readStop();
-  #ifndef __SAM3X8E__
+  #ifndef ARDUINO_ARCH_SAM
     bool setSckRate(uint8_t sckRateID);
   #endif
   /** Return the card type: SD V1, SD V2 or SDHC

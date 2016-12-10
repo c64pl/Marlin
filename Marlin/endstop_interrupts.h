@@ -75,7 +75,7 @@
 volatile uint8_t e_hit = 0; // Different from 0 when the endstops shall be tested in detail.
                             // Must be reset to 0 by the test function when the tests are finished.
 
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   // Install Pin change interrupt for a pin. Can be called multiple times.
   void pciSetup(byte pin) {
     *digitalPinToPCMSK(pin) |= bit (digitalPinToPCMSKbit(pin));  // enable pin
@@ -113,7 +113,7 @@ void endstop_ISR(void) { endstop_ISR_worker(); }
 void setup_endstop_interrupts( void ) {
 
   #if HAS_X_MAX
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(X_MAX_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(X_MAX_PIN) != NOT_AN_INTERRUPT) // if pin has an external interrupt
@@ -127,7 +127,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_X_MIN
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(X_MIN_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(X_MIN_PIN) != NOT_AN_INTERRUPT)
@@ -141,7 +141,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Y_MAX
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Y_MAX_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Y_MAX_PIN) != NOT_AN_INTERRUPT)
@@ -155,7 +155,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Y_MIN
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Y_MIN_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Y_MIN_PIN) != NOT_AN_INTERRUPT)
@@ -169,7 +169,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Z_MAX
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Z_MAX_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Z_MAX_PIN) != NOT_AN_INTERRUPT)
@@ -183,7 +183,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Z_MIN
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Z_MIN_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Z_MIN_PIN) != NOT_AN_INTERRUPT)
@@ -197,7 +197,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Z2_MAX
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Z2_MAX_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Z2_MAX_PIN) != NOT_AN_INTERRUPT)
@@ -211,7 +211,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Z2_MIN
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Z2_MIN_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Z2_MIN_PIN) != NOT_AN_INTERRUPT)
@@ -225,7 +225,7 @@ void setup_endstop_interrupts( void ) {
   #endif
 
   #if HAS_Z_MIN_PROBE_PIN
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       attachInterrupt(digitalPinToInterrupt(Z_MIN_PROBE_PIN), endstop_ISR, CHANGE); // assign it
     #else
       #if (digitalPinToInterrupt(Z_MIN_PROBE_PIN) != NOT_AN_INTERRUPT)

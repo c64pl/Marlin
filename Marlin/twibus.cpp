@@ -28,7 +28,7 @@
 #include <Wire.h>
 
 TWIBus::TWIBus() {
-  #ifndef __SAM3X8E__
+  #ifndef ARDUINO_ARCH_SAM
     #if I2C_SLAVE_ADDRESS == 0
       Wire.begin();                  // No address joins the BUS as the master
     #else

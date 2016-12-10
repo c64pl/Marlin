@@ -25,7 +25,7 @@
 #include "duration_t.h"
 
 PrintCounter::PrintCounter(): super() {
-  #ifndef __SAM3X8E__
+  #ifndef ARDUINO_ARCH_SAM
     this->loadStats();
   #endif
 }
@@ -141,7 +141,7 @@ void PrintCounter::showStats() {
   SERIAL_PROTOCOLPGM(MSG_STATS);
 
   SERIAL_ECHOPGM("Filament used: ");
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     SERIAL_ECHO((float)(this->data.filamentUsed / 1000));
   #else
     SERIAL_ECHO(this->data.filamentUsed / 1000);

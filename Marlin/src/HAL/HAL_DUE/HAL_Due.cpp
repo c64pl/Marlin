@@ -23,7 +23,7 @@
 // Description:          *** HAL for Arduino Due ***
 //
 // **************************************************************************
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
 
 // --------------------------------------------------------------------------
 // Includes
@@ -778,4 +778,4 @@ void setAdcFreerun(void) {
 void stopAdcFreerun(adc_channel_num_t chan) {
   SBI(ADC->ADC_CHDR, chan);
 }
-#endif // __SAM3X8E__
+#endif // ARDUINO_ARCH_SAM

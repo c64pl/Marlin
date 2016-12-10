@@ -366,7 +366,7 @@ static void lcd_implementation_init(
     lcd.backlight();
 
   #else
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       #if (LCD_PINS_RS != -1) && (LCD_PINS_ENABLE != -1)
         // required for RAMPS-FD, but does no harm for other targets
         SET_OUTPUT(LCD_PINS_RS);

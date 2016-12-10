@@ -827,7 +827,7 @@
   #endif
 #endif
 
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #if HAS_MOTOR_CURRENT_PWM
     #error "MOTOR_CURRENT_PWM (_XY, _Z, _E) are not supported by ARM platform yet."
   #endif

@@ -44,7 +44,7 @@
 #pragma GCC optimize (3)
 
 #define DELAY_0_NOP  NOOP
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #define DELAY_1_NOP  delayMicroseconds(1U)
   #define DELAY_2_NOP  delayMicroseconds(1U)
   #define DELAY_3_NOP  delayMicroseconds(1U)

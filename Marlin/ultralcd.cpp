@@ -259,7 +259,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     bool _skipStatic = false; \
     SCREEN_OR_MENU_LOOP()
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #if BUTTON_EXISTS(BACK)
       #define BACK_TO_PARENT() do { \
         if (lcd_backclicked) return menu_action_back(); \
@@ -1442,7 +1442,7 @@ void kill_screen(const char* lcd_msg) {
       // This assumes the center is 0,0
       #if ENABLED(DELTA)
         if (axis != Z_AXIS) {
-          max = SQRT(sq(DELTA_PRINTABLE_RADIUS) - sq(current_position[Y_AXIS - axis])); // This line is different from official RCBugFix: search tag: __SAM3X8E__
+          max = SQRT(sq(DELTA_PRINTABLE_RADIUS) - sq(current_position[Y_AXIS - axis])); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
           min = -max;
         }
       #endif
@@ -2601,7 +2601,7 @@ void lcd_init() {
   #if ENABLED(NEWPANEL)
     #if BUTTON_EXISTS(EN1)
       SET_INPUT(BTN_EN1);
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         PULLUP(BTN_EN1, HIGH);
       #else
         WRITE(BTN_EN1, HIGH);
@@ -2610,7 +2610,7 @@ void lcd_init() {
 
     #if BUTTON_EXISTS(EN2)
       SET_INPUT(BTN_EN2);
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         PULLUP(BTN_EN2, HIGH);
       #else
         WRITE(BTN_EN2, HIGH);
@@ -2619,14 +2619,14 @@ void lcd_init() {
 
     #if BUTTON_EXISTS(ENC)
       SET_INPUT(BTN_ENC);
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         PULLUP(BTN_ENC, HIGH);
       #else
         WRITE(BTN_ENC, HIGH);
       #endif
     #endif
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       #if BUTTON_EXISTS(BACK)
         SET_INPUT(BTN_BACK);
         PULLUP(BTN_BACK, HIGH);
@@ -2668,7 +2668,7 @@ void lcd_init() {
 
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
     SET_INPUT(SD_DETECT_PIN);
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       PULLUP(SD_DETECT_PIN, HIGH);
     #else
       WRITE(SD_DETECT_PIN, HIGH);
@@ -2765,7 +2765,7 @@ void lcd_update() {
     lcd_buttons_update();
 
     // If the action button is pressed...
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       #if BUTTON_EXISTS(BACK)
         if (LCD_CLICKED || LCD_BACK_CLICKED) {
       #else
@@ -2776,7 +2776,7 @@ void lcd_update() {
     #endif
       if (!wait_for_unclick) {           // If not waiting for a debounce release:
         wait_for_unclick = true;         //  Set debounce flag to ignore continous clicks
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           #if BUTTON_EXISTS(BACK)
             LCD_CLICKED ? lcd_clicked = !wait_for_user : lcd_backclicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
           #else
@@ -3123,7 +3123,7 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
           if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
         #endif
 
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           #if BUTTON_EXISTS(BACK)
             if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
           #endif

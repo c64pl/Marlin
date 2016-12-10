@@ -53,7 +53,7 @@ class Stepper;
 extern Stepper stepper;
 
 // intRes = intIn1 * intIn2 >> 16
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
 #else
   // uses:
@@ -109,7 +109,7 @@ class Stepper {
     static volatile uint32_t step_events_completed; // The number of step events executed in the current block
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         static uint32_t old_OCR0A;
         static volatile uint32_t eISR_Rate;
       #else
@@ -132,7 +132,7 @@ class Stepper {
 
     static long acceleration_time, deceleration_time;
     //unsigned long accelerate_until, decelerate_after, acceleration_rate, initial_rate, final_rate, nominal_rate;
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       static HAL_TIMER_TYPE acc_step_rate; // needed for deceleration start point
       static uint8_t step_loops, step_loops_nominal;
       static HAL_TIMER_TYPE OCR1A_nominal;
@@ -293,7 +293,7 @@ class Stepper {
 
   private:
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       static FORCE_INLINE HAL_TIMER_TYPE calc_timer(HAL_TIMER_TYPE step_rate) {
         HAL_TIMER_TYPE timer;
     #else
@@ -303,7 +303,7 @@ class Stepper {
 
       NOMORE(step_rate, MAX_STEP_FREQUENCY);
 
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         #if ENABLED(DISABLE_MULTI_STEPPING)
           {
         #else
@@ -331,7 +331,7 @@ class Stepper {
         step_loops = 1;
       }
 
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         // In case of high-performance processor, it is able to calculate in real-time 
         timer = HAL_STEPPER_TIMER_RATE / step_rate;
         if (timer < (HAL_STEPPER_TIMER_RATE / (STEP_DOUBLER_FREQUENCY * 2))) { // (STEP_DOUBLER_FREQUENCY * 2 kHz - this should never happen)
@@ -400,7 +400,7 @@ class Stepper {
       step_loops_nominal = step_loops;
       acc_step_rate = current_block->initial_rate;
       acceleration_time = calc_timer(acc_step_rate);
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         HAL_TIMER_SET_STEPPER_COUNT(acceleration_time);
       #else
         OCR1A = acceleration_time;

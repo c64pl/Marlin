@@ -30,7 +30,7 @@
 
 #if ENABLED(SDSUPPORT)
 #include "Sd2Card.h"
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   //------------------------------------------------------------------------------
   #if DISABLED(SOFTWARE_SPI)
     // functions for hardware SPI
@@ -158,7 +158,7 @@
         spiSend(buf[i]);
     }
   #endif  // SOFTWARE_SPI
-#endif // __SAM3X8E__
+#endif // ARDUINO_ARCH_SAM
 //------------------------------------------------------------------------------
 // send command and return error code.  Return zero for OK
 uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
@@ -180,7 +180,7 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   if (cmd == CMD8) crc = 0X87;  // correct crc for CMD8 with arg 0X1AA
   spiSend(crc);
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     // additional delay for CMD0
     if (cmd == CMD0) delay(100);
   #endif
@@ -225,7 +225,7 @@ void Sd2Card::chipSelectHigh() {
 }
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow() {
-  #ifndef __SAM3X8E__
+  #ifndef ARDUINO_ARCH_SAM
     #if DISABLED(SOFTWARE_SPI)
       spiInit(spiRate_);
     #endif  // SOFTWARE_SPI
@@ -308,7 +308,7 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   uint32_t arg;
 
   // set pin modes
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     spiBegin();
   #else
     pinMode(chipSelectPin_, OUTPUT);
@@ -375,7 +375,7 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   }
   chipSelectHigh();
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     UNUSED(sckRateID);
     return true;
   #else
@@ -583,7 +583,7 @@ fail:
   return false;
 }
 //------------------------------------------------------------------------------
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   /**
    * Set the SPI clock rate.
    *

@@ -31,15 +31,15 @@ void watchdog_init() {
   #if ENABLED(WATCHDOG_RESET_MANUAL)
     // We enable the watchdog timer, but only for the interrupt.
     // Take care, as this requires the correct order of operation, with interrupts disabled. See the datasheet of any AVR chip for details.
-    watchdog_reset(); // This line is different from official RCBugFix: search tag: __SAM3X8E__
-    #ifdef __SAM3X8E__
+    watchdog_reset(); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    #ifdef ARDUINO_ARCH_SAM
       HAL_watchdog_timer_enable_interrupt(4000U);
-    #else // This section is different from official RCBugFix: search tag: __SAM3X8E__
+    #else // This section is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
       _WD_CONTROL_REG = _BV(_WD_CHANGE_BIT) | _BV(WDE);
       _WD_CONTROL_REG = _BV(WDIE) | WDTO_4S;
     #endif
   #else
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       watchdogEnable(4000U); // number of milliseconds before the watchdog times out (max 15996)
     #else
       wdt_enable(WDTO_4S);
@@ -53,7 +53,7 @@ void watchdog_init() {
 
 // Watchdog timer interrupt, called if main program blocks >1sec and manual reset is enabled.
 #if ENABLED(WATCHDOG_RESET_MANUAL)
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     HAL_ISR_WATCHDOG_TIMER {
   #else
     ISR(WDT_vect) {

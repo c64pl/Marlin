@@ -31,7 +31,7 @@
 #define FORCE_INLINE __attribute__((always_inline)) inline
 
 // Bracket code that shouldn't be interrupted
-#if !defined(__SAM3X8E__) && !defined(CRITICAL_SECTION_START) // This line is different from official RCBugFix: search tag: __SAM3X8E__
+#if !defined(ARDUINO_ARCH_SAM) && !defined(CRITICAL_SECTION_START) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
   #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
   #define CRITICAL_SECTION_END    SREG = _sreg;
 #endif
@@ -136,17 +136,17 @@
 
 #define RECIPROCAL(x) (NEAR_ZERO(x) ? 0.0 : 1.0 / (x))
 
-// // This line is different from official RCBugFix: search tag: __SAM3X8E__
-// Maths macros that can be overridden by HAL.h // This line is different from official RCBugFix: search tag: __SAM3X8E__
-// // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define ATAN2(y, x) atan2(y, x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define FABS(x)     fabs(x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define POW(x, y)   pow(x, y) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define SQRT(x)     sqrt(x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define CEIL(x)     ceil(x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define FLOOR(x)    floor(x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define LROUND(x)   lround(x) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define FMOD(x, y)  fmod(x, y) // This line is different from official RCBugFix: search tag: __SAM3X8E__
-#define HYPOT(x,y)  SQRT(HYPOT2(x,y)) // This line is different from official RCBugFix: search tag: __SAM3X8E__
- // This line is different from official RCBugFix: search tag: __SAM3X8E__
+// // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+// Maths macros that can be overridden by HAL.h // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+// // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define ATAN2(y, x) atan2(y, x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FABS(x)     fabs(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define POW(x, y)   pow(x, y) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define SQRT(x)     sqrt(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define CEIL(x)     ceil(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FLOOR(x)    floor(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define LROUND(x)   lround(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FMOD(x, y)  fmod(x, y) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define HYPOT(x,y)  SQRT(HYPOT2(x,y)) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+ // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
 #endif //__MACROS_H

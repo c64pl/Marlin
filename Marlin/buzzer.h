@@ -24,7 +24,7 @@
 #define __BUZZER_H__
 
 #include "types.h"
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #include "src/HAL/fastio_wrapper.h"
 #else
   #include "fastio.h"

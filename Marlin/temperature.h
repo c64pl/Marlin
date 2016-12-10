@@ -72,7 +72,7 @@ class Temperature {
     #endif
 
     #if ENABLED(PIDTEMP) || ENABLED(PIDTEMPBED)
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         #define PID_dT (((OVERSAMPLENR + 2) * 14.0) / TEMP_TIMER_FREQUENCY)
       #else
         #define PID_dT ((OVERSAMPLENR * 12.0)/(F_CPU / 64.0 / 256.0))
@@ -179,7 +179,7 @@ class Temperature {
     static unsigned long raw_temp_value[4],
                          raw_temp_bed_value;
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       // MEDIAN COUNT
       // For Smoother temperature
       // ONLY FOR DUE
@@ -439,7 +439,7 @@ class Temperature {
 
     static void set_current_temp_raw();
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       static FORCE_INLINE int calc_raw_temp_value(uint8_t temp_id) {
         raw_median_temp[temp_id][median_counter] = (raw_temp_value[temp_id] - (min_temp[temp_id] + max_temp[temp_id]));
         sum = 0;

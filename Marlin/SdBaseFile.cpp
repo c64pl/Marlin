@@ -401,7 +401,7 @@ bool SdBaseFile::make83Name(const char* str, uint8_t* name, const char** ptr) {
     }
     else {
       // illegal FAT characters
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         // store chars in RAM
         if (strchr("|<>^+=?/[];,*\"\\", c)) goto fail;
       #else
@@ -1419,7 +1419,7 @@ bool SdBaseFile::rmRfStar() {
       if (!f.remove()) goto fail;
     }
     // position to next entry if required
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       if (curPosition_ != (uint32_t)(32 * (index + 1))) {
     #else
       if (curPosition_ != (32 * (index + 1))) {

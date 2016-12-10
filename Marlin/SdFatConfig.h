@@ -80,7 +80,7 @@
   * SPI init rate for SD initialization commands. Must be 5 (F_CPU/64)
   * or 6 (F_CPU/128).
   */
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #define SPI_SD_INIT_RATE SPI_INIT_SPEED
   #else
     #define SPI_SD_INIT_RATE 5
@@ -107,7 +107,7 @@
   */
   #define USE_SOFTWARE_SPI 0
   // define software SPI pins so Mega can use unmodified 168/328 shields
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     /** Software SPI chip select pin for the SD */
     #define SOFT_SPI_CS_PIN SS_PIN
     /** Software SPI Master Out Slave In pin */

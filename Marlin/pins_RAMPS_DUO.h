@@ -20,7 +20,7 @@
  *       A15 | A11
  */
 
-#if !defined(__SAM3X8E__) && !defined(__AVR_ATmega2560__)
+#if !defined(ARDUINO_ARCH_SAM) && !defined(__AVR_ATmega2560__)
   #error "Oops!  Make sure you have 'Arduino Due' or 'Arduino Mega' selected from the 'Tools -> Boards' menu."
 #endif
 

@@ -28,7 +28,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   #include <util/delay.h>
   #include <avr/eeprom.h>
 #endif
@@ -39,7 +39,7 @@
 
 #include "enum.h"
 #include "types.h"
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #include "src/HAL/fastio_wrapper.h"
 #else
   #include "fastio.h"
@@ -54,7 +54,7 @@
     #define MYSERIAL Serial
   #endif // BLUETOOTH
 #else
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #if SERIAL_PORT == -1
       #define MYSERIAL SerialUSB
     #elif SERIAL_PORT == 0

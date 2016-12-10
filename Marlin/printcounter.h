@@ -26,7 +26,7 @@
 #include "macros.h"
 #include "language.h"
 #include "stopwatch.h"
-#ifndef __SAM3X8E__
+#ifndef ARDUINO_ARCH_SAM
   #include <avr/eeprom.h>
 #endif
 
@@ -53,7 +53,7 @@ class PrintCounter: public Stopwatch {
      * @brief EEPROM address
      * @details Defines the start offset address where the data is stored.
      */
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       const uint32_t address = 0x40;
     #else
       const uint16_t address = 0x32;

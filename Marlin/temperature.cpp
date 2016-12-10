@@ -26,7 +26,7 @@
 
 #include "Marlin.h"
 #include "ultralcd.h"
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   #if MB(ALLIGATOR)
     #include "dac_dac084s085.h"
   #endif
@@ -159,7 +159,7 @@ volatile bool Temperature::temp_meas_ready = false;
 unsigned long Temperature::raw_temp_value[MAX_EXTRUDERS] = { 0 };
 unsigned long Temperature::raw_temp_bed_value = 0;
 
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   int Temperature::min_temp[HOTENDS + 1] = { 0 };
   int Temperature::max_temp[HOTENDS + 1] = { 0 };
   unsigned long Temperature::raw_median_temp[HOTENDS + 1][MEDIAN_COUNT] = { { 0 } };
@@ -739,7 +739,7 @@ void Temperature::manage_heater() {
     #endif // THERMAL_PROTECTION_HOTENDS
 
     #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
-      if (FABS(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF) { // This line is different from official RCBugFix: search tag: __SAM3X8E__
+      if (FABS(current_temperature[0] - redundant_temperature) > MAX_REDUNDANT_TEMP_SENSOR_DIFF) { // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
         _temp_error(0, PSTR(MSG_REDUNDANCY), PSTR(MSG_ERR_REDUNDANT_TEMP));
       }
     #endif
@@ -762,7 +762,7 @@ void Temperature::manage_heater() {
       // Get the delayed info and add 100 to reconstitute to a percent of
       // the nominal filament diameter then square it to get an area
       meas_shift_index = constrain(meas_shift_index, 0, MAX_MEASUREMENT_DELAY);
-      float vm = POW((measurement_delay[meas_shift_index] + 100.0) * 0.01, 2); // This line is different from official RCBugFix: search tag: __SAM3X8E__
+      float vm = POW((measurement_delay[meas_shift_index] + 100.0) * 0.01, 2); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
       NOLESS(vm, 0.01);
       volumetric_multiplier[FILAMENT_SENSOR_EXTRUDER_NUM] = vm;
     }
@@ -851,7 +851,7 @@ float Temperature::analog2temp(int raw, uint8_t e) {
 
     return celsius;
   }
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #if HEATER_USES_AD595
       return ((raw * ((3.3 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
     #else
@@ -886,7 +886,7 @@ float Temperature::analog2tempBed(int raw) {
 
   #elif defined(BED_USES_AD595)
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       return ((raw * ((3.3 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
     #else
       return ((raw * ((5.0 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
@@ -978,7 +978,7 @@ void Temperature::init() {
     last_e_position = 0;
   #endif
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     // Initialize some variables only at start!
     for (uint8_t i = 0; i < HOTENDS + 1; i++) {
       min_temp[i] = RAW_MIN_TEMP_DEFAULT;
@@ -1045,7 +1045,7 @@ void Temperature::init() {
 
   #endif //HEATER_0_USES_MAX6675
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #define ANALOG_SELECT(pin) startAdcConversion(pinToAdcChannel(pin))
   #else
     #ifdef DIDR2
@@ -1056,7 +1056,7 @@ void Temperature::init() {
   #endif
 
   // Set analog inputs
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     // Setup channels
 
     // ADC_MR_FREERUN_ON: Free Run Mode. It never waits for any trigger.
@@ -1083,7 +1083,7 @@ void Temperature::init() {
   #if HAS_TEMP_BED
     ANALOG_SELECT(TEMP_BED_PIN);
   #endif
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     // needs something for Due? or nothing todo?
   #else
     #if ENABLED(FILAMENT_WIDTH_SENSOR)
@@ -1132,7 +1132,7 @@ void Temperature::init() {
     #endif
   #endif
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     HAL_TIMER_START(TEMP_TIMER);
     HAL_TIMER_SET_TEMP_COUNT(128 * TEMP_TIMER_FACTOR);
     ENABLE_TEMP_INTERRUPT();
@@ -1370,7 +1370,7 @@ void Temperature::disable_all_heaters() {
 
     next_max6675_ms = ms + MAX6675_HEAT_INTERVAL;
 
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       spiBegin();
       spiInit(2);
     #else
@@ -1387,7 +1387,7 @@ void Temperature::disable_all_heaters() {
     WRITE(MAX6675_SS, 0); // enable TT_MAX6675
 
     // ensure 100ns delay - a bit extra is fine
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       delayMicroseconds(1U);
     #else
       asm("nop");//50ns on 20Mhz, 62.5ns on 16Mhz
@@ -1397,7 +1397,7 @@ void Temperature::disable_all_heaters() {
     // Read a big-endian temperature value
     max6675_temp = 0;
     for (uint8_t i = sizeof(max6675_temp); i--;) {
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         max6675_temp |= spiRec();
       #else
         SPDR = 0;
@@ -1442,7 +1442,7 @@ void Temperature::disable_all_heaters() {
  */
 void Temperature::set_current_temp_raw() {
   #if HAS_TEMP_0 && DISABLED(HEATER_0_USES_MAX6675)
-    #ifdef __SAM3X8E__
+    #ifdef ARDUINO_ARCH_SAM
       current_temperature_raw[0] = calc_raw_temp_value(0);
     #else
       current_temperature_raw[0] = raw_temp_value[0];
@@ -1450,26 +1450,26 @@ void Temperature::set_current_temp_raw() {
   #endif
   #if HAS_TEMP_1
     #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         redundant_temperature_raw = calc_raw_temp_value(1);
       #else
         redundant_temperature_raw = raw_temp_value[1];
       #endif
     #else
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         current_temperature_raw[1] = calc_raw_temp_value(1);
       #else
         current_temperature_raw[1] = raw_temp_value[1];
       #endif
     #endif
     #if HAS_TEMP_2
-      #ifdef __SAM3X8E__
+      #ifdef ARDUINO_ARCH_SAM
         current_temperature_raw[2] = calc_raw_temp_value(2);
       #else
         current_temperature_raw[2] = raw_temp_value[2];
       #endif
       #if HAS_TEMP_3
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           current_temperature_raw[3] = calc_raw_temp_value(3);
         #else
           current_temperature_raw[3] = raw_temp_value[3];
@@ -1477,12 +1477,12 @@ void Temperature::set_current_temp_raw() {
       #endif
     #endif
   #endif
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     current_temperature_bed_raw = calc_raw_temp_bed_value();
   #else
     current_temperature_bed_raw = raw_temp_bed_value;
   #endif
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     // Reset min/max-holder
     for (uint8_t i = 0; i < HOTENDS + 1; i++) {
       min_temp[i] = RAW_MIN_TEMP_DEFAULT;
@@ -1588,7 +1588,7 @@ void Temperature::set_current_temp_raw() {
  *  - Check new temperature values for MIN/MAX errors
  *  - Step the babysteps value for each axis towards 0
  */
-#ifdef __SAM3X8E__
+#ifdef ARDUINO_ARCH_SAM
   HAL_ISR(TEMP_TIMER) {
     HAL_timer_isr_prologue(TEMP_TIMER);
     Temperature::isr();
@@ -1599,7 +1599,7 @@ void Temperature::set_current_temp_raw() {
 
 void Temperature::isr() {
   //Allow UART and stepper ISRs
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     DISABLE_TEMP_INTERRUPT(); //Disable Temperature ISR
   #else
     CBI(TIMSK0, OCIE0B); //Disable Temperature ISR
@@ -1609,7 +1609,7 @@ void Temperature::isr() {
   static uint8_t temp_count = 0;
   static TempState temp_state = StartupDelay;
   static uint8_t pwm_count = _BV(SOFT_PWM_SCALE);
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     static int temp_read = 0;
   #endif
 
@@ -1853,7 +1853,7 @@ void Temperature::isr() {
 
   #endif // SLOW_PWM_HEATERS
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     #define SET_RAW_TEMP_VALUE(temp_id) temp_read = getAdcFreerun(pinToAdcChannel(TEMP_## temp_id ##_PIN)); \
       raw_temp_value[temp_id] += temp_read; \
       max_temp[temp_id] = max(max_temp[temp_id], temp_read); \
@@ -1876,7 +1876,7 @@ void Temperature::isr() {
   switch (temp_state) {
     case PrepareTemp_0:
       #if HAS_TEMP_0
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(TEMP_0_PIN);
@@ -1887,7 +1887,7 @@ void Temperature::isr() {
       break;
     case MeasureTemp_0:
       #if HAS_TEMP_0
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           SET_RAW_TEMP_VALUE(0);
         #else
           raw_temp_value[0] += ADC;
@@ -1898,7 +1898,7 @@ void Temperature::isr() {
 
     case PrepareTemp_BED:
       #if HAS_TEMP_BED
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(TEMP_BED_PIN);
@@ -1909,7 +1909,7 @@ void Temperature::isr() {
       break;
     case MeasureTemp_BED:
       #if HAS_TEMP_BED
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           SET_RAW_TEMP_BED_VALUE();
         #else
           raw_temp_bed_value += ADC;
@@ -1920,7 +1920,7 @@ void Temperature::isr() {
 
     case PrepareTemp_1:
       #if HAS_TEMP_1
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(TEMP_1_PIN);
@@ -1931,7 +1931,7 @@ void Temperature::isr() {
       break;
     case MeasureTemp_1:
       #if HAS_TEMP_1
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           SET_RAW_TEMP_VALUE(1);
         #else
           raw_temp_value[1] += ADC;
@@ -1942,7 +1942,7 @@ void Temperature::isr() {
 
     case PrepareTemp_2:
       #if HAS_TEMP_2
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(TEMP_2_PIN);
@@ -1953,7 +1953,7 @@ void Temperature::isr() {
       break;
     case MeasureTemp_2:
       #if HAS_TEMP_2
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           SET_RAW_TEMP_VALUE(2);
         #else
           raw_temp_value[2] += ADC;
@@ -1964,7 +1964,7 @@ void Temperature::isr() {
 
     case PrepareTemp_3:
       #if HAS_TEMP_3
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(TEMP_3_PIN);
@@ -1975,7 +1975,7 @@ void Temperature::isr() {
       break;
     case MeasureTemp_3:
       #if HAS_TEMP_3
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           SET_RAW_TEMP_VALUE(3);
         #else
           raw_temp_value[3] += ADC;
@@ -1986,7 +1986,7 @@ void Temperature::isr() {
 
     case Prepare_FILWIDTH:
       #if ENABLED(FILAMENT_WIDTH_SENSOR)
-        #ifdef __SAM3X8E__
+        #ifdef ARDUINO_ARCH_SAM
           // nothing todo for Due
         #else
           START_ADC(FILWIDTH_PIN);
@@ -2017,7 +2017,7 @@ void Temperature::isr() {
     //   break;
   } // switch(temp_state)
 
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     if (temp_count >= OVERSAMPLENR + 2) { // 14 * 16 * 1/(16000000/64/256)  = 164ms.
   #else
     if (temp_count >= OVERSAMPLENR) { // 10 * 16 * 1/(16000000/64/256)  = 164ms.
@@ -2120,7 +2120,7 @@ void Temperature::isr() {
     }
   #endif
   
-  #ifdef __SAM3X8E__
+  #ifdef ARDUINO_ARCH_SAM
     ENABLE_TEMP_INTERRUPT(); //re-enable Temperature ISR
   #else
     SBI(TIMSK0, OCIE0B); //re-enable Temperature ISR
