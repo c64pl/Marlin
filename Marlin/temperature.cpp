@@ -855,7 +855,7 @@ float Temperature::analog2temp(int raw, uint8_t e) {
   }
   #ifdef ARDUINO_ARCH_SAM
     #if HEATER_USES_AD595
-      return ((raw * ((3.3 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
+      return ((raw * ((LOGIC_VOLTAGE * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
     #else
       return 0;
     #endif
@@ -889,7 +889,7 @@ float Temperature::analog2tempBed(int raw) {
   #elif defined(BED_USES_AD595)
 
     #ifdef ARDUINO_ARCH_SAM
-      return ((raw * ((3.3 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
+      return ((raw * ((LOGIC_VOLTAGE * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
     #else
       return ((raw * ((5.0 * 100.0) / 1024.0) / OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN)) + TEMP_SENSOR_AD595_OFFSET;
     #endif
