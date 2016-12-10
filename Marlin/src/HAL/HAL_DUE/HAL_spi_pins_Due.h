@@ -18,8 +18,8 @@
  */
 
 
-#ifndef SPI_PINS_DUE_H
-#define SPI_PINS_DUE_H
+#ifndef HAL_SPI_PINS_DUE_H
+#define HAL_SPI_PINS_DUE_H
 
 /**
  * Define SPI Pins: SCK, MISO, MOSI, SS
@@ -50,4 +50,4 @@
 #endif
 #define SS_PIN            SDSS // A.28, A.29, B.21, C.26, C.29
 
-#endif // SPI_PINS_DUE_H
+#endif // HAL_SPI_PINS_DUE_H

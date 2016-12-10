@@ -32,7 +32,7 @@
 #if 0
   #include "../../../types.h"
 #endif
-  #include "../fastio_wrapper.h"
+  #include "../HAL_fastio.h"
 
   // --------------------------------------------------------------------------
   // Defines

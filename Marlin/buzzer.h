@@ -25,7 +25,7 @@
 
 #include "types.h"
 #ifdef ARDUINO_ARCH_SAM
-  #include "src/HAL/fastio_wrapper.h"
+  #include "src/HAL/HAL_fastio.h"
 #else
   #include "fastio.h"
 #endif

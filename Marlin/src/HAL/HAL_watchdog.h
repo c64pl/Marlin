@@ -2,6 +2,9 @@
  * Marlin 3D Printer Firmware
  * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
+ * Based on Sprinter and grbl.
+ * Copyright (C) 2011 Camiel Gubbels / Erik van der Zalm
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,18 +20,22 @@
  *
  */
 
+/**
+  This code contributed by Triffid_Hunter and modified by Kliment
+  why double up on these macros? see http://gcc.gnu.org/onlinedocs/cpp/Stringification.html
+*/
 
-#ifndef SPI_PINS_H
-#define SPI_PINS_H
+#ifndef HAL_WATCHDOG_H
+#define HAL_WATCHDOG_H
 
 #ifdef ARDUINO_ARCH_SAM
-  #include "HAL_DUE/spi_pins_Due.h"
+  #include "HAL_DUE/HAL_watchdog_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)
-  #include "HAL_AVR/spi_pins_AVR.h"
+  #include "HAL_AVR/HAL_watchdog_AVR.h"
 */
 #else
   #error Unsupported Platform!
 #endif
 
-#endif // SPI_PINS_H
+#endif // HAL_WATCHDOG_H

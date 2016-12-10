@@ -26,7 +26,7 @@
 
 #if ENABLED(USE_WATCHDOG)
 
-#include "../watchdog_wrapper.h"
+#include "../HAL_watchdog.h"
 
 // Initialize watchdog with a 4 sec interrupt time
 void watchdog_init() {

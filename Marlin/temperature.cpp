@@ -38,7 +38,7 @@
 
 #if ENABLED(USE_WATCHDOG)
   #ifdef ARDUINO_ARCH_SAM
-    #include "src/HAL/watchdog_wrapper.h"
+    #include "src/HAL/HAL_watchdog.h"
   #else
     #include "watchdog.h"
   #endif

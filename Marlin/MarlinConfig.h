@@ -24,7 +24,7 @@
 #define MARLIN_CONFIG_H
 
 #ifdef ARDUINO_ARCH_SAM
-  #include "src/HAL/fastio_wrapper.h"
+  #include "src/HAL/HAL_fastio.h"
 #else
   #include "fastio.h"
 #endif
@@ -36,7 +36,7 @@
 #include "Configuration_adv.h"
 #include "pins.h"
 #ifdef ARDUINO_ARCH_SAM
-  #include "src/HAL/spi_pins.h"
+  #include "src/HAL/HAL_spi_pins.h"
 #endif
 #ifndef USBCON
   #define HardwareSerial_h // trick to disable the standard HWserial

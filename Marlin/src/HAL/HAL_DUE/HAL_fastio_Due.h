@@ -26,8 +26,8 @@
 // ARDUINO_ARCH_SAM
 // **************************************************************************
 
-#ifndef	_FASTIO_ARDUINO_DUE_H
-#define	_FASTIO_ARDUINO_DUE_H
+#ifndef	HAL_FASTIO_DUE_H
+#define	HAL_FASTIO_DUE_H
 
 /**
   utility functions
@@ -429,4 +429,4 @@ pins
 #define DIO100_PIN 11
 #define DIO100_WPORT PIOC
 
-#endif // _FASTIO_ARDUINO_DUE_H
+#endif // HAL_FASTIO_DUE_H
