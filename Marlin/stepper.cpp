@@ -572,9 +572,7 @@ void Stepper::isr() {
         _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0); \
       }
 
-    #ifdef ARDUINO_ARCH_SAM
-      #define CYCLES_EATEN_BY_CODE 12
-    #else
+    #ifndef ARDUINO_ARCH_SAM
       #define CYCLES_EATEN_BY_CODE 240
     #endif
 
@@ -914,9 +912,7 @@ void Stepper::isr() {
       #endif
     #endif
 
-    #ifdef ARDUINO_ARCH_SAM
-      #define CYCLES_EATEN_BY_E 12
-    #else
+    #ifndef ARDUINO_ARCH_SAM
       #define CYCLES_EATEN_BY_E 60
     #endif
 

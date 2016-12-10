@@ -154,6 +154,10 @@
 #define DISABLE_TEMP_INTERRUPT() HAL_timer_disable_interrupt(TEMP_TIMER)
 #define HAL_TIMER_SET_TEMP_COUNT(n) HAL_timer_set_count(TEMP_TIMER, n)
 
+// Delays
+#define CYCLES_EATEN_BY_CODE 12
+#define CYCLES_EATEN_BY_E 12
+
 // --------------------------------------------------------------------------
 // Types
 // --------------------------------------------------------------------------
