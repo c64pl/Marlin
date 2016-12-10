@@ -75,14 +75,12 @@
 volatile uint8_t e_hit = 0; // Different from 0 when the endstops shall be tested in detail.
                             // Must be reset to 0 by the test function when the tests are finished.
 
-#ifndef ARDUINO_ARCH_SAM
-  // Install Pin change interrupt for a pin. Can be called multiple times.
-  void pciSetup(byte pin) {
-    *digitalPinToPCMSK(pin) |= bit (digitalPinToPCMSKbit(pin));  // enable pin
-    PCIFR  |= bit (digitalPinToPCICRbit(pin)); // clear any outstanding interrupt
-    PCICR  |= bit (digitalPinToPCICRbit(pin)); // enable interrupt for the group
-  }
-#endif
+// Install Pin change interrupt for a pin. Can be called multiple times.
+void pciSetup(byte pin) {
+  *digitalPinToPCMSK(pin) |= bit (digitalPinToPCMSKbit(pin));  // enable pin
+  PCIFR  |= bit (digitalPinToPCICRbit(pin)); // clear any outstanding interrupt
+  PCICR  |= bit (digitalPinToPCICRbit(pin)); // enable interrupt for the group
+}
 
 // This is what is really done inside the interrupts.
 FORCE_INLINE void endstop_ISR_worker( void ) {
@@ -113,128 +111,92 @@ void endstop_ISR(void) { endstop_ISR_worker(); }
 void setup_endstop_interrupts( void ) {
 
   #if HAS_X_MAX
-    #ifdef ARDUINO_ARCH_SAM
+    #if (digitalPinToInterrupt(X_MAX_PIN) != NOT_AN_INTERRUPT) // if pin has an external interrupt
       attachInterrupt(digitalPinToInterrupt(X_MAX_PIN), endstop_ISR, CHANGE); // assign it
     #else
-      #if (digitalPinToInterrupt(X_MAX_PIN) != NOT_AN_INTERRUPT) // if pin has an external interrupt
-        attachInterrupt(digitalPinToInterrupt(X_MAX_PIN), endstop_ISR, CHANGE); // assign it
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(X_MAX_PIN) != NULL, "X_MAX_PIN is not interrupt-capable"); // if pin has no pin change interrupt - error
-        pciSetup(X_MAX_PIN);                                                            // assign it
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(X_MAX_PIN) != NULL, "X_MAX_PIN is not interrupt-capable"); // if pin has no pin change interrupt - error
+      pciSetup(X_MAX_PIN);                                                            // assign it
     #endif
   #endif
 
   #if HAS_X_MIN
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(X_MIN_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(X_MIN_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(X_MIN_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(X_MIN_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(X_MIN_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(X_MIN_PIN) != NULL, "X_MIN_PIN is not interrupt-capable");
-        pciSetup(X_MIN_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(X_MIN_PIN) != NULL, "X_MIN_PIN is not interrupt-capable");
+      pciSetup(X_MIN_PIN);
     #endif
   #endif
 
   #if HAS_Y_MAX
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Y_MAX_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Y_MAX_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Y_MAX_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Y_MAX_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Y_MAX_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Y_MAX_PIN) != NULL, "Y_MAX_PIN is not interrupt-capable");
-        pciSetup(Y_MAX_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Y_MAX_PIN) != NULL, "Y_MAX_PIN is not interrupt-capable");
+      pciSetup(Y_MAX_PIN);
     #endif
   #endif
 
   #if HAS_Y_MIN
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Y_MIN_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Y_MIN_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Y_MIN_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Y_MIN_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Y_MIN_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Y_MIN_PIN) != NULL, "Y_MIN_PIN is not interrupt-capable");
-        pciSetup(Y_MIN_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Y_MIN_PIN) != NULL, "Y_MIN_PIN is not interrupt-capable");
+      pciSetup(Y_MIN_PIN);
     #endif
   #endif
 
   #if HAS_Z_MAX
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Z_MAX_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Z_MAX_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Z_MAX_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Z_MAX_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Z_MAX_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Z_MAX_PIN) != NULL, "Z_MAX_PIN is not interrupt-capable");
-        pciSetup(Z_MAX_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Z_MAX_PIN) != NULL, "Z_MAX_PIN is not interrupt-capable");
+      pciSetup(Z_MAX_PIN);
     #endif
   #endif
 
   #if HAS_Z_MIN
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Z_MIN_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Z_MIN_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Z_MIN_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Z_MIN_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Z_MIN_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Z_MIN_PIN) != NULL, "Z_MIN_PIN is not interrupt-capable");
-        pciSetup(Z_MIN_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Z_MIN_PIN) != NULL, "Z_MIN_PIN is not interrupt-capable");
+      pciSetup(Z_MIN_PIN);
     #endif
   #endif
 
   #if HAS_Z2_MAX
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Z2_MAX_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Z2_MAX_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Z2_MAX_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Z2_MAX_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Z2_MAX_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Z2_MAX_PIN) != NULL, "Z2_MAX_PIN is not interrupt-capable");
-        pciSetup(Z2_MAX_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Z2_MAX_PIN) != NULL, "Z2_MAX_PIN is not interrupt-capable");
+      pciSetup(Z2_MAX_PIN);
     #endif
   #endif
 
   #if HAS_Z2_MIN
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Z2_MIN_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Z2_MIN_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Z2_MIN_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Z2_MIN_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Z2_MIN_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Z2_MIN_PIN) != NULL, "Z2_MIN_PIN is not interrupt-capable");
-        pciSetup(Z2_MIN_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Z2_MIN_PIN) != NULL, "Z2_MIN_PIN is not interrupt-capable");
+      pciSetup(Z2_MIN_PIN);
     #endif
   #endif
 
   #if HAS_Z_MIN_PROBE_PIN
-    #ifdef ARDUINO_ARCH_SAM
-      attachInterrupt(digitalPinToInterrupt(Z_MIN_PROBE_PIN), endstop_ISR, CHANGE); // assign it
+    #if (digitalPinToInterrupt(Z_MIN_PROBE_PIN) != NOT_AN_INTERRUPT)
+      attachInterrupt(digitalPinToInterrupt(Z_MIN_PROBE_PIN), endstop_ISR, CHANGE);
     #else
-      #if (digitalPinToInterrupt(Z_MIN_PROBE_PIN) != NOT_AN_INTERRUPT)
-        attachInterrupt(digitalPinToInterrupt(Z_MIN_PROBE_PIN), endstop_ISR, CHANGE);
-      #else
-        // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
-        static_assert(digitalPinToPCICR(Z_MIN_PROBE_PIN) != NULL, "Z_MIN_PROBE_PIN is not interrupt-capable");
-        pciSetup(Z_MIN_PROBE_PIN);
-      #endif
+      // Not all used endstop/probe -pins can raise interrupts. Please deactivate ENDSTOP_INTERRUPTS or change the pin configuration!
+      static_assert(digitalPinToPCICR(Z_MIN_PROBE_PIN) != NULL, "Z_MIN_PROBE_PIN is not interrupt-capable");
+      pciSetup(Z_MIN_PROBE_PIN);
     #endif
   #endif
 

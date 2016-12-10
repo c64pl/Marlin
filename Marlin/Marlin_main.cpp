@@ -292,7 +292,11 @@
 #endif
 
 #if ENABLED(ENDSTOP_INTERRUPTS_FEATURE)
-  #include "endstop_interrupts.h"
+  #ifdef ARDUINO_ARCH_SAM
+    #include "src/HAL/HAL_endstop_interrupts.h"
+  #else
+    #include "endstop_interrupts.h"
+  #endif
 #endif
 
 #if ENABLED(M100_FREE_MEMORY_WATCHER)
