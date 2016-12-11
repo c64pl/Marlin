@@ -2805,35 +2805,34 @@ void lcd_init() {
 
   #if ENABLED(NEWPANEL)
     #if BUTTON_EXISTS(EN1)
-      SET_INPUT(BTN_EN1);
       #if defined(ARDUINO_ARCH_SAM)
-        PULLUP(BTN_EN1, HIGH);
+        SET_INPUT_PULLUP(BTN_EN1);
       #else
+        SET_INPUT(BTN_EN1);
         WRITE(BTN_EN1, HIGH);
       #endif
     #endif
 
     #if BUTTON_EXISTS(EN2)
-      SET_INPUT(BTN_EN2);
       #if defined(ARDUINO_ARCH_SAM)
-        PULLUP(BTN_EN2, HIGH);
+        SET_INPUT_PULLUP(BTN_EN2);
       #else
+        SET_INPUT(BTN_EN2);
         WRITE(BTN_EN2, HIGH);
       #endif
     #endif
 
     #if BUTTON_EXISTS(ENC)
-      SET_INPUT(BTN_ENC);
       #if defined(ARDUINO_ARCH_SAM)
-        PULLUP(BTN_ENC, HIGH);
+        SET_INPUT_PULLUP(BTN_ENC);
       #else
+        SET_INPUT(BTN_ENC);
         WRITE(BTN_ENC, HIGH);
       #endif
     #endif
 
     #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
-      SET_INPUT(BTN_BACK);
-      PULLUP(BTN_BACK, HIGH);
+      SET_INPUT_PULLUP(BTN_BACK);
     #endif
 
     #if ENABLED(REPRAPWORLD_KEYPAD)
@@ -2870,10 +2869,10 @@ void lcd_init() {
   #endif // !NEWPANEL
 
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
-    SET_INPUT(SD_DETECT_PIN);
     #if defined(ARDUINO_ARCH_SAM)
-      PULLUP(SD_DETECT_PIN, HIGH);
+      SET_INPUT_PULLUP(SD_DETECT_PIN);
     #else
+      SET_INPUT(SD_DETECT_PIN);
       WRITE(SD_DETECT_PIN, HIGH);
     #endif
     lcd_sd_status = 2; // UNKNOWN
