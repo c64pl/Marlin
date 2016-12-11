@@ -61,6 +61,10 @@
   #define analogInputToDigitalPin(p)  ((p < 12u) ? (p) + 54u : -1)
 #endif
 
+// Fix bug in pgm_read_ptr
+#undef pgm_read_ptr
+#define pgm_read_ptr(addr) (*(addr))
+
 #if ENABLED(DELTA_FAST_SQRT)
   #undef ATAN2
   #undef FABS
