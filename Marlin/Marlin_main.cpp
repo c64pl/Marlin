@@ -5751,15 +5751,11 @@ inline void gcode_M111() {
   SERIAL_ECHOPGM(MSG_DEBUG_PREFIX);
   if (marlin_debug_flags) {
     uint8_t comma = 0;
-    #if defined(ARDUINO_ARCH_SAM)
-      char* address = NULL;
-    #endif
     for (uint8_t i = 0; i < COUNT(debug_strings); i++) {
       if (TEST(marlin_debug_flags, i)) {
         if (comma++) SERIAL_CHAR(',');
         #if defined(ARDUINO_ARCH_SAM)
-          address = (char*)(&(debug_strings[i]));
-          serialprintPGM((char*)pgm_read_dword(address));
+          serialprintPGM((char*)pgm_read_ptr(&(debug_strings[i])));
         #else
           serialprintPGM((char*)pgm_read_word(&(debug_strings[i])));
         #endif
