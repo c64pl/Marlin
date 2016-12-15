@@ -55,7 +55,8 @@ class PrintCounter: public Stopwatch {
      * @brief EEPROM address
      * @details Defines the start offset address where the data is stored.
      */
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM) && (defined(I2C_EEPROM) || defined(SPI_EEPROM))
+      // round up address to next page boundary (assuming 32 byte pages)
       const uint32_t address = 0x40;
     #else
       const uint16_t address = 0x32;
