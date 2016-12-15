@@ -184,7 +184,7 @@ void eeprom_update_block(const void* pos, void* eeprom_address, size_t n) {
     eeprom_temp[1] = ((pos>>8) & 0xFF);//addrH
     eeprom_temp[2] = (pos& 0xFF);//addrL
     digitalWrite(SPI_EEPROM1_CS, LOW);
-    spiSend(SPI_CHAN_EEPROM1, eeprom_temp, 3);        
+    spiSend(SPI_CHAN_EEPROM1, eeprom_temp, 3);
 
     spiSend(SPI_CHAN_EEPROM1 ,newvalue , 1);
     digitalWrite(SPI_EEPROM1_CS, HIGH);
@@ -206,7 +206,7 @@ void eeprom_update_block(const void* pos, void* eeprom_address, size_t n) {
     digitalWrite(SPI_EEPROM1_CS, LOW);
     spiSend(SPI_CHAN_EEPROM1, eeprom_temp, 3);
 
-    v = spiRec(SPI_CHAN_EEPROM1); 
+    v = spiRec(SPI_CHAN_EEPROM1);
     digitalWrite(SPI_EEPROM1_CS, HIGH);
     return v;
   }
@@ -400,14 +400,14 @@ static uint32_t tone_pin = 0;
 
 void tone(uint8_t pin, int frequency) {
   // set up timer counter 1 channel 0 to generate interrupts for
-  // toggling output pin.  
+  // toggling output pin.
 
   /*TC1, 1, TC4_IRQn*/
   Tc *tc = TimerConfig[BEEPER_TIMER].pTimerRegs;
   uint32_t channel = TimerConfig[BEEPER_TIMER].channel;
   IRQn_Type irq = TimerConfig[BEEPER_TIMER].IRQ_Id;
 
-  uint32_t rc = VARIANT_MCK / BEEPER_TIMER_PRESCALE / frequency; 
+  uint32_t rc = VARIANT_MCK / BEEPER_TIMER_PRESCALE / frequency;
 
   SET_OUTPUT(pin);
   tone_pin = pin;
@@ -432,7 +432,7 @@ void tone(uint8_t pin, int frequency) {
 void noTone(uint8_t pin) {
   const tTimerConfig *pConfig = &TimerConfig[BEEPER_TIMER];
 
-  TC_Stop(pConfig->pTimerRegs, pConfig->channel); 
+  TC_Stop(pConfig->pTimerRegs, pConfig->channel);
   WRITE_VAR(pin, LOW);
 }
 

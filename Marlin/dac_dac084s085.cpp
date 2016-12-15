@@ -70,7 +70,7 @@
 
     externalDac_buf[0] |= (value>>4);
     externalDac_buf[1] |= (value<<4);
-    
+
     // All SPI chip-select HIGH
     digitalWrite( DAC0_SYNC , HIGH );
     #if EXTRUDERS > 1

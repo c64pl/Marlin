@@ -167,7 +167,7 @@ typedef struct {
   IRQn_Type   IRQ_Id;
 } tTimerConfig;
 
-// this should not be written in .h, but I can not solve compilation error 
+// this should not be written in .h, but I can not solve compilation error
 static const tTimerConfig TimerConfig[NUM_HARDWARE_TIMERS] =
 {
   { TC0, 0, TC0_IRQn},

@@ -104,7 +104,7 @@
 
     #define BTN_EN1         50
     #define BTN_EN2         52
-    #define BTN_ENC         48    
+    #define BTN_ENC         48
 
     #define SDSS             4
     #define SD_DETECT_PIN   14
@@ -116,9 +116,9 @@
     #define BTN_EN1         50
     #define BTN_EN2         52
     #define BTN_ENC         48
-      
+
     #define BTN_BACK        71
-    
+
     #undef SDSS
     #define SDSS             4
     #define SD_DETECT_PIN   14

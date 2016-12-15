@@ -32,7 +32,7 @@
   #elif (SDSS == 10)
     #define SPI_PIN         77
     #define SPI_CHAN         0
-  #elif (SDSS == 52) 
+  #elif (SDSS == 52)
     #define SPI_PIN         86
     #define SPI_CHAN         2
   #else
