@@ -113,6 +113,8 @@
 #define SD_DETECT_PIN      14
 #define PS_ON_PIN          40
 
+#define I2C_EEPROM
+
 //
 // LCD / Controller
 //

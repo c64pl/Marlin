@@ -13,10 +13,6 @@
   #define BOARD_NAME       "RAMPS-FD"
 #endif
 
-#define INVERTED_HEATER_PINS
-#define INVERTED_BED_PINS
-#define INVERTED_FAN_PINS
-
 //
 // Servos
 //
@@ -86,6 +82,10 @@
 //
 // Heaters / Fans
 //
+#define INVERTED_HEATER_PINS
+#define INVERTED_BED_PINS
+#define INVERTED_FAN_PINS
+
 #define HEATER_0_PIN        9
 #define HEATER_1_PIN       10
 #define HEATER_2_PIN       11
@@ -99,6 +99,8 @@
 //
 #define SDSS                4
 #define LED_PIN            13
+
+//#define I2C_EEPROM // for external i2c eeprom
 
 //
 // LCD / Controller

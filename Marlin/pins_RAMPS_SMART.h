@@ -60,6 +60,11 @@
 #endif
 
 //
+// Misc. Functions
+//
+#define I2C_EEPROM
+
+//
 // LCD / Controller
 //
 // Support for AZSMZ 12864 LCD with SD Card 3D printer smart controller control panel (not tested)

@@ -52,6 +52,11 @@
 #endif
 
 //
+// Misc. Functions
+//
+//#define I2C_EEPROM // for external i2c eeprom
+
+//
 // LCD / Controller
 //
 #if ENABLED(ULTRA_LCD)

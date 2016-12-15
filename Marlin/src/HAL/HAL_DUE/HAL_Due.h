@@ -206,12 +206,6 @@ static inline void HAL_delay(millis_t ms) {
 // return free memory between end of heap (or end bss) and whatever is current
 int freeMemory(void);
 
-// eeprom
-uint8_t eeprom_read_byte(uint8_t* pos);
-void eeprom_read_block(void* pos, const void* eeprom_address, size_t n);
-void eeprom_write_byte(uint8_t* pos, uint8_t value);
-void eeprom_update_block(const void* pos, void* eeprom_address, size_t n);
-
 // Timers
 void HAL_timer_start(uint8_t timer_num, uint8_t priority, uint32_t frequency, uint32_t clock, uint8_t prescale);
 void HAL_timer_enable_interrupt(uint8_t timer_num);

@@ -98,12 +98,13 @@
 
 #define EXP_VOLTAGE_LEVEL_PIN 65
 
+// external DAC
 #define SPI_CHAN_DAC           1
-
 #define DAC0_SYNC             53 // PB14
 #define DAC1_SYNC              6 // PC24
 
 // 64K SPI EEPROM
+#define SPI_EEPROM
 #define SPI_CHAN_EEPROM1       2
 #define SPI_EEPROM1_CS        25 // PD0
 

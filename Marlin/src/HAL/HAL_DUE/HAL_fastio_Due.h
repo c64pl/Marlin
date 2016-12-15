@@ -24,8 +24,8 @@
  * For ARDUINO_ARCH_SAM
  */
 
-#ifndef	HAL_FASTIO_DUE_H
-#define	HAL_FASTIO_DUE_H
+#ifndef HAL_FASTIO_DUE_H
+#define HAL_FASTIO_DUE_H
 
 /**
   utility functions

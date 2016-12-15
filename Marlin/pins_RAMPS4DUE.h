@@ -38,3 +38,8 @@
 
 #undef TEMP_BED_PIN
 #define TEMP_BED_PIN       10   // Analog Input
+
+//
+// Misc. Functions
+//
+//#define I2C_EEPROM // for external i2c eeprom
