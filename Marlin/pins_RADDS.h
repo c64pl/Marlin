@@ -110,6 +110,7 @@
 // Misc. Functions
 //
 #define SDSS                4
+#define SD_DETECT_PIN      14
 #define PS_ON_PIN          40
 
 //
@@ -135,7 +136,6 @@
 
     #undef SDSS
     #define SDSS            10
-    #define SD_DETECT_PIN   14
 
   #elif ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
     #define LCD_PINS_RS     46
@@ -154,7 +154,6 @@
     #define BTN_ENC         48
     #define BEEPER_PIN      41
     #define LCD_SDSS        10
-    #define SD_DETECT_PIN   14
 
   #elif ENABLED(SPARK_FULL_GRAPHICS)
     #define LCD_PINS_D4     29
