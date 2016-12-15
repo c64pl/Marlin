@@ -1,22 +1,23 @@
-/* **************************************************************************
- 
- Marlin 3D Printer Firmware
- Copyright (c) 2015 Nico Tonnhofer wurstnase.reprap@gmail.com
- Copyright (c) 2016 Bob Cousins bobcousins42@googlemail.com
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
-****************************************************************************/
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (C) 2016 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ * Copyright (C) 2015 Nico Tonnhofer wurstnase.reprap@gmail.com
+ * Copyright (C) 2016 Bob Cousins bobcousins42@googlemail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 /**
  * Description: HAL for Arduino Due and compatible (SAM3X8E)
@@ -204,34 +205,6 @@ static inline void HAL_delay(millis_t ms) {
 
 // return free memory between end of heap (or end bss) and whatever is current
 int freeMemory(void);
-
-// SPI
-#ifdef SOFTWARE_SPI
-  inline uint8_t spiTransfer(uint8_t b); // using Mode 0
-  inline void spiBegin();
-  inline void spiInit(uint8_t spiRate);
-  inline uint8_t spiRec();
-  inline void spiRead(uint8_t*buf, uint16_t nbyte);
-  inline void spiSend(uint8_t b);
-  inline void spiSend(const uint8_t* buf , size_t n) ;
-  inline void spiSendBlock(uint8_t token, const uint8_t* buf);
-#else
-  // Hardware setup
-  void spiBegin();
-  void spiInit(uint8_t spiRate);
-  // Write single byte to SPI
-  void spiSend(byte b);
-  void spiSend(const uint8_t* buf, size_t n);
-  void spiSend(uint32_t chan, byte b);
-  void spiSend(uint32_t chan , const uint8_t* buf , size_t n);
-  // Read single byte from SPI
-  uint8_t spiRec();
-  uint8_t spiRec(uint32_t chan);
-  // Read from SPI into buffer
-  void spiRead(uint8_t* buf, uint16_t nbyte);
-  // Write from buffer to SPI
-  void spiSendBlock(uint8_t token, const uint8_t* buf);
-#endif
 
 // eeprom
 uint8_t eeprom_read_byte(uint8_t* pos);

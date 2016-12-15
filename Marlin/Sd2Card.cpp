@@ -180,10 +180,6 @@ uint8_t Sd2Card::cardCommand(uint8_t cmd, uint32_t arg) {
   if (cmd == CMD8) crc = 0X87;  // correct crc for CMD8 with arg 0X1AA
   spiSend(crc);
 
-  #ifdef ARDUINO_ARCH_SAM
-    // additional delay for CMD0
-    if (cmd == CMD0) delay(100);
-  #endif
   // skip stuff byte for stop read
   if (cmd == CMD12) spiRec();
 
@@ -225,11 +221,9 @@ void Sd2Card::chipSelectHigh() {
 }
 //------------------------------------------------------------------------------
 void Sd2Card::chipSelectLow() {
-  #ifndef ARDUINO_ARCH_SAM
-    #if DISABLED(SOFTWARE_SPI)
-      spiInit(spiRate_);
-    #endif  // SOFTWARE_SPI
-  #endif
+  #if DISABLED(SOFTWARE_SPI)
+    spiInit(spiRate_);
+  #endif  // SOFTWARE_SPI
   digitalWrite(chipSelectPin_, LOW);
 }
 //------------------------------------------------------------------------------
@@ -375,17 +369,12 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   }
   chipSelectHigh();
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if DISABLED(SOFTWARE_SPI)
+    return setSckRate(sckRateID);
+  #else  // SOFTWARE_SPI
     UNUSED(sckRateID);
     return true;
-  #else
-    #if DISABLED(SOFTWARE_SPI)
-      return setSckRate(sckRateID);
-    #else  // SOFTWARE_SPI
-      UNUSED(sckRateID);
-      return true;
-    #endif  // SOFTWARE_SPI
-  #endif
+  #endif  // SOFTWARE_SPI
 
 fail:
   chipSelectHigh();
@@ -583,28 +572,26 @@ fail:
   return false;
 }
 //------------------------------------------------------------------------------
-#ifndef ARDUINO_ARCH_SAM
-  /**
-   * Set the SPI clock rate.
-   *
-   * \param[in] sckRateID A value in the range [0, 6].
-   *
-   * The SPI clock will be set to F_CPU/pow(2, 1 + sckRateID). The maximum
-   * SPI rate is F_CPU/2 for \a sckRateID = 0 and the minimum rate is F_CPU/128
-   * for \a scsRateID = 6.
-   *
-   * \return The value one, true, is returned for success and the value zero,
-   * false, is returned for an invalid value of \a sckRateID.
-   */
-  bool Sd2Card::setSckRate(uint8_t sckRateID) {
-    if (sckRateID > 6) {
-      error(SD_CARD_ERROR_SCK_RATE);
-      return false;
-    }
-    spiRate_ = sckRateID;
-    return true;
+/**
+ * Set the SPI clock rate.
+ *
+ * \param[in] sckRateID A value in the range [0, 6].
+ *
+ * The SPI clock will be set to F_CPU/pow(2, 1 + sckRateID). The maximum
+ * SPI rate is F_CPU/2 for \a sckRateID = 0 and the minimum rate is F_CPU/128
+ * for \a scsRateID = 6.
+ *
+ * \return The value one, true, is returned for success and the value zero,
+ * false, is returned for an invalid value of \a sckRateID.
+ */
+bool Sd2Card::setSckRate(uint8_t sckRateID) {
+  if (sckRateID > 6) {
+    error(SD_CARD_ERROR_SCK_RATE);
+    return false;
   }
-#endif
+  spiRate_ = sckRateID;
+  return true;
+}
 //------------------------------------------------------------------------------
 // wait for card to go not busy
 bool Sd2Card::waitNotBusy(uint16_t timeoutMillis) {

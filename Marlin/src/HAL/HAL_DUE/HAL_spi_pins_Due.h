@@ -50,4 +50,14 @@
 #endif
 #define SS_PIN            SDSS // A.28, A.29, B.21, C.26, C.29
 
+// define software SPI pins
+/** Software SPI chip select pin for the SD */
+#define SOFT_SPI_CS_PIN SS_PIN
+/** Software SPI Master Out Slave In pin */
+#define SOFT_SPI_MOSI_PIN MOSI_PIN
+/** Software SPI Master In Slave Out pin */
+#define SOFT_SPI_MISO_PIN MISO_PIN
+/** Software SPI Clock pin */
+#define SOFT_SPI_SCK_PIN SCK_PIN
+
 #endif // HAL_SPI_PINS_DUE_H

@@ -38,20 +38,8 @@
  */
 #include "SdFatConfig.h"
 #include "SdInfo.h"
-//------------------------------------------------------------------------------
-#ifdef ARDUINO_ARCH_SAM
-  // On Due, SPI rate = MCLK / n
-  // where MCK = 84 MHz
-
-  uint8_t const SPI_FULL_SPEED = 8;        // 10.5 MHz
-  uint8_t const SPI_HALF_SPEED = 16;       //  5.25 MHz
-  uint8_t const SPI_QUARTER_SPEED = 32;    //  2.625 MHz
-  uint8_t const SPI_EIGHTH_SPEED = 64;     //  1.3125 MHz
-  uint8_t const SPI_SIXTEENTH_SPEED = 128; //  0.65625 MHz
-
-  // slow speed for initialization
-  uint8_t const SPI_INIT_SPEED = 240;	// 350 kHz
-#else
+#ifndef ARDUINO_ARCH_SAM
+  //------------------------------------------------------------------------------
   // SPI speed is F_CPU/2^(1 + index), 0 <= index <= 6
   /** Set SCK to max rate of F_CPU/2. See Sd2Card::setSckRate(). */
   uint8_t const SPI_FULL_SPEED = 0;
@@ -63,8 +51,8 @@
   uint8_t const SPI_EIGHTH_SPEED = 3;
   /** Set SCK rate to F_CPU/32. See Sd2Card::setSckRate(). */
   uint8_t const SPI_SIXTEENTH_SPEED = 4;
+  //------------------------------------------------------------------------------
 #endif
-//------------------------------------------------------------------------------
 /** init timeout ms */
 uint16_t const SD_INIT_TIMEOUT = 2000;
 /** erase timeout ms */
@@ -139,13 +127,11 @@ uint8_t const SD_CARD_TYPE_SDHC = 3;
  * define SOFTWARE_SPI to use bit-bang SPI
  */
 //------------------------------------------------------------------------------
-#ifndef ARDUINO_ARCH_SAM
-  #if MEGA_SOFT_SPI && (defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__))
-    #define SOFTWARE_SPI
-  #elif USE_SOFTWARE_SPI
-    #define SOFTWARE_SPI
-  #endif  // MEGA_SOFT_SPI
-#endif
+#if MEGA_SOFT_SPI && (defined(__AVR_ATmega1280__)||defined(__AVR_ATmega2560__))
+  #define SOFTWARE_SPI
+#elif USE_SOFTWARE_SPI
+  #define SOFTWARE_SPI
+#endif  // MEGA_SOFT_SPI
 //------------------------------------------------------------------------------
 // SPI pin definitions - do not edit here - change in SdFatConfig.h
 //
@@ -230,9 +216,7 @@ class Sd2Card {
   bool readData(uint8_t* dst);
   bool readStart(uint32_t blockNumber);
   bool readStop();
-  #ifndef ARDUINO_ARCH_SAM
-    bool setSckRate(uint8_t sckRateID);
-  #endif
+  bool setSckRate(uint8_t sckRateID);
   /** Return the card type: SD V1, SD V2 or SDHC
    * \return 0 - SD V1, 1 - SD V2, or 3 - SDHC.
    */
