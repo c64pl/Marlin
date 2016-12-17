@@ -28,9 +28,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#if defined(ARDUINO_ARCH_SAM) && (defined(I2C_EEPROM) || defined(SPI_EEPROM))
-  #include "src/HAL/HAL_eeprom.h"
-#elif defined(ARDUINO_ARCH_AVR)
+#ifndef ARDUINO_ARCH_SAM
   #include <util/delay.h>
   #include <avr/eeprom.h>
 #endif

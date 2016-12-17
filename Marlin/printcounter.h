@@ -26,9 +26,7 @@
 #include "macros.h"
 #include "language.h"
 #include "stopwatch.h"
-#if defined(ARDUINO_ARCH_SAM) && (defined(I2C_EEPROM) || defined(SPI_EEPROM))
-  #include "src/HAL/HAL_eeprom.h"
-#elif defined(ARDUINO_ARCH_AVR)
+#ifndef ARDUINO_ARCH_SAM
   #include <avr/eeprom.h>
 #endif
 
