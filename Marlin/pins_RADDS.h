@@ -119,52 +119,47 @@
 // LCD / Controller
 //
 #if ENABLED(ULTRA_LCD)
-  // RADDS LCD panel
-  #if ENABLED(RADDS_DISPLAY)
-    #define LCD_PINS_RS     42
-    #define LCD_PINS_ENABLE 43
-    #define LCD_PINS_D4     44
-    #define LCD_PINS_D5     45
-    #define LCD_PINS_D6     46
-    #define LCD_PINS_D7     47
 
-    #define BEEPER_PIN      41
+  #define LCD_PINS_RS         42
+  #define LCD_PINS_ENABLE     43
+  #define LCD_PINS_D4         44
+  #define LCD_PINS_D5         45
+  #define LCD_PINS_D6         46
+  #define LCD_PINS_D7         47
 
-    #define BTN_EN1         50
-    #define BTN_EN2         52
-    #define BTN_ENC         48
+  #if ENABLED(NEWPANEL)
 
-    #define BTN_BACK        71
+    #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
+      #define BEEPER_PIN      41
 
-    #undef SDSS
-    #define SDSS            10
+      #define BTN_EN1         50
+      #define BTN_EN2         52
+      #define BTN_ENC         48
+      #if ENABLED(RADDS_DISPLAY)
+        #define BTN_BACK      71 // SCL1
+      #endif
 
-  #elif ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
-    #define LCD_PINS_RS     46
-    #define LCD_PINS_ENABLE 47
-    #define LCD_PINS_D4     44
+      #undef SDSS
+      #define SDSS            10
 
-    #define BEEPER_PIN      41
+    #elif ENABLED(SPARK_FULL_GRAPHICS)
+      #define LCD_PINS_RS     25
+      #define LCD_PINS_ENABLE 27
+      #define LCD_PINS_D4     29
 
-    #define BTN_EN1         50
-    #define BTN_EN2         52
-    #define BTN_ENC         48
+      #define BTN_EN1         35
+      #define BTN_EN2         33
+      #define BTN_ENC         37
 
-  #elif ENABLED(SSD1306_OLED_I2C_CONTROLLER)
-    #define BTN_EN1         50
-    #define BTN_EN2         52
-    #define BTN_ENC         48
-    #define BEEPER_PIN      41
-    #define LCD_SDSS        10
+    #elif ENABLED(SSD1306_OLED_I2C_CONTROLLER)
+      #define BEEPER_PIN      41
 
-  #elif ENABLED(SPARK_FULL_GRAPHICS)
-    #define LCD_PINS_D4     29
-    #define LCD_PINS_ENABLE 27
-    #define LCD_PINS_RS     25
+      #define BTN_EN1         50
+      #define BTN_EN2         52
+      #define BTN_ENC         48
 
-    #define BTN_EN1         35
-    #define BTN_EN2         33
-    #define BTN_ENC         37
+      #define LCD_SDSS        10
 
-  #endif // SPARK_FULL_GRAPHICS
+    #endif
+  #endif // NEWPANEL
 #endif // ULTRA_LCD
