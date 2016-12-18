@@ -405,7 +405,7 @@ class Stepper {
       #else
         OCR1A = acceleration_time;
       #endif
-      
+
       #if ENABLED(LIN_ADVANCE)
         if (current_block->use_advance_lead) {
           current_estep_rate[current_block->active_extruder] = ((unsigned long)acc_step_rate * current_block->abs_adv_steps_multiplier8) >> 17;

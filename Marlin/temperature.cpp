@@ -2107,7 +2107,7 @@ void Temperature::isr() {
       if (!endstop_monitor_count) endstop_monitor();  // report changes in endstop status
     }
   #endif
-  
+
   #ifdef ARDUINO_ARCH_SAM
     ENABLE_TEMP_INTERRUPT(); //re-enable Temperature ISR
   #else

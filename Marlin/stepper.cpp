@@ -375,7 +375,7 @@ void Stepper::isr() {
   #endif
   DISABLE_STEPPER_DRIVER_INTERRUPT();
   sei();
-  
+
   if (cleaning_buffer_counter) {
     --cleaning_buffer_counter;
     current_block = NULL;
@@ -676,7 +676,7 @@ void Stepper::isr() {
       #endif
    }
   #endif
-  
+
   #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
     // If we have esteps to execute, fire the next advance_isr "now"
     #ifdef ARDUINO_ARCH_SAM
