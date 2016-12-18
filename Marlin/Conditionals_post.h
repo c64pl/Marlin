@@ -801,9 +801,16 @@
     #define DELTA_ENDSTOP_ADJ { 0 }
   #endif
 
-  #ifndef ARDUINO_ARCH_SAM
+  #ifdef ARDUINO_ARCH_SAM
+    #if MB(ALLIGATOR) && (!defined(UI_VOLTAGE_LEVEL) || (UI_VOLTAGE_LEVEL != 0 && UI_VOLTAGE_LEVEL != 1))
+      #undef UI_VOLTAGE_LEVEL
+      #define UI_VOLTAGE_LEVEL 0
+    #endif
+  #else
     #undef UI_VOLTAGE_LEVEL
     #undef RADDS_DISPLAY
+    #undef SSD1306_OLED_I2C_CONTROLLER
+    #undef AZSMZ_12864_LCD
     #undef MOTOR_CURRENT
   #endif
 

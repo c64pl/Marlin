@@ -831,9 +831,6 @@
   #if HAS_MOTOR_CURRENT_PWM
     #error "MOTOR_CURRENT_PWM (_XY, _Z, _E) are not supported by ARM platform yet."
   #endif
-  #if MB(ALLIGATOR) && DISABLED(UI_VOLTAGE_LEVEL)
-    #error "DEPENDENCY ERROR: Missing setting UI_VOLTAGE_LEVEL"
-  #endif
   #ifdef M100_FREE_MEMORY_WATCHER
     #error "M100_FREE_MEMORY_WATCHER is not supported by ARM platform yet."
   #endif

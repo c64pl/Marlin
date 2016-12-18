@@ -118,20 +118,29 @@
 //
 // LCD / Controller
 //
-#if ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
+// Display Voltage Logic Selector on Alligator Board
+// 0 = 3.3V, 1 = 5V
+#define UI_VOLTAGE_LEVEL 0
 
-  #define LCD_PINS_RS         18
-  #define LCD_PINS_ENABLE     15
-  #define LCD_PINS_D4         19
-  #define BEEPER_PIN          64
+#if ENABLED(ULTRA_LCD)
 
-  #define BTN_EN1             14
-  #define BTN_EN2             16
-  #define BTN_ENC             17
+  #define LCD_PINS_RS       18
+  #define LCD_PINS_ENABLE   15
+  #define LCD_PINS_D4       19
 
-  #if UI_VOLTAGE_LEVEL != 1
-    #undef UI_VOLTAGE_LEVEL
-    #define UI_VOLTAGE_LEVEL   1
-  #endif
+  #if ENABLED(NEWPANEL)
 
-#endif // REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
+    #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER)
+      #define BEEPER_PIN    64
+
+      #define BTN_EN1       14
+      #define BTN_EN2       16
+      #define BTN_ENC       17
+
+      #undef UI_VOLTAGE_LEVEL
+      #define UI_VOLTAGE_LEVEL 1
+
+    #endif
+  #endif // NEWPANEL
+
+#endif // ULTRA_LCD

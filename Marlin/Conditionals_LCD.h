@@ -46,6 +46,10 @@
     #define DEFAULT_LCD_CONTRAST 17
   #endif
 
+  #if defined(ARDUINO_ARCH_SAM) && ENABLED(AZSMZ_12864_LCD)
+    #define VIKI2
+  #endif
+
   #if ENABLED(miniVIKI) || ENABLED(VIKI2) || ENABLED(ELB_FULL_GRAPHIC_CONTROLLER)
     #define ULTRA_LCD  //general LCD support, also 16x2
     #define DOGLCD  // Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
@@ -104,7 +108,7 @@
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
 
-  #if ENABLED(RADDS_DISPLAY)
+  #if defined(ARDUINO_ARCH_SAM) && ENABLED(RADDS_DISPLAY)
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
 
@@ -125,6 +129,13 @@
   #endif
 
   #if ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
+    #define DOGLCD
+    #define U8GLIB_ST7920
+    #define ULTIPANEL
+    #define NEWPANEL
+  #endif
+
+  #if defined(ARDUINO_ARCH_SAM) && ENABLED(SPARK_FULL_GRAPHICS)
     #define DOGLCD
     #define U8GLIB_ST7920
     #define ULTIPANEL
@@ -181,6 +192,13 @@
     #ifndef ENCODER_STEPS_PER_MENU_ITEM
       #define ENCODER_STEPS_PER_MENU_ITEM 2
     #endif
+  #endif
+
+  #if defined(ARDUINO_ARCH_SAM) && ENABLED(SSD1306_OLED_I2C_CONTROLLER)
+    #define DOGLCD
+    #define U8GLIB_SSD1306
+    #define ULTIPANEL
+    #define NEWPANEL
   #endif
 
   // Shift register panels

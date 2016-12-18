@@ -89,11 +89,7 @@
 #define TEMP_BED_PIN        4   // Analog Input
 
 // SPI for Max6675 or Max31855 Thermocouple
-#if DISABLED(SDSUPPORT)
-  #define MAX6675_SS        5 // shared with SERVO0_PIN
-#else
-  #define MAX6675_SS        5 // shared with SERVO0_PIN
-#endif
+#define MAX6675_SS          5 // shared with SERVO0_PIN
 
 //
 // Heaters / Fans
@@ -143,13 +139,23 @@
       #define SDSS            10
 
     #elif ENABLED(SPARK_FULL_GRAPHICS)
-      #define LCD_PINS_RS     25
-      #define LCD_PINS_ENABLE 27
-      #define LCD_PINS_D4     29
+      // with sparkLCD Adapter
+      #define LCD_PINS_RS     44
+      #define LCD_PINS_ENABLE 45
+      #define LCD_PINS_D4     46
 
-      #define BTN_EN1         35
-      #define BTN_EN2         33
-      #define BTN_ENC         37
+      #define BTN_EN1         50
+      #define BTN_EN2         52
+      #define BTN_ENC         48
+
+      // without sparkLCD Adapter
+      //#define LCD_PINS_RS     25
+      //#define LCD_PINS_ENABLE 27
+      //#define LCD_PINS_D4     29
+
+      //#define BTN_EN1         35
+      //#define BTN_EN2         33
+      //#define BTN_ENC         37
 
     #elif ENABLED(SSD1306_OLED_I2C_CONTROLLER)
       #define BEEPER_PIN      41
@@ -159,7 +165,9 @@
       #define BTN_ENC         48
 
       #define LCD_SDSS        10
+      #undef SD_DETECT_PIN
 
     #endif
   #endif // NEWPANEL
+
 #endif // ULTRA_LCD

@@ -1296,16 +1296,21 @@
 //#define ULTIMAKERCONTROLLER
 
 //
-// Display Voltage Logic Selector on Alligator Board
-// 0 = 3.3V, 1 = 5V
-//
-//#define UI_VOLTAGE_LEVEL 1
-
-//
 // RADDS LCD-Display
 // http://doku.radds.org/dokumentation/lcd-display/
 //
 //#define RADDS_DISPLAY
+
+//
+// sparklab. sparkLCD - Graphic Display for RADDS Board
+// http://the-sparklab.de/sparklcd-grafik-lcd-fuer-radds
+//
+//#define SPARK_FULL_GRAPHICS
+
+//
+// AZSMZ 12864 LCD with SD Card 3D printer smart controller control panel
+//
+//#define AZSMZ_12864_LCD
 
 //
 // ULTIPANEL as seen on Thingiverse.
@@ -1412,6 +1417,12 @@
 // http://www.elefu.com/index.php?route=product/product&product_id=53
 //
 //#define RA_CONTROL_PANEL
+
+//
+// Tiny SSD1306 OLED I2C 128x64 FULL GRAPHICS CONTROLLER
+// https://www.thingiverse.com/thing:1110160
+//
+//#define SSD1306_OLED_I2C_CONTROLLER
 
 //
 // Sainsmart YW Robot (LCM1602) LCD Display
