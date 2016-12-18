@@ -22,6 +22,8 @@
  * Not platform dependent.
  */
 
+#include "../../MarlinConfig.h"
+
 #ifdef SPI_EEPROM
 
 #include "HAL.h"

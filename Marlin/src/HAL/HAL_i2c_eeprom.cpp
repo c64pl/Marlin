@@ -22,6 +22,8 @@
  * Not platform dependent.
  */
 
+#include "../../MarlinConfig.h"
+
 #ifdef I2C_EEPROM
 
 // --------------------------------------------------------------------------
@@ -77,7 +79,7 @@ static void eeprom_init(void) {
   }
 }
 
-unsigned char eeprom_read_byte(unsigned char *pos) {
+unsigned char eeprom_read_byte(uint8_t* pos) {
   byte data = 0xFF;
   unsigned eeprom_address = (unsigned) pos;
 
@@ -106,7 +108,7 @@ void eeprom_read_block(void* pos, const void* eeprom_address, size_t n) {
     if (Wire.available()) *((uint8_t*)pos + c) = Wire.read();
 }
 
-void eeprom_write_byte(unsigned char *pos, unsigned char value) {
+void eeprom_write_byte(uint8_t* pos, uint8_t value) {
   unsigned eeprom_address = (unsigned) pos;
 
   eeprom_init();
