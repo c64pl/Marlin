@@ -70,10 +70,8 @@
 #define SWITCH_ENABLED_true  1
 #define SWITCH_ENABLED_0     0
 #define SWITCH_ENABLED_1     1
-#ifdef ARDUINO_ARCH_SAM
-  #define SWITCH_ENABLED_0x0   0
-  #define SWITCH_ENABLED_0x1   1
-#endif
+#define SWITCH_ENABLED_0x0   0 // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define SWITCH_ENABLED_0x1   1 // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
 #define SWITCH_ENABLED_      1
 #define ENABLED(b) _CAT(SWITCH_ENABLED_, b)
 #define DISABLED(b) (!_CAT(SWITCH_ENABLED_, b))
@@ -140,17 +138,17 @@
 
 #define RECIPROCAL(x) (NEAR_ZERO(x) ? 0.0 : 1.0 / (x))
 
-// // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+//                                              // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
 // Maths macros that can be overridden by HAL.h // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-// // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define ATAN2(y, x) atan2(y, x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define FABS(x)     fabs(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define POW(x, y)   pow(x, y) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define SQRT(x)     sqrt(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define CEIL(x)     ceil(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define FLOOR(x)    floor(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define LROUND(x)   lround(x) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define FMOD(x, y)  fmod(x, y) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#define HYPOT(x,y)  SQRT(HYPOT2(x,y)) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
- // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+//                                              // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define ATAN2(y, x) atan2(y, x)                 // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FABS(x)     fabs(x)                     // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define POW(x, y)   pow(x, y)                   // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define SQRT(x)     sqrt(x)                     // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define CEIL(x)     ceil(x)                     // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FLOOR(x)    floor(x)                    // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define LROUND(x)   lround(x)                   // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define FMOD(x, y)  fmod(x, y)                  // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#define HYPOT(x,y)  SQRT(HYPOT2(x,y))           // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+                                                // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
 #endif //__MACROS_H
