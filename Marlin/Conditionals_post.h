@@ -807,10 +807,6 @@
       #define UI_VOLTAGE_LEVEL 0
     #endif
   #else
-    #undef UI_VOLTAGE_LEVEL
-    #undef RADDS_DISPLAY
-    #undef SSD1306_OLED_I2C_CONTROLLER
-    #undef AZSMZ_12864_LCD
     #undef MOTOR_CURRENT
   #endif
 

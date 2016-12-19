@@ -73,7 +73,7 @@
         #undef DOGLCD_A0
         #define DOGLCD_A0        59
 
-        #undef DOGLCD_A0
+        #undef DOGLCD_CS
         #define DOGLCD_CS        44
 
         #undef BTN_EN1

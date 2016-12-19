@@ -81,9 +81,11 @@
 //
 #if ENABLED(ULTRA_LCD)
 
-  #define LCD_PINS_RS         42
-  #define LCD_PINS_ENABLE     43
-  #define LCD_PINS_D4         44
+  #if DISABLED(SPARK_FULL_GRAPHICS)
+    #define LCD_PINS_RS       42
+    #define LCD_PINS_ENABLE   43
+    #define LCD_PINS_D4       44
+  #endif
   #define LCD_PINS_D5         45
   #define LCD_PINS_D6         46
   #define LCD_PINS_D7         47
