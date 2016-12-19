@@ -112,14 +112,6 @@
   added as necessary or if I feel like it- not a comprehensive list!
 */
 
-// UART
-#define RXD        DIO0
-#define TXD        DIO1
-
-// TWI (I2C)
-#define SCL        DIO21
-#define SDA        DIO20
-
 /**
 pins
 */
@@ -426,5 +418,9 @@ pins
 
 #define DIO100_PIN 11
 #define DIO100_WPORT PIOC
+
+// UART
+#define RXD DIO0_PIN
+#define TXD DIO1_PIN
 
 #endif // HAL_FASTIO_DUE_H
