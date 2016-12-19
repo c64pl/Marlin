@@ -1501,18 +1501,42 @@ void Stepper::report_positions() {
 
   void Stepper::microstep_init() {
     SET_OUTPUT(X_MS1_PIN);
-    SET_OUTPUT(X_MS2_PIN);
+    #ifdef ARDUINO_ARCH_SAM
+      #if X_MS2_PIN > -1
+        SET_OUTPUT(X_MS2_PIN);
+      #endif
+    #else
+      SET_OUTPUT(X_MS2_PIN);
+    #endif
     #if HAS_MICROSTEPS_Y
       SET_OUTPUT(Y_MS1_PIN);
-      SET_OUTPUT(Y_MS2_PIN);
+      #ifdef ARDUINO_ARCH_SAM
+        #if Y_MS2_PIN > -1
+          SET_OUTPUT(Y_MS2_PIN);
+        #endif
+      #else
+        SET_OUTPUT(Y_MS2_PIN);
+      #endif
     #endif
     #if HAS_MICROSTEPS_Z
       SET_OUTPUT(Z_MS1_PIN);
-      SET_OUTPUT(Z_MS2_PIN);
+      #ifdef ARDUINO_ARCH_SAM
+        #if Z_MS2_PIN > -1
+          SET_OUTPUT(Z_MS2_PIN);
+        #endif
+      #else
+        SET_OUTPUT(Z_MS2_PIN);
+      #endif
     #endif
     #if HAS_MICROSTEPS_E0
       SET_OUTPUT(E0_MS1_PIN);
-      SET_OUTPUT(E0_MS2_PIN);
+      #ifdef ARDUINO_ARCH_SAM
+        #if E0_MS2_PIN > -1
+          SET_OUTPUT(E0_MS2_PIN);
+        #endif
+      #else
+        SET_OUTPUT(E0_MS2_PIN);
+      #endif
     #endif
     #if HAS_MICROSTEPS_E1
       SET_OUTPUT(E1_MS1_PIN);
@@ -1573,21 +1597,53 @@ void Stepper::report_positions() {
     SERIAL_PROTOCOLLNPGM("MS1,MS2 Pins");
     SERIAL_PROTOCOLPGM("X: ");
     SERIAL_PROTOCOL(READ(X_MS1_PIN));
-    SERIAL_PROTOCOLLN(READ(X_MS2_PIN));
+    #ifdef ARDUINO_ARCH_SAM
+      #if X_MS2_PIN > -1
+        SERIAL_PROTOCOLLN(READ(X_MS2_PIN));
+      #else
+        SERIAL_PROTOCOLLN("");
+      #endif
+    #else
+      SERIAL_PROTOCOLLN(READ(X_MS2_PIN));
+    #endif
     #if HAS_MICROSTEPS_Y
       SERIAL_PROTOCOLPGM("Y: ");
       SERIAL_PROTOCOL(READ(Y_MS1_PIN));
-      SERIAL_PROTOCOLLN(READ(Y_MS2_PIN));
+      #ifdef ARDUINO_ARCH_SAM
+        #if Y_MS2_PIN > -1
+          SERIAL_PROTOCOLLN(READ(Y_MS2_PIN));
+        #else
+          SERIAL_PROTOCOLLN("");
+        #endif
+      #else
+        SERIAL_PROTOCOLLN(READ(Y_MS2_PIN));
+      #endif
     #endif
     #if HAS_MICROSTEPS_Z
       SERIAL_PROTOCOLPGM("Z: ");
       SERIAL_PROTOCOL(READ(Z_MS1_PIN));
-      SERIAL_PROTOCOLLN(READ(Z_MS2_PIN));
+      #ifdef ARDUINO_ARCH_SAM
+        #if Z_MS2_PIN > -1
+          SERIAL_PROTOCOLLN(READ(Z_MS2_PIN));
+        #else
+          SERIAL_PROTOCOLLN("");
+        #endif
+      #else
+        SERIAL_PROTOCOLLN(READ(Z_MS2_PIN));
+      #endif
     #endif
     #if HAS_MICROSTEPS_E0
       SERIAL_PROTOCOLPGM("E0: ");
       SERIAL_PROTOCOL(READ(E0_MS1_PIN));
-      SERIAL_PROTOCOLLN(READ(E0_MS2_PIN));
+      #ifdef ARDUINO_ARCH_SAM
+        #if E0_MS2_PIN > -1
+          SERIAL_PROTOCOLLN(READ(E0_MS2_PIN));
+        #else
+          SERIAL_PROTOCOLLN("");
+        #endif
+      #else
+        SERIAL_PROTOCOLLN(READ(E0_MS2_PIN));
+      #endif
     #endif
     #if HAS_MICROSTEPS_E1
       SERIAL_PROTOCOLPGM("E1: ");

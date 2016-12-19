@@ -885,7 +885,7 @@ bool enqueue_and_echo_command(const char* cmd, bool say_ok/*=false*/) {
     WRITE(EXP_VOLTAGE_LEVEL_PIN, UI_VOLTAGE_LEVEL);
     dac084s085::begin(); //initialize ExternalDac
     #if HAS_BUZZER
-      buzz(10,10);
+      buzzer.tone(10,10);
     #endif
   }
 #endif

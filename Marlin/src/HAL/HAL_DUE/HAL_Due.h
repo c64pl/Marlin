@@ -58,6 +58,12 @@
   #define _BV(b) (1 << (b))
 #endif
 
+// Variant files of Alligator Board is old
+#if MB(ALLIGATOR)
+  #define strncpy_P(s1, s2, n) strncpy((s1), (s2), (n))
+  #define analogInputToDigitalPin(p)  ((p < 12u) ? (p) + 54u : -1)
+#endif
+
 #if ENABLED(DELTA_FAST_SQRT)
   #undef ATAN2
   #undef FABS
