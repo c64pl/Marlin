@@ -128,7 +128,6 @@ void eeprom_write_byte(uint8_t* pos, uint8_t value) {
 // also, data can be maximum of about 30 bytes, because the Wire library has a buffer of 32 bytes
 void eeprom_update_block(const void* pos, void* eeprom_address, size_t n) {
   uint8_t eeprom_temp[32] = {0};
-  uint8_t flag = 0;
 
   eeprom_init();
 
@@ -139,19 +138,18 @@ void eeprom_update_block(const void* pos, void* eeprom_address, size_t n) {
   Wire.requestFrom(eeprom_device_address, (byte)n);
   for (byte c = 0; c < n; c++) {
     if (Wire.available()) eeprom_temp[c] = Wire.read();
-    if (flag = (eeprom_temp[c] ^ *((uint8_t*)pos + c))) break;
-  }
+    if (eeprom_temp[c] ^ *((uint8_t*)pos + c)) {
+      Wire.beginTransmission(eeprom_device_address);
+      Wire.write((int)((unsigned)eeprom_address >> 8));   // MSB
+      Wire.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
+      Wire.write((uint8_t*)(pos), n);
+      Wire.endTransmission();
 
-  if (flag) {
-    Wire.beginTransmission(eeprom_device_address);
-    Wire.write((int)((unsigned)eeprom_address >> 8));   // MSB
-    Wire.write((int)((unsigned)eeprom_address & 0xFF)); // LSB
-    Wire.write((uint8_t*)(pos), n);
-    Wire.endTransmission();
-
-    // wait for write cycle to complete
-    // this could be done more efficiently with "acknowledge polling"
-    delay(5);
+      // wait for write cycle to complete
+      // this could be done more efficiently with "acknowledge polling"
+      delay(5);
+      break;
+    }
   }
 }
 
