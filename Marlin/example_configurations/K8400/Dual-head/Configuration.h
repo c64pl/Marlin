@@ -312,6 +312,11 @@
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
   #define K1 0.95 //smoothing factor within the PID
 
+  // Emergency measure for suppress PID vibration when PID autotune is useless
+  // When you set this to 2, sampling period of the PID routine will be 1/2
+  // And if you change this value, you need to clear your EEPROM by M502 and M500
+  //#define PID_dT_FACTOR 1
+
   // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
   // Ultimaker
   //#define  DEFAULT_Kp 22.2

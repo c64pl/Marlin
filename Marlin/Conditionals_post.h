@@ -330,6 +330,10 @@
   #define HAS_PID_HEATING (ENABLED(PIDTEMP) || ENABLED(PIDTEMPBED))
   #define HAS_PID_FOR_BOTH (ENABLED(PIDTEMP) && ENABLED(PIDTEMPBED))
 
+  #if defined(ARDUINO_ARCH_SAM) && (!defined(PID_dT_FACTOR) || PID_dT_FACTOR <= 0)
+    #define PID_dT_FACTOR 1
+  #endif
+
   /**
    * Default hotend offsets, if not defined
    */
