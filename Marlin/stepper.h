@@ -110,12 +110,11 @@ class Stepper {
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
       #ifdef ARDUINO_ARCH_SAM
-        static uint32_t old_OCR0A;
-        static volatile uint32_t eISR_Rate;
+        static HAL_TIMER_TYPE nextMainISR, nextAdvanceISR, eISR_Rate;
       #else
-        static uint8_t old_OCR0A;
-        static volatile uint8_t eISR_Rate;
+        static uint16_t nextMainISR, nextAdvanceISR, eISR_Rate;
       #endif
+      #define _NEXT_ISR(T) nextMainISR = T
       #if ENABLED(LIN_ADVANCE)
         static volatile int e_steps[E_STEPPERS];
         static int final_estep_rate;
@@ -127,6 +126,12 @@ class Stepper {
         static long e_steps[E_STEPPERS];
         static long advance_rate, advance, final_advance;
         static long old_advance;
+      #endif
+    #else
+      #ifdef ARDUINO_ARCH_SAM
+        #define _NEXT_ISR(T) HAL_TIMER_SET_STEPPER_COUNT(T);
+      #else
+        #define _NEXT_ISR(T) OCR1A = T
       #endif
     #endif // ADVANCE or LIN_ADVANCE
 
@@ -192,6 +197,7 @@ class Stepper {
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
       static void advance_isr();
+      static void advance_isr_scheduler();
     #endif
 
     //
@@ -361,8 +367,8 @@ class Stepper {
       return timer;
     }
 
-    // Initializes the trapezoid generator from the current block. Called whenever a new
-    // block begins.
+    // Initialize the trapezoid generator from the current block.
+    // Called whenever a new block begins.
     static FORCE_INLINE void trapezoid_generator_reset() {
 
       static int8_t last_extruder = -1;
@@ -400,11 +406,7 @@ class Stepper {
       step_loops_nominal = step_loops;
       acc_step_rate = current_block->initial_rate;
       acceleration_time = calc_timer(acc_step_rate);
-      #ifdef ARDUINO_ARCH_SAM
-        HAL_TIMER_SET_STEPPER_COUNT(acceleration_time);
-      #else
-        OCR1A = acceleration_time;
-      #endif
+      _NEXT_ISR(acceleration_time);
 
       #if ENABLED(LIN_ADVANCE)
         if (current_block->use_advance_lead) {

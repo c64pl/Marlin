@@ -95,12 +95,14 @@ volatile uint32_t Stepper::step_events_completed = 0; // The number of step even
 #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
 
   #ifdef ARDUINO_ARCH_SAM
-    uint32_t Stepper::old_OCR0A = 0;
-    volatile uint32_t Stepper::eISR_Rate = 200 * EXTRUDER_TIMER_FACTOR; // Keep the ISR at a low rate until needed
+    HAL_TIMER_TYPE Stepper::nextMainISR = 0,
   #else
-    uint8_t Stepper::old_OCR0A = 0;
-    volatile uint8_t Stepper::eISR_Rate = 200; // Keep the ISR at a low rate until needed
+    constexpr uint16_t ADV_NEVER = 65535;
+
+    uint16_t Stepper::nextMainISR = 0,
   #endif
+           Stepper::nextAdvanceISR = ADV_NEVER,
+           Stepper::eISR_Rate = ADV_NEVER;
 
   #if ENABLED(LIN_ADVANCE)
     volatile int Stepper::e_steps[E_STEPPERS];
@@ -114,6 +116,9 @@ volatile uint32_t Stepper::step_events_completed = 0; // The number of step even
          Stepper::advance_rate,
          Stepper::advance;
   #endif
+
+  #define ADV_RATE(T, L) (e_steps[TOOL_E_INDEX] ? (T) * (L) / abs(e_steps[TOOL_E_INDEX]) : ADV_NEVER)
+
 #endif
 
 long Stepper::acceleration_time, Stepper::deceleration_time;
@@ -353,28 +358,33 @@ void Stepper::set_directions() {
 #ifdef ARDUINO_ARCH_SAM
   HAL_ISR(STEPPER_TIMER) {
     HAL_timer_isr_prologue(STEPPER_TIMER);
-    Stepper::isr();
-  }
 #else
-  ISR(TIMER1_COMPA_vect) { Stepper::isr(); }
+  ISR(TIMER1_COMPA_vect) {
 #endif
+  #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
+    Stepper::advance_isr_scheduler();
+  #else
+    Stepper::isr();
+  #endif
+}
 
 void Stepper::isr() {
-  //Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
-  #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-    #ifdef ARDUINO_ARCH_SAM
-      DISABLE_EXTRUDER_INTERRUPT();
-    #else
-      CBI(TIMSK0, OCIE0A); //estepper ISR
-    #endif
-  #endif
   #ifdef ARDUINO_ARCH_SAM
-    DISABLE_TEMP_INTERRUPT();
+    #define _ENABLE_ISRs() cli(); ENABLE_TEMP_INTERRUPT(); ENABLE_STEPPER_DRIVER_INTERRUPT()
   #else
-    CBI(TIMSK0, OCIE0B); //Temperature ISR
+    #define _ENABLE_ISRs() cli(); SBI(TIMSK0, OCIE0B); ENABLE_STEPPER_DRIVER_INTERRUPT()
   #endif
-  DISABLE_STEPPER_DRIVER_INTERRUPT();
-  sei();
+
+  #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
+    //Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
+    #ifdef ARDUINO_ARCH_SAM
+      DISABLE_TEMP_INTERRUPT(); //Temperature ISR
+    #else
+      CBI(TIMSK0, OCIE0B); //Temperature ISR
+    #endif
+    DISABLE_STEPPER_DRIVER_INTERRUPT();
+    sei();
+  #endif
 
   if (cleaning_buffer_counter) {
     --cleaning_buffer_counter;
@@ -384,24 +394,11 @@ void Stepper::isr() {
       if (!cleaning_buffer_counter && (SD_FINISHED_STEPPERRELEASE)) enqueue_and_echo_commands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
     #ifdef ARDUINO_ARCH_SAM
-      HAL_TIMER_SET_STEPPER_COUNT(200 * STEPPER_TIMER_FACTOR); // Run at max speed - 10 KHz
+      _NEXT_ISR(200 * STEPPER_TIMER_FACTOR); // Run at max speed - 10 KHz
     #else
-      OCR1A = 200; // Run at max speed - 10 KHz
+      _NEXT_ISR(200); // Run at max speed - 10 KHz
     #endif
-    //re-enable ISRs
-    #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-      #ifdef ARDUINO_ARCH_SAM
-        ENABLE_EXTRUDER_INTERRUPT();
-      #else
-        SBI(TIMSK0, OCIE0A);
-      #endif
-    #endif
-    #ifdef ARDUINO_ARCH_SAM
-      ENABLE_TEMP_INTERRUPT();
-    #else
-      SBI(TIMSK0, OCIE0B);
-    #endif
-    ENABLE_STEPPER_DRIVER_INTERRUPT();
+    _ENABLE_ISRs(); // re-enable ISRs
     return;
   }
 
@@ -435,23 +432,11 @@ void Stepper::isr() {
         if (current_block->steps[Z_AXIS] > 0) {
           enable_z();
           #ifdef ARDUINO_ARCH_SAM
-            HAL_TIMER_SET_STEPPER_COUNT(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
+            _NEXT_ISR(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
           #else
-            OCR1A = 2000; // Run at slow speed - 1 KHz
+            _NEXT_ISR(2000); // Run at slow speed - 1 KHz
           #endif
-          #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-            #ifdef ARDUINO_ARCH_SAM
-              ENABLE_EXTRUDER_INTERRUPT();
-            #else
-              SBI(TIMSK0, OCIE0A);
-            #endif
-          #endif
-          #ifdef ARDUINO_ARCH_SAM
-            ENABLE_TEMP_INTERRUPT();
-          #else
-            SBI(TIMSK0, OCIE0B);
-          #endif
-          ENABLE_STEPPER_DRIVER_INTERRUPT();
+          _ENABLE_ISRs(); // re-enable ISRs
           return;
         }
       #endif
@@ -462,23 +447,11 @@ void Stepper::isr() {
     }
     else {
       #ifdef ARDUINO_ARCH_SAM
-        HAL_TIMER_SET_STEPPER_COUNT(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
+        _NEXT_ISR(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
       #else
-        OCR1A = 2000; // Run at slow speed - 1 KHz
+        _NEXT_ISR(2000); // Run at slow speed - 1 KHz
       #endif
-      #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-        #ifdef ARDUINO_ARCH_SAM
-          ENABLE_EXTRUDER_INTERRUPT();
-        #else
-          SBI(TIMSK0, OCIE0A);
-        #endif
-      #endif
-      #ifdef ARDUINO_ARCH_SAM
-        ENABLE_TEMP_INTERRUPT();
-      #else
-        SBI(TIMSK0, OCIE0B);
-      #endif
-      ENABLE_STEPPER_DRIVER_INTERRUPT();
+      _ENABLE_ISRs(); // re-enable ISRs
       return;
     }
   }
@@ -679,11 +652,7 @@ void Stepper::isr() {
 
   #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
     // If we have esteps to execute, fire the next advance_isr "now"
-    #ifdef ARDUINO_ARCH_SAM
-      if (e_steps[TOOL_E_INDEX]) HAL_TIMER_SET_EXTRUDER_COUNT(HAL_timer_get_current_count(EXTRUDER_TIMER) + 2 * REFERENCE_EXTRUDER_TIMER_PRESCALE / EXTRUDER_TIMER_PRESCALE);
-    #else
-      if (e_steps[TOOL_E_INDEX]) OCR0A = TCNT0 + 2;
-    #endif
+    if (e_steps[TOOL_E_INDEX]) nextAdvanceISR = 0;
   #endif
 
   // Calculate new timer value
@@ -702,11 +671,10 @@ void Stepper::isr() {
     // step_rate to timer interval
     #ifdef ARDUINO_ARCH_SAM
       HAL_TIMER_TYPE timer = calc_timer(acc_step_rate);
-      HAL_TIMER_SET_STEPPER_COUNT(timer);
     #else
       uint16_t timer = calc_timer(acc_step_rate);
-      OCR1A = timer;
     #endif
+    _NEXT_ISR(timer);
     acceleration_time += timer;
 
     #if ENABLED(LIN_ADVANCE)
@@ -743,11 +711,7 @@ void Stepper::isr() {
     #endif // ADVANCE or LIN_ADVANCE
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-      #ifdef ARDUINO_ARCH_SAM
-        eISR_Rate = timer * step_loops / abs(e_steps[TOOL_E_INDEX]); //Both Timer 2 and Timer 1 runs at 84/2=42MHz.
-      #else
-        eISR_Rate = (timer >> 3) * step_loops / abs(e_steps[TOOL_E_INDEX]); //>> 3 is divide by 8. Reason: Timer 1 runs at 16/8=2MHz, Timer 0 at 16/64=0.25MHz. ==> 2/0.25=8.
-      #endif
+      eISR_Rate = ADV_RATE(timer, step_loops);
     #endif
   }
   else if (step_events_completed > (uint32_t)current_block->decelerate_after) {
@@ -769,11 +733,10 @@ void Stepper::isr() {
     // step_rate to timer interval
     #ifdef ARDUINO_ARCH_SAM
       HAL_TIMER_TYPE timer = calc_timer(step_rate);
-      HAL_TIMER_SET_STEPPER_COUNT(timer);
     #else
       uint16_t timer = calc_timer(step_rate);
-      OCR1A = timer;
     #endif
+    _NEXT_ISR(timer);
     deceleration_time += timer;
 
     #if ENABLED(LIN_ADVANCE)
@@ -808,11 +771,7 @@ void Stepper::isr() {
     #endif // ADVANCE or LIN_ADVANCE
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-      #ifdef ARDUINO_ARCH_SAM
-        eISR_Rate = timer * step_loops / abs(e_steps[TOOL_E_INDEX]);
-      #else
-        eISR_Rate = (timer >> 3) * step_loops / abs(e_steps[TOOL_E_INDEX]);
-      #endif
+      eISR_Rate = ADV_RATE(timer, step_loops);
     #endif
   }
   else {
@@ -822,29 +781,23 @@ void Stepper::isr() {
       if (current_block->use_advance_lead)
         current_estep_rate[TOOL_E_INDEX] = final_estep_rate;
 
-      #ifdef ARDUINO_ARCH_SAM
-        eISR_Rate = OCR1A_nominal * step_loops_nominal / abs(e_steps[TOOL_E_INDEX]);
-      #else
-        eISR_Rate = (OCR1A_nominal >> 3) * step_loops_nominal / abs(e_steps[TOOL_E_INDEX]);
-      #endif
+      eISR_Rate = ADV_RATE(OCR1A_nominal, step_loops_nominal);
 
     #endif
 
-    #ifdef ARDUINO_ARCH_SAM
-      HAL_TIMER_SET_STEPPER_COUNT(OCR1A_nominal);
-    #else
-      OCR1A = OCR1A_nominal;
-    #endif
+    _NEXT_ISR(OCR1A_nominal);
     // ensure we're running at the correct step rate, even if we just came off an acceleration
     step_loops = step_loops_nominal;
   }
 
-  #ifdef ARDUINO_ARCH_SAM
-    uint32_t stepper_timer_count = HAL_timer_get_count(STEPPER_TIMER),
-             stepper_timer_current_count = HAL_timer_get_current_count(STEPPER_TIMER) + 16 * REFERENCE_STEPPER_TIMER_PRESCALE / STEPPER_TIMER_PRESCALE;
-    HAL_TIMER_SET_STEPPER_COUNT(stepper_timer_count < stepper_timer_current_count ? stepper_timer_current_count : stepper_timer_count);
-  #else
-    NOLESS(OCR1A, TCNT1 + 16);
+  #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
+    #ifdef ARDUINO_ARCH_SAM
+      uint32_t stepper_timer_count = HAL_timer_get_count(STEPPER_TIMER),
+               stepper_timer_current_count = HAL_timer_get_current_count(STEPPER_TIMER) + 16 * REFERENCE_STEPPER_TIMER_PRESCALE / STEPPER_TIMER_PRESCALE;
+      HAL_TIMER_SET_STEPPER_COUNT(stepper_timer_count < stepper_timer_current_count ? stepper_timer_current_count : stepper_timer_count);
+    #else
+      NOLESS(OCR1A, TCNT1 + 16);
+    #endif
   #endif
 
   // If current block is finished, reset pointer
@@ -852,43 +805,19 @@ void Stepper::isr() {
     current_block = NULL;
     planner.discard_current_block();
   }
-  #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-    #ifdef ARDUINO_ARCH_SAM
-      ENABLE_EXTRUDER_INTERRUPT();
-    #else
-      SBI(TIMSK0, OCIE0A);
-    #endif
+  #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
+    _ENABLE_ISRs(); // re-enable ISRs
   #endif
-  #ifdef ARDUINO_ARCH_SAM
-    ENABLE_TEMP_INTERRUPT();
-  #else
-    SBI(TIMSK0, OCIE0B);
-  #endif
-  ENABLE_STEPPER_DRIVER_INTERRUPT();
 }
 
 #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
 
   // Timer interrupt for E. e_steps is set in the main routine;
-  #ifdef ARDUINO_ARCH_SAM
-    HAL_ISR(EXTRUDER_TIMER) {
-      HAL_timer_isr_prologue(EXTRUDER_TIMER);
-      Stepper::advance_isr();
-    }
-  #else
-    // Timer 0 is shared with millies
-    ISR(TIMER0_COMPA_vect) { Stepper::advance_isr(); }
-  #endif
 
   void Stepper::advance_isr() {
-
-    old_OCR0A += eISR_Rate;
-    #ifdef ARDUINO_ARCH_SAM
-      HAL_TIMER_SET_EXTRUDER_COUNT(old_OCR0A);
-    #else
-      OCR0A = old_OCR0A;
-    #endif
-
+    
+    nextAdvanceISR = eISR_Rate;
+    
     #define SET_E_STEP_DIR(INDEX) \
       if (e_steps[INDEX]) E## INDEX ##_DIR_WRITE(e_steps[INDEX] < 0 ? INVERT_E## INDEX ##_DIR : !INVERT_E## INDEX ##_DIR)
 
@@ -922,7 +851,7 @@ void Stepper::isr() {
       #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E
         static uint32_t pulse_start;
         #ifdef ARDUINO_ARCH_SAM
-          pulse_start = HAL_timer_get_current_count(EXTRUDER_TIMER);
+          pulse_start = HAL_timer_get_current_count(STEPPER_TIMER);
         #else
           pulse_start = TCNT0;
         #endif
@@ -944,8 +873,8 @@ void Stepper::isr() {
         #ifdef ARDUINO_ARCH_SAM
           // ADVANCE: MINIMUM_STEPPER_PULSE = 0... pulse width = 40ns, 1... 1.34μs, 2... 2.3μs, 3... 3.27μs, 4... 4.24μs, 5... 5.2μs
           // LIN_ADVANCE: MINIMUM_STEPPER_PULSE = 0... pulse width = 300ns, 1... 1.12μs, 2... 2.38μs, 3... 3.21μs, 4... 4.04μs, 5... 5.3μs
-          while (HAL_timer_get_current_count(EXTRUDER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / EXTRUDER_TIMER_PRESCALE) { /* nada */ }
-          pulse_start = HAL_timer_get_current_count(EXTRUDER_TIMER);
+          while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / STEPPER_TIMER_PRESCALE) { /* nada */ }
+          pulse_start = HAL_timer_get_current_count(STEPPER_TIMER);
         #else
           while ((uint32_t)(TCNT0 - pulse_start) < STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) { /* nada */ }
         #endif
@@ -964,10 +893,72 @@ void Stepper::isr() {
 
       #if defined(ARDUINO_ARCH_SAM) && (STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E)
         // For a minimum pulse time wait before stopping low pulses
-        if (i < step_loops - 1) while (HAL_timer_get_current_count(EXTRUDER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / EXTRUDER_TIMER_PRESCALE) { /* nada */ }
+        if (i < step_loops - 1) while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / STEPPER_TIMER_PRESCALE) { /* nada */ }
       #endif
     }
 
+  }
+
+  void Stepper::advance_isr_scheduler() {
+    // Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
+    #ifdef ARDUINO_ARCH_SAM
+      DISABLE_TEMP_INTERRUPT(); // Temperature ISR
+    #else
+      CBI(TIMSK0, OCIE0B); // Temperature ISR
+    #endif
+    DISABLE_STEPPER_DRIVER_INTERRUPT();
+    sei();
+
+    // Run main stepping ISR if flagged
+    if (!nextMainISR) isr();
+
+    // Run Advance stepping ISR if flagged
+    if (!nextAdvanceISR) advance_isr();
+  
+    // Is the next advance ISR scheduled before the next main ISR?
+    if (nextAdvanceISR <= nextMainISR) {
+      // Set up the next interrupt
+      #ifdef ARDUINO_ARCH_SAM
+        HAL_TIMER_SET_STEPPER_COUNT(nextAdvanceISR);
+      #else
+        OCR1A = nextAdvanceISR;
+      #endif
+      // New interval for the next main ISR
+      if (nextMainISR) nextMainISR -= nextAdvanceISR;
+      // Will call Stepper::advance_isr on the next interrupt
+      nextAdvanceISR = 0;
+    }
+    else {
+      // The next main ISR comes first
+      #ifdef ARDUINO_ARCH_SAM
+        HAL_TIMER_SET_STEPPER_COUNT(nextMainISR);
+      #else
+        OCR1A = nextMainISR;
+      #endif
+      // New interval for the next advance ISR, if any
+      if (nextAdvanceISR && nextAdvanceISR != ADV_NEVER)
+        nextAdvanceISR -= nextMainISR;
+      // Will call Stepper::isr on the next interrupt
+      nextMainISR = 0;
+    }
+  
+    // Don't run the ISR faster than possible
+    #ifdef ARDUINO_ARCH_SAM
+      uint32_t stepper_timer_count = HAL_timer_get_count(STEPPER_TIMER),
+               stepper_timer_current_count = HAL_timer_get_current_count(STEPPER_TIMER) + 16 * REFERENCE_STEPPER_TIMER_PRESCALE / STEPPER_TIMER_PRESCALE;
+      HAL_TIMER_SET_STEPPER_COUNT(stepper_timer_count < stepper_timer_current_count ? stepper_timer_current_count : stepper_timer_count);
+    #else
+      NOLESS(OCR1A, TCNT1 + 16);
+    #endif
+
+    // Restore original ISR settings
+    cli();
+    #ifdef ARDUINO_ARCH_SAM
+      ENABLE_TEMP_INTERRUPT();
+    #else
+      SBI(TIMSK0, OCIE0B);
+    #endif
+    ENABLE_STEPPER_DRIVER_INTERRUPT();
   }
 
 #endif // ADVANCE or LIN_ADVANCE
@@ -1170,17 +1161,6 @@ void Stepper::init() {
         current_adv_steps[i] = 0;
       #endif
     }
-
-    #ifdef ARDUINO_ARCH_SAM
-      HAL_TIMER_START(EXTRUDER_TIMER);
-      ENABLE_EXTRUDER_INTERRUPT();
-    #else
-      #if defined(TCCR0A) && defined(WGM01)
-        CBI(TCCR0A, WGM01);
-        CBI(TCCR0A, WGM00);
-      #endif
-      SBI(TIMSK0, OCIE0A);
-    #endif
 
   #endif // ADVANCE or LIN_ADVANCE
 
