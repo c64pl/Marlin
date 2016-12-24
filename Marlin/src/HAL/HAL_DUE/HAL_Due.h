@@ -50,9 +50,6 @@
 #define CRITICAL_SECTION_START uint32_t primask = __get_PRIMASK(); __disable_irq();
 #define CRITICAL_SECTION_END if (primask == 0) __enable_irq();
 
-// On AVR this is in math.h?
-#define square(x) ((x)*(x))
-
 // On AVR this is in sfr_defs.h
 #ifndef _BV
   #define _BV(b) (1 << (b))
