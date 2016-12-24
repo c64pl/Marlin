@@ -126,6 +126,15 @@
 // Voltage
 #define LOGIC_VOLTAGE 3.3
 
+// reset reason
+#define RST_POWER_ON   1
+#define RST_EXTERNAL   2
+#define RST_BROWN_OUT  4
+#define RST_WATCHDOG   8
+#define RST_JTAG      16
+#define RST_SOFTWARE  32
+#define RST_BACKUP    64
+
 #if 0
 #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
   #define EXTRUDER_TIMER 1
@@ -163,10 +172,6 @@ constexpr HAL_TIMER_TYPE ADV_NEVER = UINT32_MAX;
 // Public Variables
 // --------------------------------------------------------------------------
 
-// reset reason set by bootloader
-extern uint8_t MCUSR;
-volatile static uint32_t debug_counter;
-
 // timers
 typedef struct {
   Tc          *pTimerRegs;
@@ -197,6 +202,12 @@ void cli(void);
 
 // Enable interrupts
 void sei(void);
+
+// clear reset reason
+void HAL_clear_reset_source(void);
+
+// reset reason
+uint8_t HAL_get_reset_source(void);
 
 #if 0
 // Delays

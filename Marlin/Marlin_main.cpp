@@ -10366,13 +10366,21 @@ void setup() {
   SERIAL_ECHO_START;
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
-  byte mcu = MCUSR;
+  #ifdef ARDUINO_ARCH_SAM
+    byte mcu = HAL_get_reset_source();
+  #else
+    byte mcu = MCUSR;
+  #endif
   if (mcu & 1) SERIAL_ECHOLNPGM(MSG_POWERUP);
   if (mcu & 2) SERIAL_ECHOLNPGM(MSG_EXTERNAL_RESET);
   if (mcu & 4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
   if (mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
   if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
-  MCUSR = 0;
+  #ifdef ARDUINO_ARCH_SAM
+    HAL_clear_reset_source();
+  #else
+    MCUSR = 0;
+  #endif
 
   SERIAL_ECHOPGM(MSG_MARLIN);
   SERIAL_CHAR(' ');
