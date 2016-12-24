@@ -31,7 +31,7 @@
  * For ARDUINO_ARCH_SAM
  */
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
 
 // --------------------------------------------------------------------------
 // Includes

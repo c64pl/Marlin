@@ -5,7 +5,7 @@
  * Use 4k7 thermistor tables
  */
 
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   #error "Oops!  Make sure you have 'Arduino Due' selected from the 'Tools -> Boards' menu."
 #endif
 

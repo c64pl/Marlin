@@ -69,7 +69,7 @@ void Endstops::init() {
   #if HAS_X_MIN
     SET_INPUT(X_MIN_PIN);
     #if ENABLED(ENDSTOPPULLUP_XMIN)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(X_MIN_PIN, HIGH);
       #else
         WRITE(X_MIN_PIN,HIGH);
@@ -80,7 +80,7 @@ void Endstops::init() {
   #if HAS_Y_MIN
     SET_INPUT(Y_MIN_PIN);
     #if ENABLED(ENDSTOPPULLUP_YMIN)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Y_MIN_PIN, HIGH);
       #else
         WRITE(Y_MIN_PIN,HIGH);
@@ -91,7 +91,7 @@ void Endstops::init() {
   #if HAS_Z_MIN
     SET_INPUT(Z_MIN_PIN);
     #if ENABLED(ENDSTOPPULLUP_ZMIN)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Z_MIN_PIN, HIGH);
       #else
         WRITE(Z_MIN_PIN,HIGH);
@@ -102,7 +102,7 @@ void Endstops::init() {
   #if HAS_Z2_MIN
     SET_INPUT(Z2_MIN_PIN);
     #if ENABLED(ENDSTOPPULLUP_ZMIN)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Z2_MIN_PIN, HIGH);
       #else
         WRITE(Z2_MIN_PIN,HIGH);
@@ -113,7 +113,7 @@ void Endstops::init() {
   #if HAS_X_MAX
     SET_INPUT(X_MAX_PIN);
     #if ENABLED(ENDSTOPPULLUP_XMAX)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(X_MAX_PIN, HIGH);
       #else
         WRITE(X_MAX_PIN,HIGH);
@@ -124,7 +124,7 @@ void Endstops::init() {
   #if HAS_Y_MAX
     SET_INPUT(Y_MAX_PIN);
     #if ENABLED(ENDSTOPPULLUP_YMAX)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Y_MAX_PIN, HIGH);
       #else
         WRITE(Y_MAX_PIN,HIGH);
@@ -135,7 +135,7 @@ void Endstops::init() {
   #if HAS_Z_MAX
     SET_INPUT(Z_MAX_PIN);
     #if ENABLED(ENDSTOPPULLUP_ZMAX)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Z_MAX_PIN, HIGH);
       #else
         WRITE(Z_MAX_PIN,HIGH);
@@ -146,7 +146,7 @@ void Endstops::init() {
   #if HAS_Z2_MAX
     SET_INPUT(Z2_MAX_PIN);
     #if ENABLED(ENDSTOPPULLUP_ZMAX)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Z2_MAX_PIN, HIGH);
       #else
         WRITE(Z2_MAX_PIN,HIGH);
@@ -157,7 +157,7 @@ void Endstops::init() {
   #if ENABLED(Z_MIN_PROBE_ENDSTOP)
     SET_INPUT(Z_MIN_PROBE_PIN);
     #if ENABLED(ENDSTOPPULLUP_ZMIN_PROBE)
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(Z_MIN_PROBE_PIN, HIGH);
       #else
         WRITE(Z_MIN_PROBE_PIN,HIGH);

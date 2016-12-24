@@ -2806,7 +2806,7 @@ void lcd_init() {
   #if ENABLED(NEWPANEL)
     #if BUTTON_EXISTS(EN1)
       SET_INPUT(BTN_EN1);
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(BTN_EN1, HIGH);
       #else
         WRITE(BTN_EN1, HIGH);
@@ -2815,7 +2815,7 @@ void lcd_init() {
 
     #if BUTTON_EXISTS(EN2)
       SET_INPUT(BTN_EN2);
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(BTN_EN2, HIGH);
       #else
         WRITE(BTN_EN2, HIGH);
@@ -2824,7 +2824,7 @@ void lcd_init() {
 
     #if BUTTON_EXISTS(ENC)
       SET_INPUT(BTN_ENC);
-      #ifdef ARDUINO_ARCH_SAM
+      #if defined(ARDUINO_ARCH_SAM)
         PULLUP(BTN_ENC, HIGH);
       #else
         WRITE(BTN_ENC, HIGH);
@@ -2871,7 +2871,7 @@ void lcd_init() {
 
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
     SET_INPUT(SD_DETECT_PIN);
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM)
       PULLUP(SD_DETECT_PIN, HIGH);
     #else
       WRITE(SD_DETECT_PIN, HIGH);

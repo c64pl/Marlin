@@ -21,7 +21,7 @@
 #ifndef HAL_SPI_PINS_H
 #define HAL_SPI_PINS_H
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "HAL_DUE/HAL_spi_pins_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)

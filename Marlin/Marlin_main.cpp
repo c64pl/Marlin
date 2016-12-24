@@ -254,14 +254,14 @@
 #endif
 
 #if ENABLED(USE_WATCHDOG)
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #include "src/HAL/HAL_watchdog.h"
   #else
     #include "watchdog.h"
   #endif
 #endif
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if ENABLED(BLINKM)
     #include "blinkm.h"
     #include "Wire.h"
@@ -292,7 +292,7 @@
 #endif
 
 #if ENABLED(ENDSTOP_INTERRUPTS_FEATURE)
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #include "src/HAL/HAL_endstop_interrupts.h"
   #else
     #include "endstop_interrupts.h"
@@ -776,7 +776,7 @@ inline void sync_plan_position_e() { planner.set_e_position_mm(current_position[
 
 #endif
 
-#ifndef ARDUINO_ARCH_SAM // HAL for Due
+#if !defined(ARDUINO_ARCH_SAM) // HAL for Due
   #if ENABLED(SDSUPPORT)
     #include "SdFatUtil.h"
     int freeMemory() { return SdFatUtil::FreeRam(); }
@@ -5747,13 +5747,13 @@ inline void gcode_M111() {
   SERIAL_ECHOPGM(MSG_DEBUG_PREFIX);
   if (marlin_debug_flags) {
     uint8_t comma = 0;
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM)
       char* address = NULL;
     #endif
     for (uint8_t i = 0; i < COUNT(debug_strings); i++) {
       if (TEST(marlin_debug_flags, i)) {
         if (comma++) SERIAL_CHAR(',');
-        #ifdef ARDUINO_ARCH_SAM
+        #if defined(ARDUINO_ARCH_SAM)
           address = (char*)(&(debug_strings[i]));
           serialprintPGM((char*)pgm_read_dword(address));
         #else
@@ -10366,7 +10366,7 @@ void setup() {
   SERIAL_ECHO_START;
 
   // Check startup - does nothing if bootloader sets MCUSR to 0
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     byte mcu = HAL_get_reset_source();
   #else
     byte mcu = MCUSR;
@@ -10376,7 +10376,7 @@ void setup() {
   if (mcu & 4) SERIAL_ECHOLNPGM(MSG_BROWNOUT_RESET);
   if (mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
   if (mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     HAL_clear_reset_source();
   #else
     MCUSR = 0;
@@ -10490,7 +10490,7 @@ void setup() {
         mixing_virtual_tool_mix[t][i] = mixing_factor[i];
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #if ENABLED(PRINTCOUNTER)
       print_job_timer.loadStats();
     #endif

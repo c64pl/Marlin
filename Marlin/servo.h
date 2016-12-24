@@ -70,7 +70,7 @@
 #define servo_h
 
 #include <inttypes.h>
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "servotimers.h"
 #endif
 
@@ -83,7 +83,7 @@
  *
  */
 
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   // Say which 16 bit timers can be used and in what order
   #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     //#define _useTimer1

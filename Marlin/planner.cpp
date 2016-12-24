@@ -1137,7 +1137,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   }
   block->acceleration_steps_per_s2 = accel;
   block->acceleration = accel / steps_per_mm;
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     block->acceleration_rate = (long)(accel * (4294967296.0 / HAL_STEPPER_TIMER_RATE));
   #else
     block->acceleration_rate = (long)(accel * 16777216.0 / ((F_CPU) * 0.125)); // * 8.388608

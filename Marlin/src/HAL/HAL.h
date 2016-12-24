@@ -120,7 +120,7 @@ void spiSendBlock(uint8_t token, const uint8_t* buf);
   #include "HAL_eeprom.h"
 #endif
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "HAL_DUE/HAL_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)

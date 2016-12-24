@@ -28,7 +28,7 @@
 #ifndef HAL_FASTIO_H
 #define HAL_FASTIO_H
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "HAL_DUE/HAL_fastio_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)

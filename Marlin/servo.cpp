@@ -59,7 +59,7 @@
 
 #include "servo.h"
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #define usToTicks(_us)    (( clockCyclesPerMicrosecond() * _us) / 32)     // converts microseconds to tick
   #define ticksToUs(_ticks) (( (unsigned)_ticks * 32)/ clockCyclesPerMicrosecond() ) // converts from ticks back to microseconds
 #else
@@ -86,7 +86,7 @@ uint8_t ServoCount = 0;                                     // the total number 
 #define SERVO_MIN() (MIN_PULSE_WIDTH - this->min * 4)  // minimum value in uS for this servo
 #define SERVO_MAX() (MAX_PULSE_WIDTH - this->max * 4)  // maximum value in uS for this servo
 
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   /************ static functions common to all instances ***********************/
 
   static inline void handle_interrupts(timer16_Sequence_t timer, volatile uint16_t* TCNTn, volatile uint16_t* OCRnA) {
@@ -148,7 +148,7 @@ uint8_t ServoCount = 0;                                     // the total number 
 #endif // ARDUINO_ARCH_SAM
 
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   //------------------------------------------------------------------------------
   /// Interrupt handler for the TC0 channel 1.
   //------------------------------------------------------------------------------
@@ -228,7 +228,7 @@ uint8_t ServoCount = 0;                                     // the total number 
 #endif // ARDUINO_ARCH_SAM
 
 static void initISR(timer16_Sequence_t timer) {
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #ifdef _useTimer1
       if (timer == _timer1)
         _initISR(TC_FOR_TIMER1, CHANNEL_FOR_TIMER1, ID_TC_FOR_TIMER1, IRQn_FOR_TIMER1);
@@ -310,7 +310,7 @@ static void initISR(timer16_Sequence_t timer) {
 }
 
 static void finISR(timer16_Sequence_t timer) {
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #if defined (_useTimer1)
       TC_Stop(TC_FOR_TIMER1, CHANNEL_FOR_TIMER1);
     #endif

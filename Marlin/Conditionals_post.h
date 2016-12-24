@@ -163,7 +163,7 @@
     #define DEFAULT_KEEPALIVE_INTERVAL 2
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     /**
      * Hidden options for developer
      */
@@ -183,13 +183,13 @@
    * MAX_STEP_FREQUENCY differs for TOSHIBA
    */
   #if ENABLED(CONFIG_STEPPERS_TOSHIBA)
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM)
       #define MAX_STEP_FREQUENCY STEP_DOUBLER_FREQUENCY // Max step frequency for Toshiba Stepper Controllers, 96kHz is close to maximum for an Arduino Due
     #else
       #define MAX_STEP_FREQUENCY 10000 // Max step frequency for Toshiba Stepper Controllers
     #endif
   #else
-    #ifdef ARDUINO_ARCH_SAM
+    #if defined(ARDUINO_ARCH_SAM)
       #define MAX_STEP_FREQUENCY (STEP_DOUBLER_FREQUENCY * 4) // Max step frequency for the Due is approx. 330kHz
     #else
       #define MAX_STEP_FREQUENCY 40000 // Max step frequency for Ultimaker (5000 pps / half step)
@@ -320,7 +320,7 @@
     #define BED_USES_THERMISTOR
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #define HEATER_USES_AD595 (ENABLED(HEATER_0_USES_AD595) || ENABLED(HEATER_1_USES_AD595) || ENABLED(HEATER_2_USES_AD595) || ENABLED(HEATER_3_USES_AD595))
   #endif
 
@@ -566,7 +566,7 @@
   /**
    * Helper Macros for heaters and extruder fan
    */
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #if ENABLED(INVERTED_HEATER_PINS)
       #define WRITE_HEATER(pin, v) WRITE(pin, !v)
     #else
@@ -620,7 +620,7 @@
     #define FAN_COUNT 0
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #if ENABLED(INVERTED_FAN_PINS)
       #define _WRITE_FAN(pin, v) WRITE(pin, !v)
     #else
@@ -790,7 +790,7 @@
 
   // Stepper pulse duration, in cycles
   #define STEP_PULSE_CYCLES ((MINIMUM_STEPPER_PULSE) * CYCLES_PER_MICROSECOND)
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     // Add additional delay for between direction signal and pulse signal of stepper
     #ifndef STEPPER_DIRECTION_DELAY
       #define STEPPER_DIRECTION_DELAY 0 // time in microseconds
@@ -801,7 +801,7 @@
     #define DELTA_ENDSTOP_ADJ { 0 }
   #endif
 
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     #if MB(ALLIGATOR) && (!defined(UI_VOLTAGE_LEVEL) || (UI_VOLTAGE_LEVEL != 0 && UI_VOLTAGE_LEVEL != 1))
       #undef UI_VOLTAGE_LEVEL
       #define UI_VOLTAGE_LEVEL 0

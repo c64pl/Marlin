@@ -595,7 +595,7 @@
   #define AVR_SS_PIN   16
 #endif
 
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   #ifndef SCK_PIN
     #define SCK_PIN  AVR_SCK_PIN
   #endif

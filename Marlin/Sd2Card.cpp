@@ -30,7 +30,7 @@
 
 #if ENABLED(SDSUPPORT)
 #include "Sd2Card.h"
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   //------------------------------------------------------------------------------
   #if DISABLED(SOFTWARE_SPI)
     // functions for hardware SPI
@@ -302,7 +302,7 @@ bool Sd2Card::init(uint8_t sckRateID, uint8_t chipSelectPin) {
   uint32_t arg;
 
   // set pin modes
-  #ifdef ARDUINO_ARCH_SAM
+  #if defined(ARDUINO_ARCH_SAM)
     spiBegin();
   #else
     pinMode(chipSelectPin_, OUTPUT);

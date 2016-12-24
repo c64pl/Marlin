@@ -26,7 +26,7 @@
 #include "macros.h"
 #include "language.h"
 #include "stopwatch.h"
-#ifndef ARDUINO_ARCH_SAM
+#if !defined(ARDUINO_ARCH_SAM)
   #include <avr/eeprom.h>
 #endif
 

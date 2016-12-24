@@ -102,7 +102,7 @@
   * Set USE_SOFTWARE_SPI nonzero to always use software SPI.
   */
   #define USE_SOFTWARE_SPI 0
-  #ifndef ARDUINO_ARCH_SAM
+  #if !defined(ARDUINO_ARCH_SAM)
     // define software SPI pins so Mega can use unmodified 168/328 shields
     /** Software SPI chip select pin for the SD */
     #define SOFT_SPI_CS_PIN 10

@@ -828,7 +828,7 @@
   #endif
 #endif
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if HAS_MOTOR_CURRENT_PWM
     #error "MOTOR_CURRENT_PWM (_XY, _Z, _E) are not supported by ARM platform yet."
   #endif
@@ -956,7 +956,7 @@
 #else
   #define COUNT_LCD_2 COUNT_LCD_1
 #endif
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if ENABLED(REPRAP_DISCOUNT_SMART_CONTROLLER) \
       && DISABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER) && DISABLED(RADDS_DISPLAY)
     #define COUNT_LCD_3 INCREMENT(COUNT_LCD_2)
@@ -995,7 +995,7 @@
 #else
   #define COUNT_LCD_8 COUNT_LCD_7
 #endif
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if ENABLED(VIKI2) && DISABLED(AZSMZ_12864_LCD)
     #define COUNT_LCD_9 INCREMENT(COUNT_LCD_8)
   #else
@@ -1063,7 +1063,7 @@
 #else
   #define COUNT_LCD_20 COUNT_LCD_19
 #endif
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if ENABLED(U8GLIB_SSD1306) && DISABLED(SSD1306_OLED_I2C_CONTROLLER)
     #define COUNT_LCD_21 INCREMENT(COUNT_LCD_20)
   #else
@@ -1091,7 +1091,7 @@
 #else
   #define COUNT_LCD_24 COUNT_LCD_23
 #endif
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #if ENABLED(RADDS_DISPLAY)
     #define COUNT_LCD_25 INCREMENT(COUNT_LCD_24)
   #else

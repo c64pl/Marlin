@@ -20,7 +20,7 @@
  *
  */
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
 
 #include "../../../Marlin.h"
 

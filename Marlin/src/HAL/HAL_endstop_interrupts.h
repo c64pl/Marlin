@@ -33,7 +33,7 @@ FORCE_INLINE void endstop_ISR_worker( void ) {
 // One ISR for all EXT-Interrupts
 void endstop_ISR(void) { endstop_ISR_worker(); }
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "HAL_DUE/HAL_endstop_interrupts_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)

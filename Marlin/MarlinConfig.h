@@ -23,7 +23,7 @@
 #ifndef MARLIN_CONFIG_H
 #define MARLIN_CONFIG_H
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "src/HAL/HAL_fastio.h"
 #else
   #include "fastio.h"
@@ -35,7 +35,7 @@
 #include "Conditionals_LCD.h"
 #include "Configuration_adv.h"
 #include "pins.h"
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "src/HAL/HAL_spi_pins.h"
 #endif
 #ifndef USBCON
@@ -44,7 +44,7 @@
 #include "Arduino.h"
 #include "Conditionals_post.h"
 #include "SanityCheck.h"
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "src/HAL/HAL.h"
 #endif
 

@@ -28,7 +28,7 @@
 #ifndef CONDITIONALS_LCD_H // Get the LCD defines which are needed first
 #define CONDITIONALS_LCD_H
 
-  #ifndef ARDUINO_ARCH_SAM
+  #if !defined(ARDUINO_ARCH_SAM)
     #undef RADDS_DISPLAY
     #undef SPARK_FULL_GRAPHICS
     #undef AZSMZ_12864_LCD

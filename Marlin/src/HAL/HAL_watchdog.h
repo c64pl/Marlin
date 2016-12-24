@@ -28,7 +28,7 @@
 #ifndef HAL_WATCHDOG_H
 #define HAL_WATCHDOG_H
 
-#ifdef ARDUINO_ARCH_SAM
+#if defined(ARDUINO_ARCH_SAM)
   #include "HAL_DUE/HAL_watchdog_Due.h"
 /*
 #elif defined(ARDUINO_ARCH_AVR)
