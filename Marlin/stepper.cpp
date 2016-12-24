@@ -370,7 +370,7 @@ void Stepper::set_directions() {
 
 void Stepper::isr() {
   #ifdef ARDUINO_ARCH_SAM
-    #define _ENABLE_ISRs() cli(); ENABLE_TEMP_INTERRUPT(); ENABLE_STEPPER_DRIVER_INTERRUPT()
+    #define _ENABLE_ISRs() ENABLE_TEMP_INTERRUPT(); ENABLE_STEPPER_DRIVER_INTERRUPT()
   #else
     #define _ENABLE_ISRs() cli(); SBI(TIMSK0, OCIE0B); ENABLE_STEPPER_DRIVER_INTERRUPT()
   #endif
@@ -952,10 +952,10 @@ void Stepper::isr() {
     #endif
 
     // Restore original ISR settings
-    cli();
     #ifdef ARDUINO_ARCH_SAM
       ENABLE_TEMP_INTERRUPT();
     #else
+      cli();
       SBI(TIMSK0, OCIE0B);
     #endif
     ENABLE_STEPPER_DRIVER_INTERRUPT();
