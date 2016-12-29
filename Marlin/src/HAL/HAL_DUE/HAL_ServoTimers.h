@@ -24,17 +24,23 @@
  * _Nbr_16timers indicates how many 16 bit timers are available.
  */
 
+#ifndef HAL_SERVOTIMERS_H
+#define HAL_SERVOTIMERS_H
+
 /**
  * SAM Only definitions
  * --------------------
  */
 
 // For SAM3X:
-//!#define _useTimer1
-//!#define _useTimer2
+//#define _useTimer1
+//#define _useTimer2
 #define _useTimer3
-//!#define _useTimer4
+//#define _useTimer4
 #define _useTimer5
+
+#define TRIM_DURATION          2 // compensation ticks to trim adjust for digitalWrite delays
+#define SERVO_TIMER_PRESCALER 32 // timer prescaler
 
 /*
   TC0, chan 0 => TC0_Handler
@@ -87,3 +93,4 @@
 //typedef enum { _timer1, _timer2, _timer3, _timer4, _timer5, _Nbr_16timers } timer16_Sequence_t ;
 typedef enum { _timer3, _timer5, _Nbr_16timers } timer16_Sequence_t ;
 
+#endif // HAL_SERVOTIMERS_H

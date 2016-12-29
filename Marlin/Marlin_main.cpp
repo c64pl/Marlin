@@ -276,7 +276,11 @@
 #endif
 
 #if HAS_SERVOS
-  #include "servo.h"
+  #if defined(ARDUINO_ARCH_SAM)
+    #include "src/HAL/HAL_Servo.h"
+  #else
+    #include "servo.h"
+  #endif
 #endif
 
 #if HAS_DIGIPOTSS
