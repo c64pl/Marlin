@@ -77,8 +77,7 @@
   }
 
   void spiBegin() {
-    SET_OUTPUT(SS_PIN);
-    WRITE(SS_PIN, HIGH);
+    OUT_WRITE(SS_PIN, HIGH);
     SET_OUTPUT(SCK_PIN);
     SET_INPUT(MISO_PIN);
     SET_OUTPUT(MOSI_PIN);
@@ -164,8 +163,7 @@
       #if MB(ALLIGATOR)
         SET_OUTPUT(DAC0_SYNC);
         #if EXTRUDERS > 1
-          SET_OUTPUT(DAC1_SYNC);
-          WRITE(DAC1_SYNC, HIGH);
+          OUT_WRITE(DAC1_SYNC, HIGH);
         #endif
         SET_OUTPUT(SPI_EEPROM1_CS);
         SET_OUTPUT(SPI_EEPROM2_CS);

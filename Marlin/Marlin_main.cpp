@@ -885,8 +885,7 @@ bool enqueue_and_echo_command(const char* cmd, bool say_ok/*=false*/) {
 #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
   void setup_alligator_board() {
     // Init Expansion Port Voltage logic Selector
-    SET_OUTPUT(EXP_VOLTAGE_LEVEL_PIN);
-    WRITE(EXP_VOLTAGE_LEVEL_PIN, UI_VOLTAGE_LEVEL);
+    OUT_WRITE(EXP_VOLTAGE_LEVEL_PIN, UI_VOLTAGE_LEVEL);
     dac084s085::begin(); //initialize ExternalDac
     #if HAS_BUZZER
       buzzer.tone(10,10);
@@ -906,7 +905,11 @@ void setup_killpin() {
   void setup_filrunoutpin() {
     SET_INPUT(FIL_RUNOUT_PIN);
     #if ENABLED(ENDSTOPPULLUP_FIL_RUNOUT)
-      WRITE(FIL_RUNOUT_PIN, HIGH);
+      #if defined(ARDUINO_ARCH_SAM)
+        PULLUP(FIL_RUNOUT_PIN);
+      #else
+        WRITE(FIL_RUNOUT_PIN, HIGH);
+      #endif
     #endif
   }
 
