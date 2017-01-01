@@ -11,7 +11,7 @@
 Marlin Duo is modified version of [Marlin](https://github.com/MarlinFirmware/Marlin/tree/RCBugFix).
 This branch is compatible with both Arduino MEGA and Due. 
   - based on [original Marlin 1.1.0-RCBugFix](https://github.com/MarlinFirmware/Marlin/tree/RCBugFix)<br>
-  - Due part was ported [from MK4duo](https://github.com/MagoKimbra/MK4duo), [Marlin4Due](https://github.com/Wurstnase/Marlin4Due), and [official 32bit project] (https://github.com/MarlinFirmware/Marlin/pull/5357)<br>
+  - Due part was ported from [MK4duo](https://github.com/MagoKimbra/MK4duo), [Marlin4Due](https://github.com/Wurstnase/Marlin4Due), and [official 32bit project] (https://github.com/MarlinFirmware/Marlin/pull/5357)<br>
 
 __Not for production use – use with caution!__
 
