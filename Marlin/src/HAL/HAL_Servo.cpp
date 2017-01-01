@@ -68,8 +68,8 @@
 
 #if HAS_SERVOS
 
-#include "HAL_servo.h"
-#include "HAL_servo_private.h"
+#include "HAL_Servo.h"
+#include "HAL_Servo_private.h"
 
 ServoInfo_t servo_info[MAX_SERVOS];                          // static array of servo structures
 uint8_t ServoCount = 0;                                     // the total number of attached servos
