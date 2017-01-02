@@ -44,7 +44,7 @@
 #pragma GCC optimize (3)
 
 #define DELAY_0_NOP  NOOP
-#if defined(ARDUINO_ARCH_SAM)
+#if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   #define DELAY_1_NOP  delayMicroseconds(1U)
   #define DELAY_2_NOP  delayMicroseconds(1U)
   #define DELAY_3_NOP  delayMicroseconds(1U)

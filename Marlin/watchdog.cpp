@@ -20,9 +20,9 @@
  *
  */
 
-#ifdef ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-                        // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
 #include "Marlin.h"
+
+#if !defined(USE_HAL)
 
 #if ENABLED(USE_WATCHDOG)
 
@@ -56,5 +56,5 @@ void watchdog_init() {
 #endif //WATCHDOG_RESET_MANUAL
 
 #endif //USE_WATCHDOG
-       // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#endif // ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+
+#endif // USE_HAL

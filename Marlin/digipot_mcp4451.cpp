@@ -38,7 +38,7 @@
 #endif
 
 static byte current_to_wiper(float current) {
-  return byte(CEIL(float((DIGIPOT_I2C_FACTOR * current)))); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+  return byte(CEIL(float((DIGIPOT_I2C_FACTOR * current)))); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 }
 
 static void i2c_send(byte addr, byte a, byte b) {

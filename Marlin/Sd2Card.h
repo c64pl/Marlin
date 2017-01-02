@@ -38,7 +38,7 @@
  */
 #include "SdFatConfig.h"
 #include "SdInfo.h"
-#if !defined(ARDUINO_ARCH_SAM)
+#if !defined(USE_HAL)
   //------------------------------------------------------------------------------
   // SPI speed is F_CPU/2^(1 + index), 0 <= index <= 6
   /** Set SCK to max rate of F_CPU/2. See Sd2Card::setSckRate(). */

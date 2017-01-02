@@ -20,34 +20,15 @@
  *
  */
 
-#ifndef MARLIN_CONFIG_H
-#define MARLIN_CONFIG_H
+#ifndef MARLIN_CONFIG_EXTRA_H
+#define MARLIN_CONFIG_EXTRA_H
 
-#include "MarlinConfig_extra.h" // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
-                              // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
-#if defined(USE_HAL)
-  #include "src/HAL/HAL_fastio.h"
+#if !defined(ARDUINO_ARCH_AVR)
+  #define USE_HAL
+  #define ADDITIONAL_EXPERIMENTAL_FEATURES
 #else
-  #include "fastio.h"
-#endif
-#include "macros.h"
-#include "boards.h"
-#include "Version.h"
-#include "Configuration.h"
-#include "Conditionals_LCD.h"
-#include "Configuration_adv.h"
-#include "pins.h"
-#if defined(USE_HAL)
-  #include "src/HAL/HAL_spi_pins.h"
-#endif
-#ifndef USBCON
-  #define HardwareSerial_h // trick to disable the standard HWserial
-#endif
-#include "Arduino.h"
-#include "Conditionals_post.h"
-#include "SanityCheck.h"
-#if defined(USE_HAL)
-  #include "src/HAL/HAL.h"
+  //#define USE_HAL
+  //#define ADDITIONAL_EXPERIMENTAL_FEATURES
 #endif
 
-#endif // MARLIN_CONFIG_H
+#endif // MARLIN_CONFIG_EXTRA_H

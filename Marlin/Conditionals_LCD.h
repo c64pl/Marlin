@@ -28,7 +28,7 @@
 #ifndef CONDITIONALS_LCD_H // Get the LCD defines which are needed first
 #define CONDITIONALS_LCD_H
 
-  #if !defined(ARDUINO_ARCH_SAM)
+  #if !defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     #undef RADDS_DISPLAY
     #undef SPARK_FULL_GRAPHICS
     #undef AZSMZ_12864_LCD
@@ -53,7 +53,7 @@
     #define DEFAULT_LCD_CONTRAST 17
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM) && ENABLED(AZSMZ_12864_LCD)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && ENABLED(AZSMZ_12864_LCD)
     #define VIKI2
   #endif
 
@@ -115,7 +115,7 @@
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM) && ENABLED(RADDS_DISPLAY)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && ENABLED(RADDS_DISPLAY)
     #define REPRAP_DISCOUNT_SMART_CONTROLLER
   #endif
 
@@ -142,7 +142,7 @@
     #define NEWPANEL
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM) && ENABLED(SPARK_FULL_GRAPHICS)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && ENABLED(SPARK_FULL_GRAPHICS)
     #define DOGLCD
     #define U8GLIB_ST7920
     #define ULTIPANEL
@@ -201,7 +201,7 @@
     #endif
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM) && ENABLED(SSD1306_OLED_I2C_CONTROLLER)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && ENABLED(SSD1306_OLED_I2C_CONTROLLER)
     #define DOGLCD
     #define U8GLIB_SSD1306
     #define ULTIPANEL

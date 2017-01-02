@@ -24,7 +24,7 @@
 #define __BUZZER_H__
 
 #include "types.h"
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
   #include "src/HAL/HAL_fastio.h"
 #else
   #include "fastio.h"

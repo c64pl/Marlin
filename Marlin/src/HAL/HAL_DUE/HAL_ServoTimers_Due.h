@@ -24,8 +24,8 @@
  * _Nbr_16timers indicates how many 16 bit timers are available.
  */
 
-#ifndef HAL_SERVOTIMERS_H
-#define HAL_SERVOTIMERS_H
+#ifndef HAL_SERVOTIMERS_DUE_H
+#define HAL_SERVOTIMERS_DUE_H
 
 /**
  * SAM Only definitions
@@ -93,4 +93,4 @@
 //typedef enum { _timer1, _timer2, _timer3, _timer4, _timer5, _Nbr_16timers } timer16_Sequence_t ;
 typedef enum { _timer3, _timer5, _Nbr_16timers } timer16_Sequence_t ;
 
-#endif // HAL_SERVOTIMERS_H
+#endif // HAL_SERVOTIMERS_DUE_H

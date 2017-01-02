@@ -1414,7 +1414,7 @@ bool SdBaseFile::rmRfStar() {
       if (!f.remove()) goto fail;
     }
     // position to next entry if required
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       if (curPosition_ != (uint32_t)(32 * (index + 1))) {
     #else
       if (curPosition_ != (32 * (index + 1))) {

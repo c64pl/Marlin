@@ -28,7 +28,7 @@
  * Modified 28 September 2010 by Mark Sproul
  * Modified 14 February 2016 by Andreas Hardtung (added tx buffer)
  */
-#if !defined(ARDUINO_ARCH_SAM)
+#if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
 #include "MarlinSerial.h"
 
@@ -528,4 +528,4 @@ MarlinSerial customizedSerial;
 
 #endif
 
-#endif // ARDUINO_ARCH_SAM
+#endif // ARDUINO_ARCH_AVR

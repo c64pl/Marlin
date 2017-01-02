@@ -262,7 +262,7 @@ uint16_t max_display_update_time = 0;
     bool _skipStatic = false; \
     SCREEN_OR_MENU_LOOP()
 
-  #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && BUTTON_EXISTS(BACK)
     #define BACK_TO_PARENT() do { \
       if (lcd_backclicked) return menu_action_back(); \
       } while(0)
@@ -1571,7 +1571,7 @@ KeepDrawing:
       // This assumes the center is 0,0
       #if ENABLED(DELTA)
         if (axis != Z_AXIS) {
-          max = SQRT(sq(DELTA_PRINTABLE_RADIUS) - sq(current_position[Y_AXIS - axis])); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+          max = SQRT(sq(DELTA_PRINTABLE_RADIUS) - sq(current_position[Y_AXIS - axis])); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
           min = -max;
         }
       #endif
@@ -2805,7 +2805,7 @@ void lcd_init() {
 
   #if ENABLED(NEWPANEL)
     #if BUTTON_EXISTS(EN1)
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         SET_INPUT_PULLUP(BTN_EN1);
       #else
         SET_INPUT(BTN_EN1);
@@ -2814,7 +2814,7 @@ void lcd_init() {
     #endif
 
     #if BUTTON_EXISTS(EN2)
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         SET_INPUT_PULLUP(BTN_EN2);
       #else
         SET_INPUT(BTN_EN2);
@@ -2823,7 +2823,7 @@ void lcd_init() {
     #endif
 
     #if BUTTON_EXISTS(ENC)
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         SET_INPUT_PULLUP(BTN_ENC);
       #else
         SET_INPUT(BTN_ENC);
@@ -2831,7 +2831,7 @@ void lcd_init() {
       #endif
     #endif
 
-    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && BUTTON_EXISTS(BACK)
       SET_INPUT_PULLUP(BTN_BACK);
     #endif
 
@@ -2869,7 +2869,7 @@ void lcd_init() {
   #endif // !NEWPANEL
 
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       SET_INPUT_PULLUP(SD_DETECT_PIN);
     #else
       SET_INPUT(SD_DETECT_PIN);
@@ -2967,14 +2967,14 @@ void lcd_update() {
     lcd_buttons_update();
 
     // If the action button is pressed...
-    #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && BUTTON_EXISTS(BACK)
       if (LCD_CLICKED || LCD_BACK_CLICKED) {
     #else
       if (LCD_CLICKED) {
     #endif
       if (!wait_for_unclick) {           // If not waiting for a debounce release:
         wait_for_unclick = true;         //  Set debounce flag to ignore continous clicks
-        #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+        #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && BUTTON_EXISTS(BACK)
           LCD_CLICKED ? lcd_clicked = !wait_for_user : lcd_backclicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
         #else
           lcd_clicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
@@ -3295,7 +3295,7 @@ void lcd_reset_alert_level() { lcd_status_message_level = 0; }
           if (BUTTON_PRESSED(ENC)) newbutton |= EN_C;
         #endif
 
-        #if defined(ARDUINO_ARCH_SAM) && BUTTON_EXISTS(BACK)
+        #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && BUTTON_EXISTS(BACK)
           if (BUTTON_PRESSED(BACK)) newbutton |= EN_D;
         #endif
 

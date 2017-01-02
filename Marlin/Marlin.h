@@ -22,13 +22,15 @@
 #ifndef MARLIN_H
 #define MARLIN_H
 
+#include "MarlinConfig_extra.h" // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+                              // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
-#if !defined(ARDUINO_ARCH_SAM)
+#if !defined(USE_HAL)
   #include <util/delay.h>
   #include <avr/eeprom.h>
 #endif
@@ -39,7 +41,7 @@
 
 #include "enum.h"
 #include "types.h"
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
   #include "src/HAL/HAL_fastio.h"
 #else
   #include "fastio.h"
@@ -54,7 +56,7 @@
     #define MYSERIAL Serial
   #endif // BLUETOOTH
 #else
-  #if defined(ARDUINO_ARCH_SAM)
+  #if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     #if SERIAL_PORT == -1
       #define MYSERIAL SerialUSB
     #elif SERIAL_PORT == 0

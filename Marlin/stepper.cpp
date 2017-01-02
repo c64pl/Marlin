@@ -48,7 +48,7 @@
 #include "stepper.h"
 #include "endstops.h"
 #include "planner.h"
-#if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+#if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && MB(ALLIGATOR)
   #include "dac_dac084s085.h"
 #endif
 #include "temperature.h"
@@ -94,7 +94,7 @@ volatile uint32_t Stepper::step_events_completed = 0; // The number of step even
 
 #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(USE_HAL)
     HAL_TIMER_TYPE Stepper::nextMainISR = 0,
   #else
     constexpr uint16_t ADV_NEVER = 65535;
@@ -130,7 +130,7 @@ volatile signed char Stepper::count_direction[NUM_AXIS] = { 1, 1, 1, 1 };
   long Stepper::counter_m[MIXING_STEPPERS];
 #endif
 
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
   HAL_TIMER_TYPE Stepper::acc_step_rate; // needed for deceleration start point
   uint8_t Stepper::step_loops, Stepper::step_loops_nominal;
   HAL_TIMER_TYPE Stepper::OCR1A_nominal;
@@ -206,7 +206,7 @@ volatile long Stepper::endstops_trigsteps[XYZ];
 #endif
 
 // intRes = longIn1 * longIn2 >> 24
-#if defined(ARDUINO_ARCH_SAM)
+#if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   #define MultiU32X32toH32(intRes, longIn1, longIn2) intRes = ((uint64_t)longIn1 * longIn2 + 0x80000000) >> 32
 #else
   // uses:
@@ -288,7 +288,7 @@ volatile long Stepper::endstops_trigsteps[XYZ];
  *  The slope of acceleration is calculated using v = u + at where t is the accumulated timer values of the steps so far.
  */
 void Stepper::wake_up() {
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(USE_HAL)
     // HAL_TIMER_SET_STEPPER_COUNT(0 * STEPPER_TIMER_FACTOR);
   #else
     //  TCNT1 = 0;
@@ -355,7 +355,7 @@ void Stepper::set_directions() {
  *  2000     1 KHz - sleep rate
  *  4000   500  Hz - init rate
  */
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
   HAL_ISR(STEPPER_TIMER) {
     HAL_timer_isr_prologue(STEPPER_TIMER);
 #else
@@ -369,7 +369,7 @@ void Stepper::set_directions() {
 }
 
 void Stepper::isr() {
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(USE_HAL)
     #define _ENABLE_ISRs() ENABLE_TEMP_INTERRUPT(); ENABLE_STEPPER_DRIVER_INTERRUPT()
   #else
     #define _ENABLE_ISRs() cli(); SBI(TIMSK0, OCIE0B); ENABLE_STEPPER_DRIVER_INTERRUPT()
@@ -377,7 +377,7 @@ void Stepper::isr() {
 
   #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
     //Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       DISABLE_TEMP_INTERRUPT(); //Temperature ISR
     #else
       CBI(TIMSK0, OCIE0B); //Temperature ISR
@@ -393,7 +393,7 @@ void Stepper::isr() {
     #ifdef SD_FINISHED_RELEASECOMMAND
       if (!cleaning_buffer_counter && (SD_FINISHED_STEPPERRELEASE)) enqueue_and_echo_commands_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     #endif
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       _NEXT_ISR(200 * STEPPER_TIMER_FACTOR); // Run at max speed - 10 KHz
     #else
       _NEXT_ISR(200); // Run at max speed - 10 KHz
@@ -409,7 +409,7 @@ void Stepper::isr() {
     if (current_block) {
       trapezoid_generator_reset();
 
-      #if defined(ARDUINO_ARCH_SAM) && (STEPPER_DIRECTION_DELAY > 0)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && (STEPPER_DIRECTION_DELAY > 0)
         delayMicroseconds(STEPPER_DIRECTION_DELAY);
       #endif
 
@@ -431,7 +431,7 @@ void Stepper::isr() {
       #if ENABLED(Z_LATE_ENABLE)
         if (current_block->steps[Z_AXIS] > 0) {
           enable_z();
-          #if defined(ARDUINO_ARCH_SAM)
+          #if defined(USE_HAL)
             _NEXT_ISR(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
           #else
             _NEXT_ISR(2000); // Run at slow speed - 1 KHz
@@ -446,7 +446,7 @@ void Stepper::isr() {
       // #endif
     }
     else {
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         _NEXT_ISR(2000 * STEPPER_TIMER_FACTOR); // Run at slow speed - 1 KHz
       #else
         _NEXT_ISR(2000); // Run at slow speed - 1 KHz
@@ -545,14 +545,14 @@ void Stepper::isr() {
         _APPLY_STEP(AXIS)(_INVERT_STEP_PIN(AXIS),0); \
       }
 
-    #if !defined(ARDUINO_ARCH_SAM)
+    #if !defined(USE_HAL)
       #define CYCLES_EATEN_BY_CODE 240
     #endif
 
     // If a minimum pulse time was specified get the CPU clock
     #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
       static uint32_t pulse_start;
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         pulse_start = HAL_timer_get_current_count(STEPPER_TIMER);
       #else
         pulse_start = TCNT0;
@@ -588,7 +588,7 @@ void Stepper::isr() {
 
     // For a minimum pulse time wait before stopping pulses
     #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         // MINIMUM_STEPPER_PULSE = 0... pulse width = 820ns, 1... 1.5μs, 2... 2.24μs, 3... 3.34μs, 4... 4.08μs, 5... 5.18μs
         while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_CODE) / STEPPER_TIMER_PRESCALE) { /* nada */ }
         pulse_start = HAL_timer_get_current_count(STEPPER_TIMER);
@@ -629,7 +629,7 @@ void Stepper::isr() {
       all_steps_done = true;
       break;
     }
-    #if defined(ARDUINO_ARCH_SAM) && STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
+    #if defined(USE_HAL) && STEP_PULSE_CYCLES > CYCLES_EATEN_BY_CODE
       // For a minimum pulse time wait before stopping low pulses
       if (i < step_loops - 1) while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_CODE) / STEPPER_TIMER_PRESCALE) { /* nada */ }
     #endif
@@ -658,7 +658,7 @@ void Stepper::isr() {
   // Calculate new timer value
   if (step_events_completed <= (uint32_t)current_block->accelerate_until) {
 
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       MultiU32X32toH32(acc_step_rate, acceleration_time, current_block->acceleration_rate);
     #else
       MultiU24X32toH16(acc_step_rate, acceleration_time, current_block->acceleration_rate);
@@ -669,7 +669,7 @@ void Stepper::isr() {
     NOMORE(acc_step_rate, current_block->nominal_rate);
 
     // step_rate to timer interval
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       HAL_TIMER_TYPE timer = calc_timer(acc_step_rate);
     #else
       uint16_t timer = calc_timer(acc_step_rate);
@@ -715,7 +715,7 @@ void Stepper::isr() {
     #endif
   }
   else if (step_events_completed > (uint32_t)current_block->decelerate_after) {
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       HAL_TIMER_TYPE step_rate;
       MultiU32X32toH32(step_rate, deceleration_time, current_block->acceleration_rate);
     #else
@@ -731,7 +731,7 @@ void Stepper::isr() {
       step_rate = current_block->final_rate;
 
     // step_rate to timer interval
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       HAL_TIMER_TYPE timer = calc_timer(step_rate);
     #else
       uint16_t timer = calc_timer(step_rate);
@@ -791,7 +791,7 @@ void Stepper::isr() {
   }
 
   #if DISABLED(ADVANCE) && DISABLED(LIN_ADVANCE)
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       HAL_TIMER_TYPE stepper_timer_count = HAL_timer_get_count(STEPPER_TIMER),
                      stepper_timer_current_count = HAL_timer_get_current_count(STEPPER_TIMER) + 16 * REFERENCE_STEPPER_TIMER_PRESCALE / STEPPER_TIMER_PRESCALE;
       HAL_TIMER_SET_STEPPER_COUNT(stepper_timer_count < stepper_timer_current_count ? stepper_timer_current_count : stepper_timer_count);
@@ -841,7 +841,7 @@ void Stepper::isr() {
       #endif
     #endif
 
-    #if !defined(ARDUINO_ARCH_SAM)
+    #if !defined(USE_HAL)
       #define CYCLES_EATEN_BY_E 60
     #endif
 
@@ -850,7 +850,7 @@ void Stepper::isr() {
 
       #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E
         static uint32_t pulse_start;
-        #if defined(ARDUINO_ARCH_SAM)
+        #if defined(USE_HAL)
           pulse_start = HAL_timer_get_current_count(STEPPER_TIMER);
         #else
           pulse_start = TCNT0;
@@ -870,7 +870,7 @@ void Stepper::isr() {
 
       // For a minimum pulse time wait before stopping pulses
       #if STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E
-        #if defined(ARDUINO_ARCH_SAM)
+        #if defined(USE_HAL)
           // ADVANCE: MINIMUM_STEPPER_PULSE = 0... pulse width = 40ns, 1... 1.34μs, 2... 2.3μs, 3... 3.27μs, 4... 4.24μs, 5... 5.2μs
           // LIN_ADVANCE: MINIMUM_STEPPER_PULSE = 0... pulse width = 300ns, 1... 1.12μs, 2... 2.38μs, 3... 3.21μs, 4... 4.04μs, 5... 5.3μs
           while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / STEPPER_TIMER_PRESCALE) { /* nada */ }
@@ -891,7 +891,7 @@ void Stepper::isr() {
         #endif
       #endif
 
-      #if defined(ARDUINO_ARCH_SAM) && (STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E)
+      #if defined(USE_HAL) && (STEP_PULSE_CYCLES > CYCLES_EATEN_BY_E)
         // For a minimum pulse time wait before stopping low pulses
         if (i < step_loops - 1) while (HAL_timer_get_current_count(STEPPER_TIMER) - pulse_start < (STEP_PULSE_CYCLES - CYCLES_EATEN_BY_E) / STEPPER_TIMER_PRESCALE) { /* nada */ }
       #endif
@@ -901,7 +901,7 @@ void Stepper::isr() {
 
   void Stepper::advance_isr_scheduler() {
     // Disable Timer0 ISRs and enable global ISR again to capture UART events (incoming chars)
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       DISABLE_TEMP_INTERRUPT(); // Temperature ISR
     #else
       CBI(TIMSK0, OCIE0B); // Temperature ISR
@@ -918,7 +918,7 @@ void Stepper::isr() {
     // Is the next advance ISR scheduled before the next main ISR?
     if (nextAdvanceISR <= nextMainISR) {
       // Set up the next interrupt
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         HAL_TIMER_SET_STEPPER_COUNT(nextAdvanceISR);
       #else
         OCR1A = nextAdvanceISR;
@@ -930,7 +930,7 @@ void Stepper::isr() {
     }
     else {
       // The next main ISR comes first
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         HAL_TIMER_SET_STEPPER_COUNT(nextMainISR);
       #else
         OCR1A = nextMainISR;
@@ -943,7 +943,7 @@ void Stepper::isr() {
     }
   
     // Don't run the ISR faster than possible
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       HAL_TIMER_TYPE stepper_timer_count = HAL_timer_get_count(STEPPER_TIMER),
                      stepper_timer_current_count = HAL_timer_get_current_count(STEPPER_TIMER) + 16 * REFERENCE_STEPPER_TIMER_PRESCALE / STEPPER_TIMER_PRESCALE;
       HAL_TIMER_SET_STEPPER_COUNT(stepper_timer_count < stepper_timer_current_count ? stepper_timer_current_count : stepper_timer_count);
@@ -952,7 +952,7 @@ void Stepper::isr() {
     #endif
 
     // Restore original ISR settings
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       ENABLE_TEMP_INTERRUPT();
     #else
       cli();
@@ -970,14 +970,14 @@ void Stepper::init() {
     digipot_init();
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && MB(ALLIGATOR)
     const float motor_current[] = MOTOR_CURRENT;
     unsigned int digipot_motor = 0;
     for (uint8_t i = 0; i < 3 + EXTRUDERS; i++) {
       digipot_motor = 255 * (motor_current[i] / 2.5);
       dac084s085::setValue(i, digipot_motor);
     }
-  #endif // defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #endif // defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && MB(ALLIGATOR)
 
   // Init Microstepping Pins
   #if HAS_MICROSTEPS
@@ -1125,7 +1125,7 @@ void Stepper::init() {
     E_AXIS_INIT(3);
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(USE_HAL)
     HAL_TIMER_START(STEPPER_TIMER);
     // Init Stepper ISR to 122 Hz for quick starting
     HAL_TIMER_SET_STEPPER_COUNT(0x4000 * STEPPER_TIMER_FACTOR);
@@ -1481,7 +1481,7 @@ void Stepper::report_positions() {
 
   void Stepper::microstep_init() {
     SET_OUTPUT(X_MS1_PIN);
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       #if X_MS2_PIN > -1
         SET_OUTPUT(X_MS2_PIN);
       #endif
@@ -1490,7 +1490,7 @@ void Stepper::report_positions() {
     #endif
     #if HAS_MICROSTEPS_Y
       SET_OUTPUT(Y_MS1_PIN);
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if Y_MS2_PIN > -1
           SET_OUTPUT(Y_MS2_PIN);
         #endif
@@ -1500,7 +1500,7 @@ void Stepper::report_positions() {
     #endif
     #if HAS_MICROSTEPS_Z
       SET_OUTPUT(Z_MS1_PIN);
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if Z_MS2_PIN > -1
           SET_OUTPUT(Z_MS2_PIN);
         #endif
@@ -1510,7 +1510,7 @@ void Stepper::report_positions() {
     #endif
     #if HAS_MICROSTEPS_E0
       SET_OUTPUT(E0_MS1_PIN);
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if E0_MS2_PIN > -1
           SET_OUTPUT(E0_MS2_PIN);
         #endif
@@ -1567,7 +1567,7 @@ void Stepper::report_positions() {
       case 4: microstep_ms(driver, MICROSTEP4); break;
       case 8: microstep_ms(driver, MICROSTEP8); break;
       case 16: microstep_ms(driver, MICROSTEP16); break;
-      #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && MB(ALLIGATOR)
         case 32: microstep_ms(driver, MICROSTEP32); break;
       #endif
     }
@@ -1577,7 +1577,7 @@ void Stepper::report_positions() {
     SERIAL_PROTOCOLLNPGM("MS1,MS2 Pins");
     SERIAL_PROTOCOLPGM("X: ");
     SERIAL_PROTOCOL(READ(X_MS1_PIN));
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       #if X_MS2_PIN > -1
         SERIAL_PROTOCOLLN(READ(X_MS2_PIN));
       #else
@@ -1589,7 +1589,7 @@ void Stepper::report_positions() {
     #if HAS_MICROSTEPS_Y
       SERIAL_PROTOCOLPGM("Y: ");
       SERIAL_PROTOCOL(READ(Y_MS1_PIN));
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if Y_MS2_PIN > -1
           SERIAL_PROTOCOLLN(READ(Y_MS2_PIN));
         #else
@@ -1602,7 +1602,7 @@ void Stepper::report_positions() {
     #if HAS_MICROSTEPS_Z
       SERIAL_PROTOCOLPGM("Z: ");
       SERIAL_PROTOCOL(READ(Z_MS1_PIN));
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if Z_MS2_PIN > -1
           SERIAL_PROTOCOLLN(READ(Z_MS2_PIN));
         #else
@@ -1615,7 +1615,7 @@ void Stepper::report_positions() {
     #if HAS_MICROSTEPS_E0
       SERIAL_PROTOCOLPGM("E0: ");
       SERIAL_PROTOCOL(READ(E0_MS1_PIN));
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if E0_MS2_PIN > -1
           SERIAL_PROTOCOLLN(READ(E0_MS2_PIN));
         #else

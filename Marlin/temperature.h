@@ -72,7 +72,7 @@ class Temperature {
     #endif
 
     #if ENABLED(PIDTEMP) || ENABLED(PIDTEMPBED)
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         #define PID_dT (((OVERSAMPLENR + 2) * 12.0) / (TEMP_TIMER_FREQUENCY * PID_dT_FACTOR))
       #else
         #define PID_dT ((OVERSAMPLENR * 12.0)/(F_CPU / 64.0 / 256.0))
@@ -179,7 +179,7 @@ class Temperature {
     static unsigned long raw_temp_value[4],
                          raw_temp_bed_value;
 
-    #if defined(ARDUINO_ARCH_SAM)
+    #if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
       // MEDIAN COUNT
       // For Smoother temperature
       // ONLY FOR DUE
@@ -439,7 +439,7 @@ class Temperature {
 
     static void set_current_temp_raw();
 
-    #if defined(ARDUINO_ARCH_SAM)
+    #if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
       static FORCE_INLINE int calc_raw_temp_value(uint8_t temp_id) {
         raw_median_temp[temp_id][median_counter] = (raw_temp_value[temp_id] - (min_temp[temp_id] + max_temp[temp_id]));
         sum = 0;

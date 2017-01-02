@@ -50,8 +50,8 @@
  * detach()              - Stop an attached servo from pulsing its i/o pin.
  *
  */
-#ifdef ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-                        // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+#ifdef ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+                        // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 #include "MarlinConfig.h"
 
 #if HAS_SERVOS
@@ -320,5 +320,5 @@ void Servo::move(int value) {
 }
 
 #endif
-       // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-#endif // ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+       // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+#endif // ARDUINO_ARCH_AVR // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL

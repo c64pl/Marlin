@@ -31,13 +31,13 @@ bool endstop_monitor_flag = false;
 #define _ANALOG_PIN_SAY(NAME) { sprintf(buffer, NAME_FORMAT, NAME); SERIAL_ECHO(buffer); pin_is_analog = true; return true; }
 #define ANALOG_PIN_SAY(NAME) if (pin == analogInputToDigitalPin(NAME)) _ANALOG_PIN_SAY(#NAME);
 
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
   #define IS_ANALOG(P) ((uint8_t)(P) >= analogInputToDigitalPin(0) && (uint8_t)(P) <= analogInputToDigitalPin(MAX_ANALOG_PIN_NUMBER))
 #else
   #define IS_ANALOG(P) ((P) >= analogInputToDigitalPin(0) && ((P) <= analogInputToDigitalPin(15) || (P) <= analogInputToDigitalPin(5)))
 #endif
 
-#if !defined(ARDUINO_ARCH_SAM)
+#if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   int digitalRead_mod(int8_t pin) { // same as digitalRead except the PWM stop section has been removed
     uint8_t port = digitalPinToPort(pin);
     return (port != NOT_A_PIN) && (*portInputRegister(port) & digitalPinToBitMask(pin)) ? HIGH : LOW;
@@ -113,7 +113,7 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
   #if defined(BTN_ENC) && BTN_ENC >= 0
     PIN_SAY(BTN_ENC);
   #endif
-  #if defined(ARDUINO_ARCH_SAM) && defined(BTN_BACK) && BTN_BACK >= 0
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && defined(BTN_BACK) && BTN_BACK >= 0
     PIN_SAY(BTN_BACK);
   #endif
   #if defined(BTN_HOME) && BTN_HOME >= 0
@@ -369,7 +369,7 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
   #if PIN_EXISTS(LED)
     PIN_SAY(LED_PIN);
   #endif
-  #if defined(ARDUINO_ARCH_SAM) && PIN_EXISTS(LED_GREEN)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && PIN_EXISTS(LED_GREEN)
     PIN_SAY(LED_GREEN_PIN);
   #endif
   #if PIN_EXISTS(CASE_LIGHT)
@@ -498,7 +498,7 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
   #if PIN_EXISTS(SUICIDE)
     PIN_SAY(SUICIDE_PIN);
   #endif
-  #if !defined(ARDUINO_ARCH_SAM)
+  #if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     #if defined(TC1) && TC1 >= 0
       ANALOG_PIN_SAY(TC1);
     #endif
@@ -684,7 +684,7 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
  * Print a pin's PWM status.
  * Return true if it's currently a PWM pin.
  */
-#if !defined(ARDUINO_ARCH_SAM)
+#if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   static bool pwm_status(uint8_t pin) {
     char buffer[20];   // for the sprintf statements
 
@@ -745,7 +745,7 @@ static bool report_pin_name(int8_t pin, bool &pin_is_analog) {
 #define WGM_TEST1 (WGM == 0 || WGM == 2 || WGM == 4 || WGM == 6)
 #define WGM_TEST2 (WGM == 0 || WGM == 4 || WGM == 12 || WGM == 13)
 
-#if !defined(ARDUINO_ARCH_SAM)
+#if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   static void err_is_counter() {
     SERIAL_PROTOCOLPGM("   Can't be used as a PWM because of counter mode");
   }
@@ -921,7 +921,7 @@ inline void report_pin_state(int8_t pin) {
   SERIAL_EOL;
 }
 
-#if !defined(ARDUINO_ARCH_SAM)
+#if defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   bool get_pinMode(int8_t pin) { return *portModeRegister(digitalPinToPort(pin)) & digitalPinToBitMask(pin); }
 #endif
 
@@ -938,7 +938,7 @@ inline void report_pin_state_extended(int8_t pin, bool ignore) {
   bool analog_pin;
   report_pin_name(pin, analog_pin);
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     UNUSED(ignore);
   #else
     // report pin state

@@ -163,7 +163,7 @@
     #define DEFAULT_KEEPALIVE_INTERVAL 2
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     /**
      * Hidden options for developer
      */
@@ -183,13 +183,13 @@
    * MAX_STEP_FREQUENCY differs for TOSHIBA
    */
   #if ENABLED(CONFIG_STEPPERS_TOSHIBA)
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       #define MAX_STEP_FREQUENCY STEP_DOUBLER_FREQUENCY // Max step frequency for Toshiba Stepper Controllers, 96kHz is close to maximum for an Arduino Due
     #else
       #define MAX_STEP_FREQUENCY 10000 // Max step frequency for Toshiba Stepper Controllers
     #endif
   #else
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
       #define MAX_STEP_FREQUENCY (STEP_DOUBLER_FREQUENCY * 4) // Max step frequency for the Due is approx. 330kHz
     #else
       #define MAX_STEP_FREQUENCY 40000 // Max step frequency for Ultimaker (5000 pps / half step)
@@ -201,7 +201,7 @@
   #define MICROSTEP2 HIGH,LOW
   #define MICROSTEP4 LOW,HIGH
   #define MICROSTEP8 HIGH,HIGH
-  #if defined(ARDUINO_ARCH_SAM) && MB(ALLIGATOR)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && MB(ALLIGATOR)
     #define MICROSTEP16 LOW,LOW
     #define MICROSTEP32 HIGH,HIGH
   #else
@@ -320,7 +320,7 @@
     #define BED_USES_THERMISTOR
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     #define HEATER_USES_AD595 (ENABLED(HEATER_0_USES_AD595) || ENABLED(HEATER_1_USES_AD595) || ENABLED(HEATER_2_USES_AD595) || ENABLED(HEATER_3_USES_AD595))
   #endif
 
@@ -330,7 +330,7 @@
   #define HAS_PID_HEATING (ENABLED(PIDTEMP) || ENABLED(PIDTEMPBED))
   #define HAS_PID_FOR_BOTH (ENABLED(PIDTEMP) && ENABLED(PIDTEMPBED))
 
-  #if defined(ARDUINO_ARCH_SAM) && (!defined(PID_dT_FACTOR) || PID_dT_FACTOR <= 0)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && (!defined(PID_dT_FACTOR) || PID_dT_FACTOR <= 0)
     #define PID_dT_FACTOR 1
   #endif
 
@@ -570,7 +570,7 @@
   /**
    * Helper Macros for heaters and extruder fan
    */
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     #if ENABLED(INVERTED_HEATER_PINS)
       #define WRITE_HEATER(pin, v) WRITE(pin, !v)
     #else
@@ -586,7 +586,7 @@
         #endif
       #endif
     #endif
-  #else // !ARDUINO_ARCH_SAM
+  #else // !ADDITIONAL_EXPERIMENTAL_FEATURES
     #define WRITE_HEATER_0P(v) WRITE(HEATER_0_PIN, v)
     #if HOTENDS > 1 || ENABLED(HEATERS_PARALLEL)
       #define WRITE_HEATER_1(v) WRITE(HEATER_1_PIN, v)
@@ -597,14 +597,14 @@
         #endif
       #endif
     #endif
-  #endif // ARDUINO_ARCH_SAM
+  #endif // ADDITIONAL_EXPERIMENTAL_FEATURES
   #if ENABLED(HEATERS_PARALLEL)
     #define WRITE_HEATER_0(v) { WRITE_HEATER_0P(v); WRITE_HEATER_1(v); }
   #else
     #define WRITE_HEATER_0(v) WRITE_HEATER_0P(v)
   #endif
   #if HAS_HEATER_BED
-    #if defined(ARDUINO_ARCH_SAM) && ENABLED(INVERTED_BED_PINS)
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && ENABLED(INVERTED_BED_PINS)
       #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN, !v)
     #else
       #define WRITE_HEATER_BED(v) WRITE(HEATER_BED_PIN, v)
@@ -624,7 +624,7 @@
     #define FAN_COUNT 0
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     #if ENABLED(INVERTED_FAN_PINS)
       #define _WRITE_FAN(pin, v) WRITE(pin, !v)
     #else
@@ -640,7 +640,7 @@
     #if HAS_FAN2
       #define WRITE_FAN2(v) _WRITE_FAN(FAN2_PIN, v)
     #endif
-  #else // !ARDUINO_ARCH_SAM
+  #else // !ADDITIONAL_EXPERIMENTAL_FEATURES
     #if HAS_FAN0
       #define WRITE_FAN(v) WRITE(FAN_PIN, v)
       #define WRITE_FAN0(v) WRITE_FAN(v)
@@ -651,7 +651,7 @@
     #if HAS_FAN2
       #define WRITE_FAN2(v) WRITE(FAN2_PIN, v)
     #endif
-  #endif // ARDUINO_ARCH_SAM
+  #endif // ADDITIONAL_EXPERIMENTAL_FEATURES
   #define WRITE_FAN_N(n, v) WRITE_FAN##n(v)
 
   /**
@@ -794,7 +794,7 @@
 
   // Stepper pulse duration, in cycles
   #define STEP_PULSE_CYCLES ((MINIMUM_STEPPER_PULSE) * CYCLES_PER_MICROSECOND)
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     // Add additional delay for between direction signal and pulse signal of stepper
     #ifndef STEPPER_DIRECTION_DELAY
       #define STEPPER_DIRECTION_DELAY 0 // time in microseconds
@@ -805,7 +805,7 @@
     #define DELTA_ENDSTOP_ADJ { 0 }
   #endif
 
-  #if defined(ARDUINO_ARCH_SAM)
+  #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
     #if MB(ALLIGATOR) && (!defined(UI_VOLTAGE_LEVEL) || (UI_VOLTAGE_LEVEL != 0 && UI_VOLTAGE_LEVEL != 1))
       #undef UI_VOLTAGE_LEVEL
       #define UI_VOLTAGE_LEVEL 0

@@ -26,7 +26,7 @@
 #include "macros.h"
 #include "language.h"
 #include "stopwatch.h"
-#if !defined(ARDUINO_ARCH_SAM)
+#if !defined(USE_HAL)
   #include <avr/eeprom.h>
 #endif
 
@@ -53,7 +53,7 @@ class PrintCounter: public Stopwatch {
      * @brief EEPROM address
      * @details Defines the start offset address where the data is stored.
      */
-    #if defined(ARDUINO_ARCH_SAM) && (defined(I2C_EEPROM) || defined(SPI_EEPROM))
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES) && (defined(I2C_EEPROM) || defined(SPI_EEPROM))
       // round up address to next page boundary (assuming 32 byte pages)
       const uint32_t address = 0x40;
     #else

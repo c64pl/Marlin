@@ -53,7 +53,7 @@ class Stepper;
 extern Stepper stepper;
 
 // intRes = intIn1 * intIn2 >> 16
-#if defined(ARDUINO_ARCH_SAM)
+#if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   #define MultiU16X8toH16(intRes, charIn1, intIn2)   intRes = ((charIn1) * (intIn2)) >> 16
 #else
   // uses:
@@ -109,7 +109,7 @@ class Stepper {
     static volatile uint32_t step_events_completed; // The number of step events executed in the current block
 
     #if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         static HAL_TIMER_TYPE nextMainISR, nextAdvanceISR, eISR_Rate;
       #else
         static uint16_t nextMainISR, nextAdvanceISR, eISR_Rate;
@@ -128,7 +128,7 @@ class Stepper {
         static long old_advance;
       #endif
     #else
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(USE_HAL)
         #define _NEXT_ISR(T) HAL_TIMER_SET_STEPPER_COUNT(T);
       #else
         #define _NEXT_ISR(T) OCR1A = T
@@ -137,7 +137,7 @@ class Stepper {
 
     static long acceleration_time, deceleration_time;
     //unsigned long accelerate_until, decelerate_after, acceleration_rate, initial_rate, final_rate, nominal_rate;
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       static HAL_TIMER_TYPE acc_step_rate; // needed for deceleration start point
       static uint8_t step_loops, step_loops_nominal;
       static HAL_TIMER_TYPE OCR1A_nominal;
@@ -299,7 +299,7 @@ class Stepper {
 
   private:
 
-    #if defined(ARDUINO_ARCH_SAM)
+    #if defined(USE_HAL)
       static FORCE_INLINE HAL_TIMER_TYPE calc_timer(HAL_TIMER_TYPE step_rate) {
         HAL_TIMER_TYPE timer;
     #else
@@ -309,7 +309,7 @@ class Stepper {
 
       NOMORE(step_rate, MAX_STEP_FREQUENCY);
 
-      #if defined(ARDUINO_ARCH_SAM)
+      #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
         #if ENABLED(DISABLE_MULTI_STEPPING)
           {
         #else
@@ -337,7 +337,7 @@ class Stepper {
         step_loops = 1;
       }
 
-      #if defined(ARDUINO_ARCH_SAM)
+      #if !defined(ARDUINO_ARCH_AVR) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
         // In case of high-performance processor, it is able to calculate in real-time 
         timer = HAL_STEPPER_TIMER_RATE / step_rate;
         if (timer < (HAL_STEPPER_TIMER_RATE / (STEP_DOUBLER_FREQUENCY * 2))) { // (STEP_DOUBLER_FREQUENCY * 2 kHz - this should never happen)

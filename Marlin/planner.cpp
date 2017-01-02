@@ -175,23 +175,23 @@ void Planner::init() {
  * by the provided factors.
  */
 void Planner::calculate_trapezoid_for_block(block_t* const block, const float &entry_factor, const float &exit_factor) {
-  uint32_t initial_rate = CEIL(block->nominal_rate * entry_factor), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-           final_rate = CEIL(block->nominal_rate * exit_factor); // (steps per second) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+  uint32_t initial_rate = CEIL(block->nominal_rate * entry_factor), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+           final_rate = CEIL(block->nominal_rate * exit_factor); // (steps per second) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
   // Limit minimal step rate (Otherwise the timer will overflow.)
   NOLESS(initial_rate, MINIMAL_STEP_RATE);
   NOLESS(final_rate, MINIMAL_STEP_RATE);
 
   int32_t accel = block->acceleration_steps_per_s2,
-          accelerate_steps = CEIL(estimate_acceleration_distance(initial_rate, block->nominal_rate, accel)), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-          decelerate_steps = FLOOR(estimate_acceleration_distance(block->nominal_rate, final_rate, -accel)), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+          accelerate_steps = CEIL(estimate_acceleration_distance(initial_rate, block->nominal_rate, accel)), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+          decelerate_steps = FLOOR(estimate_acceleration_distance(block->nominal_rate, final_rate, -accel)), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
           plateau_steps = block->step_event_count - accelerate_steps - decelerate_steps;
 
   // Is the Plateau of Nominal Rate smaller than nothing? That means no cruising, and we will
   // have to use intersection_distance() to calculate when to abort accel and start braking
   // in order to reach the final_rate exactly at the end of this block.
   if (plateau_steps < 0) {
-    accelerate_steps = CEIL(intersection_distance(initial_rate, final_rate, accel, block->step_event_count)); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    accelerate_steps = CEIL(intersection_distance(initial_rate, final_rate, accel, block->step_event_count)); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     NOLESS(accelerate_steps, 0); // Check limits due to numerical round-off
     accelerate_steps = min((uint32_t)accelerate_steps, block->step_event_count);//(We can cast here to unsigned, because the above line ensures that we are above zero)
     plateau_steps = 0;
@@ -218,8 +218,8 @@ void Planner::calculate_trapezoid_for_block(block_t* const block, const float &e
 // This method will calculate the junction jerk as the euclidean distance between the nominal
 // velocities of the respective blocks.
 //inline float junction_jerk(block_t *before, block_t *after) {
-//  return SQRT( // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-//    POW((before->speed_x-after->speed_x), 2)+POW((before->speed_y-after->speed_y), 2)); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+//  return SQRT( // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+//    POW((before->speed_x-after->speed_x), 2)+POW((before->speed_y-after->speed_y), 2)); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 //}
 
 
@@ -657,16 +657,16 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Calculate target position in absolute steps
   //this should be done after the wait, because otherwise a M92 code within the gcode disrupts this calculation somehow
   const long target[XYZE] = {
-    LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-    LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-    LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-    LROUND(e * axis_steps_per_mm[E_AXIS_N]) // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+    LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+    LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+    LROUND(e * axis_steps_per_mm[E_AXIS_N]) // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   };
 
   // When changing extruders recalculate steps corresponding to the E position
   #if ENABLED(DISTINCT_E_FACTORS)
     if (last_extruder != extruder && axis_steps_per_mm[E_AXIS_N] != axis_steps_per_mm[E_AXIS + last_extruder]) {
-      position[E_AXIS] = LROUND(position[E_AXIS] * axis_steps_per_mm[E_AXIS_N] * steps_to_mm[E_AXIS + last_extruder]); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+      position[E_AXIS] = LROUND(position[E_AXIS] * axis_steps_per_mm[E_AXIS_N] * steps_to_mm[E_AXIS + last_extruder]); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
       last_extruder = extruder;
     }
   #endif
@@ -962,10 +962,10 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   delta_mm[E_AXIS] = esteps_float * steps_to_mm[E_AXIS_N];
 
   if (block->steps[X_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Y_AXIS] < MIN_STEPS_PER_SEGMENT && block->steps[Z_AXIS] < MIN_STEPS_PER_SEGMENT) {
-    block->millimeters = FABS(delta_mm[E_AXIS]); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    block->millimeters = FABS(delta_mm[E_AXIS]); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   }
   else {
-    block->millimeters = SQRT( // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    block->millimeters = SQRT( // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
       #if CORE_IS_XY
         sq(delta_mm[X_HEAD]) + sq(delta_mm[Y_HEAD]) + sq(delta_mm[Z_AXIS])
       #elif CORE_IS_XZ
@@ -986,16 +986,16 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
 
   // Slow down when the buffer starts to empty, rather than wait at the corner for a buffer refill
   #if ENABLED(SLOWDOWN) || ENABLED(ULTRA_LCD) || defined(XY_FREQUENCY_LIMIT)
-    unsigned long segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    unsigned long segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   #endif
   #if ENABLED(SLOWDOWN)
     // Segment time im micro seconds
     if (moves_queued > 1 && moves_queued < (BLOCK_BUFFER_SIZE) / 2) {
       if (segment_time < min_segment_time) {
         // buffer is draining, add extra time.  The amount of time added increases if the buffer is still emptied more.
-        inverse_mm_s = 1000000.0 / (segment_time + LROUND(2 * (min_segment_time - segment_time) / moves_queued)); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+        inverse_mm_s = 1000000.0 / (segment_time + LROUND(2 * (min_segment_time - segment_time) / moves_queued)); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
         #if defined(XY_FREQUENCY_LIMIT) || ENABLED(ULTRA_LCD)
-          segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+          segment_time = LROUND(1000000.0 / inverse_mm_s); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
         #endif
       }
     }
@@ -1008,7 +1008,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   #endif
 
   block->nominal_speed = block->millimeters * inverse_mm_s; // (mm/sec) Always > 0
-  block->nominal_rate = CEIL(block->step_event_count * inverse_mm_s); // (step/sec) Always > 0 // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+  block->nominal_rate = CEIL(block->step_event_count * inverse_mm_s); // (step/sec) Always > 0 // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
   #if ENABLED(FILAMENT_WIDTH_SENSOR)
     static float filwidth_e_count = 0, filwidth_delay_dist = 0;
@@ -1047,7 +1047,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   // Calculate and limit speed in mm/sec for each axis
   float current_speed[NUM_AXIS], speed_factor = 1.0; // factor <1 decreases speed
   LOOP_XYZE(i) {
-    const float cs = FABS(current_speed[i] = delta_mm[i] * inverse_mm_s); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    const float cs = FABS(current_speed[i] = delta_mm[i] * inverse_mm_s); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     if (cs > max_feedrate_mm_s[i]) NOMORE(speed_factor, max_feedrate_mm_s[i] / cs);
   }
 
@@ -1057,7 +1057,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
     // Check and limit the xy direction change frequency
     const unsigned char direction_change = block->direction_bits ^ old_direction_bits;
     old_direction_bits = block->direction_bits;
-    segment_time = LROUND((float)segment_time / speed_factor); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    segment_time = LROUND((float)segment_time / speed_factor); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
     long xs0 = axis_segment_time[X_AXIS][0],
          xs1 = axis_segment_time[X_AXIS][1],
@@ -1101,7 +1101,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   uint32_t accel;
   if (!block->steps[X_AXIS] && !block->steps[Y_AXIS] && !block->steps[Z_AXIS]) {
     // convert to: acceleration steps/sec^2
-    accel = CEIL(retract_acceleration * steps_per_mm); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    accel = CEIL(retract_acceleration * steps_per_mm); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   }
   else {
     #define LIMIT_ACCEL_LONG(AXIS,INDX) do{ \
@@ -1119,7 +1119,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
     }while(0)
 
     // Start with print or travel acceleration
-    accel = CEIL((esteps ? acceleration : travel_acceleration) * steps_per_mm); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    accel = CEIL((esteps ? acceleration : travel_acceleration) * steps_per_mm); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
     // Limit acceleration per axis
     if (block->step_event_count <= cutoff_long) {
@@ -1188,8 +1188,8 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
         // Skip and avoid divide by zero for straight junctions at 180 degrees. Limit to min() of nominal speeds.
         if (cos_theta > -0.95) {
           // Compute maximum junction velocity based on maximum acceleration and junction deviation
-          float sin_theta_d2 = SQRT(0.5 * (1.0 - cos_theta)); // Trig half angle identity. Always positive. // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-          NOMORE(vmax_junction, SQRT(block->acceleration * junction_deviation * sin_theta_d2 / (1.0 - sin_theta_d2))); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+          float sin_theta_d2 = SQRT(0.5 * (1.0 - cos_theta)); // Trig half angle identity. Always positive. // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+          NOMORE(vmax_junction, SQRT(block->acceleration * junction_deviation * sin_theta_d2 / (1.0 - sin_theta_d2))); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
         }
       }
     }
@@ -1207,7 +1207,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
   float safe_speed = block->nominal_speed;
   uint8_t limited = 0;
   LOOP_XYZE(i) {
-    const float jerk = FABS(current_speed[i]), maxj = max_jerk[i]; // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+    const float jerk = FABS(current_speed[i]), maxj = max_jerk[i]; // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
     if (jerk > maxj) {
       if (limited) {
         const float mjerk = maxj * block->nominal_speed;
@@ -1315,7 +1315,7 @@ void Planner::_buffer_line(const float &a, const float &b, const float &c, const
                             && (uint32_t)esteps != block->step_event_count
                             && de_float > 0.0;
     if (block->use_advance_lead)
-      block->abs_adv_steps_multiplier8 = LROUND(extruder_advance_k * (de_float / mm_D_float) * block->nominal_speed / (float)block->nominal_rate * axis_steps_per_mm[E_AXIS_N] * 256.0); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+      block->abs_adv_steps_multiplier8 = LROUND(extruder_advance_k * (de_float / mm_D_float) * block->nominal_speed / (float)block->nominal_rate * axis_steps_per_mm[E_AXIS_N] * 256.0); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
   #elif ENABLED(ADVANCE)
 
@@ -1367,10 +1367,10 @@ void Planner::_set_position_mm(const float &a, const float &b, const float &c, c
   #else
     #define _EINDEX E_AXIS
   #endif
-  long na = position[X_AXIS] = LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-       nb = position[Y_AXIS] = LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-       nc = position[Z_AXIS] = LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-       ne = position[E_AXIS] = LROUND(e * axis_steps_per_mm[_EINDEX]); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+  long na = position[X_AXIS] = LROUND(a * axis_steps_per_mm[X_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+       nb = position[Y_AXIS] = LROUND(b * axis_steps_per_mm[Y_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+       nc = position[Z_AXIS] = LROUND(c * axis_steps_per_mm[Z_AXIS]), // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+       ne = position[E_AXIS] = LROUND(e * axis_steps_per_mm[_EINDEX]); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   stepper.set_position(na, nb, nc, ne);
   previous_nominal_speed = 0.0; // Resets planner junction speeds. Assumes start from rest.
   ZERO(previous_speed);
@@ -1408,7 +1408,7 @@ void Planner::set_position_mm(const AxisEnum axis, const float& v) {
   #else
     const uint8_t axis_index = axis;
   #endif
-  position[axis] = LROUND(v * axis_steps_per_mm[axis_index]); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+  position[axis] = LROUND(v * axis_steps_per_mm[axis_index]); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
   stepper.set_position(axis, v);
   previous_speed[axis] = 0.0;
 }

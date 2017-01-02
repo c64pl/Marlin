@@ -92,8 +92,8 @@ class Nozzle {
       __attribute__((unused)) uint8_t const &objects
     ) __attribute__((optimize ("Os"))) {
       #if ENABLED(NOZZLE_CLEAN_FEATURE)
-        float A = FABS(end.y - start.y); // [twice the] Amplitude // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
-        float P = FABS(end.x - start.x) / (objects << 1); // Period // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+        float A = FABS(end.y - start.y); // [twice the] Amplitude // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+        float P = FABS(end.x - start.x) / (objects << 1); // Period // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
         // Don't allow impossible triangles
         if (A <= 0.0f || P <= 0.0f ) return;
@@ -111,7 +111,7 @@ class Nozzle {
         for (uint8_t j = 0; j < strokes; j++) {
           for (uint8_t i = 0; i < (objects << 1); i++) {
             float const x = start.x + i * P;
-            float const y = start.y + (A/P) * (P - FABS(FMOD((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+            float const y = start.y + (A/P) * (P - FABS(FMOD((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
             do_blocking_move_to_xy(x, y);
             if (i == 0) do_blocking_move_to_z(start.z);
@@ -119,7 +119,7 @@ class Nozzle {
 
           for (int i = (objects << 1); i > -1; i--) {
             float const x = start.x + i * P;
-            float const y = start.y + (A/P) * (P - FABS(FMOD((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: ARDUINO_ARCH_SAM
+            float const y = start.y + (A/P) * (P - FABS(FMOD((i*P), (2*P)) - P)); // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 
             do_blocking_move_to_xy(x, y);
           }

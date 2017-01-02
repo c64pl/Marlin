@@ -66,7 +66,7 @@
 
 #include "../../MarlinConfig.h"
 
-#if defined(ARDUINO_ARCH_SAM)
+#if defined(USE_HAL)
 
 #if HAS_SERVOS
 
@@ -175,4 +175,4 @@ void Servo::move(int value) {
 
 #endif // HAS_SERVOS
 
-#endif // ARDUINO_ARCH_SAM
+#endif // USE_HAL
