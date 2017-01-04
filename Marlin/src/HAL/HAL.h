@@ -29,32 +29,20 @@
 #ifndef _HAL_H
 #define _HAL_H
 
-// --------------------------------------------------------------------------
-// Defines
-// --------------------------------------------------------------------------
+/**
+ * Public Variables
+ */
 
-#define REFERENCE_F_CPU 16000000 // 16MHz MEGA2560
+constexpr uint32_t REFERENCE_F_CPU = 16000000; // 16MHz MEGA2560
 
 // timers
-#define REFERENCE_STEPPER_TIMER_PRESCALE 8
-#define HAL_REFERENCE_STEPPER_TIMER_RATE (REFERENCE_F_CPU / REFERENCE_STEPPER_TIMER_PRESCALE) // timer1 of MEGA2560: 16000000 / 8 = 2MHz
-#define REFERENCE_STEPPER_TIMER_FREQUENCY (HAL_REFERENCE_STEPPER_TIMER_RATE / 2000) // note: timer0 is in mode2 (CTC), 1KHz at start
+constexpr uint32_t REFERENCE_STEPPER_TIMER_PRESCALE = 8;
+constexpr uint32_t HAL_REFERENCE_STEPPER_TIMER_RATE = REFERENCE_F_CPU / REFERENCE_STEPPER_TIMER_PRESCALE; // timer1 of MEGA2560: 16000000 / 8 = 2MHz
+constexpr uint32_t REFERENCE_STEPPER_TIMER_FREQUENCY = HAL_REFERENCE_STEPPER_TIMER_RATE / 2000; // note: timer0 is in mode2 (CTC), 1KHz at start
 
-#define REFERENCE_TEMP_TIMER_PRESCALE 64
-#define HAL_REFERENCE_TEMP_TIMER_RATE (REFERENCE_F_CPU / REFERENCE_TEMP_TIMER_PRESCALE) // timer0 of MEGA2560: 16000000 / 64 = 250KHz (sharing with advanced extruder)
-#define REFERENCE_TEMP_TIMER_FREQUENCY (HAL_REFERENCE_TEMP_TIMER_RATE / 256) // note: timer0 is in mode3 (8bit fast PWM), 976.5625Hz always
-
-#if 0
-#if ENABLED(ADVANCE) || ENABLED(LIN_ADVANCE)
-  #define REFERENCE_EXTRUDER_TIMER_PRESCALE 64
-  #define HAL_REFERENCE_EXTRUDER_TIMER_RATE (REFERENCE_F_CPU / REFERENCE_EXTRUDER_TIMER_PRESCALE) // timer0 of MEGA2560: 16000000 / 64 = 250KHz
-  #define REFERENCE_EXTRUDER_TIMER_FREQUENCY (HAL_REFERENCE_EXTRUDER_TIMER_RATE / 200) // note: timer0 is in mode3 (8bit fast PWM), 1.25KHz at start
-#endif
-#endif
-
-// --------------------------------------------------------------------------
-// Public Variables
-// --------------------------------------------------------------------------
+constexpr uint32_t REFERENCE_TEMP_TIMER_PRESCALE = 64;
+constexpr uint32_t HAL_REFERENCE_TEMP_TIMER_RATE = REFERENCE_F_CPU / REFERENCE_TEMP_TIMER_PRESCALE; // timer0 of MEGA2560: 16000000 / 64 = 250KHz (sharing with advanced extruder)
+constexpr uint32_t REFERENCE_TEMP_TIMER_FREQUENCY = HAL_REFERENCE_TEMP_TIMER_RATE / 256; // note: timer0 is in mode3 (8bit fast PWM), 976.5625Hz always
 
 // SPI
 /**
@@ -75,23 +63,23 @@
  */
 
 /** Set SCK to max rate */
-uint8_t const SPI_FULL_SPEED = 0;
+constexpr uint8_t SPI_FULL_SPEED = 0;
 /** Set SCK rate to half max rate. */
-uint8_t const SPI_HALF_SPEED = 1;
+constexpr uint8_t SPI_HALF_SPEED = 1;
 /** Set SCK rate to quarter max rate. */
-uint8_t const SPI_QUARTER_SPEED = 2;
+constexpr uint8_t SPI_QUARTER_SPEED = 2;
 /** Set SCK rate to 1/8 max rate. */
-uint8_t const SPI_EIGHTH_SPEED = 3;
+constexpr uint8_t SPI_EIGHTH_SPEED = 3;
 /** Set SCK rate to 1/16 of max rate. */
-uint8_t const SPI_SIXTEENTH_SPEED = 4;
+constexpr uint8_t SPI_SIXTEENTH_SPEED = 4;
 /** Set SCK rate to 1/32 of max rate. */
-uint8_t const SPI_SPEED_5 = 5;
+constexpr uint8_t SPI_SPEED_5 = 5;
 /** Set SCK rate to 1/64 of max rate. */
-uint8_t const SPI_SPEED_6 = 6;
+constexpr uint8_t SPI_SPEED_6 = 6;
 
-// --------------------------------------------------------------------------
-// Public functions
-// --------------------------------------------------------------------------
+/**
+ * Public functions
+ */
 
 // Standard SPI functions
 /** Initialise SPI bus */
@@ -112,9 +100,9 @@ void spiSendBlock(uint8_t token, const uint8_t* buf);
   uint8_t spiRec(uint32_t chan);
 #endif
 
-// --------------------------------------------------------------------------
-// Includes
-// --------------------------------------------------------------------------
+/**
+ * Includes
+ */
 
 #if defined(I2C_EEPROM) || defined(SPI_EEPROM)
   #include "HAL_eeprom.h"
@@ -127,7 +115,7 @@ void spiSendBlock(uint8_t token, const uint8_t* buf);
   #include "HAL_AVR/HAL_AVR.h"
 */
 #else
-  #error Unsupported Platform!
+  #error "Unsupported Platform!"
 #endif
 
 #endif // _HAL_H

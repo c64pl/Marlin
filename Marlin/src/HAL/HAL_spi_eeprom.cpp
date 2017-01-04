@@ -28,9 +28,9 @@
 
 #include "HAL.h"
 
-#define CMD_WREN  6 // WREN
-#define CMD_READ  3 // READ
-#define CMD_WRITE 2 // WRITE
+static constexpr uint8_t CMD_WREN = 6; // WREN
+static constexpr uint8_t CMD_READ = 3; // READ
+static constexpr uint8_t CMD_WRITE = 2; // WRITE
 
 uint8_t eeprom_read_byte(uint8_t* pos) {
   uint8_t eeprom_temp[3] = {0};

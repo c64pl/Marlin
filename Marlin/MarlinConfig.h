@@ -24,7 +24,7 @@
 #define MARLIN_CONFIG_H
 
 #include "MarlinConfig_extra.h" // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
-                              // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+                                // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 #if defined(USE_HAL)
   #include "src/HAL/HAL_fastio.h"
 #else

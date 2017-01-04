@@ -26,9 +26,9 @@
 #ifndef HAL_EEPROM_H
 #define HAL_EEPROM_H
 
-// --------------------------------------------------------------------------
-// Public functions
-// --------------------------------------------------------------------------
+/**
+ * Public functions
+ */
 
 uint8_t eeprom_read_byte(uint8_t* pos);
 void eeprom_read_block(void* pos, const void* eeprom_address, size_t n);

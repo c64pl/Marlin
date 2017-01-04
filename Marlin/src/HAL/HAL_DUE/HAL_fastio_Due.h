@@ -27,400 +27,162 @@
 #ifndef HAL_FASTIO_DUE_H
 #define HAL_FASTIO_DUE_H
 
+#include <Arduino.h>
+
 /**
-  utility functions
-*/
+ * Types
+ */
+
+typedef struct {
+  Pio* base_address;
+  uint32_t shift_count;
+} Fastio_Param;
+
+/**
+ * ports and functions
+ *
+ * added as necessary or if I feel like it- not a comprehensive list!
+ */
+
+// UART
+#define RXD (0u)
+#define TXD (1u)
+
+/**
+ * pins
+ */
+
+static constexpr Fastio_Param Fastio[101] = {
+  // D0 to D9
+  { PIOA,  8 }, { PIOA,  9 }, { PIOB, 25 }, { PIOC, 28 }, { PIOC, 26 }, { PIOC, 25 }, { PIOC, 24 }, { PIOC, 23 }, { PIOC, 22 }, { PIOC, 21 },
+
+  // D10 to D19
+  { PIOC, 29 }, { PIOD,  7 }, { PIOD,  8 }, { PIOB, 27 }, { PIOD,  4 }, { PIOD,  5 }, { PIOA, 13 }, { PIOA, 12 }, { PIOA, 11 }, { PIOA, 10 },
+
+  // D20 to D29
+  { PIOB, 12 }, { PIOB, 13 }, { PIOB, 26 }, { PIOA, 14 }, { PIOA, 15 }, { PIOD,  0 }, { PIOD,  1 }, { PIOD,  2 }, { PIOD,  3 }, { PIOD,  6 },
+
+  // D30 to D39
+  { PIOD,  9 }, { PIOA,  7 }, { PIOD, 10 }, { PIOC,  1 }, { PIOC,  2 }, { PIOC,  3 }, { PIOC,  4 }, { PIOC,  5 }, { PIOC,  6 }, { PIOC,  7 },
+
+  // D40 to D49
+  { PIOC,  8 }, { PIOC,  9 }, { PIOA, 19 }, { PIOA, 20 }, { PIOC, 19 }, { PIOC, 18 }, { PIOC, 17 }, { PIOC, 16 }, { PIOC, 15 }, { PIOC, 14 },
+
+  // D50 to D59
+  { PIOC, 13 }, { PIOC, 12 }, { PIOB, 21 }, { PIOB, 14 }, { PIOA, 16 }, { PIOA, 24 }, { PIOA, 23 }, { PIOA, 22 }, { PIOA,  6 }, { PIOA,  4 },
+
+  // D60 to D69
+  { PIOA,  3 }, { PIOA,  2 }, { PIOB, 17 }, { PIOB, 18 }, { PIOB, 19 }, { PIOB, 20 }, { PIOB, 15 }, { PIOB, 16 }, { PIOA,  1 }, { PIOA,  0 },
+
+  // D70 to D79
+  { PIOA, 17 }, { PIOA, 18 }, { PIOC, 30 }, { PIOA, 21 }, { PIOA, 25 }, { PIOA, 26 }, { PIOA, 27 }, { PIOA, 28 }, { PIOB, 23 }, { PIOA, 17 },
+
+  // D80 to D89
+  { PIOB, 12 }, { PIOA,  8 }, { PIOA, 11 }, { PIOA, 13 }, { PIOD,  4 }, { PIOB, 11 }, { PIOB, 21 }, { PIOA, 29 }, { PIOB, 15 }, { PIOB, 14 },
+
+  // D90 to D99
+  { PIOA,  1 }, { PIOB, 15 }, { PIOA,  5 }, { PIOB, 12 }, { PIOB, 22 }, { PIOB, 23 }, { PIOB, 24 }, { PIOC, 20 }, { PIOC, 27 }, { PIOC, 10 },
+
+  // D100
+  { PIOC, 11 }
+};
+
+/**
+ * utility functions
+ */
 
 #ifndef MASK
-  #define MASK(PIN)  (1 << PIN)
+  #define MASK(PIN) (1 << PIN)
 #endif
 
 /**
-  magic I/O routines
-  now you can simply SET_OUTPUT(STEP); WRITE(STEP, 1); WRITE(STEP, 0);
+ * magic I/O routines
+ * now you can simply SET_OUTPUT(STEP); WRITE(STEP, 1); WRITE(STEP, 0);
+ */
+
+// Read a pin
+static FORCE_INLINE bool READ(const uint32_t pin) {
+  return (bool)(Fastio[pin].base_address -> PIO_PDSR & (MASK(Fastio[pin].shift_count)));
+}
+
+/*
+static FORCE_INLINE bool READ(const uint32_t pin) {
+  return g_APinDescription[pin].pPort->PIO_PDSR & g_APinDescription[pin].ulPin ? true : false;
+}
 */
 
-/// Read a pin
-#define _READ(IO) ((bool)(DIO ## IO ## _WPORT -> PIO_PDSR & (MASK(DIO ## IO ## _PIN))))
-/// write to a pin
+// write to a pin
 // On some boards pins > 0x100 are used. These are not converted to atomic actions. An critical section is needed.
+static FORCE_INLINE void WRITE(const uint32_t pin, uint8_t flag) {
+   flag ? Fastio[pin].base_address -> PIO_SODR = MASK(Fastio[pin].shift_count) : Fastio[pin].base_address -> PIO_CODR = MASK(Fastio[pin].shift_count);
+}
 
-#define _WRITE_VAR(IO, v) do {  if (v) {g_APinDescription[IO].pPort->PIO_SODR = g_APinDescription[IO].ulPin; } \
-                                    else {g_APinDescription[IO].pPort->PIO_CODR = g_APinDescription[IO].ulPin; } \
-                                 } while (0)
+/*
+static FORCE_INLINE void WRITE(const uint32_t pin, uint8_t flag) {
+  flag ? g_APinDescription[pin].pPort->PIO_SODR = g_APinDescription[pin].ulPin : g_APinDescription[pin].pPort->PIO_CODR = g_APinDescription[pin].ulPin;
+}
+*/
 
-#define _WRITE(IO, v) do {  if (v) {DIO ## IO ## _WPORT -> PIO_SODR = MASK(DIO ## IO ##_PIN); } \
-                                else {DIO ##  IO ## _WPORT -> PIO_CODR = MASK(DIO ## IO ## _PIN); }; \
-                             } while (0)
+// toggle a pin
+static FORCE_INLINE void TOGGLE(const uint32_t pin) {
+  WRITE(pin, !READ(pin));
+}
 
-/// toggle a pin
-#define _TOGGLE(IO)  _WRITE(IO, !READ(IO))
-
-/// set pin as input
-#define _SET_INPUT(IO)  pmc_enable_periph_clk(g_APinDescription[IO].ulPeripheralId); \
-                        PIO_Configure(g_APinDescription[IO].pPort, PIO_INPUT, g_APinDescription[IO].ulPin, 0)
-/// set pin as output
-#define _SET_OUTPUT(IO)  PIO_Configure(g_APinDescription[IO].pPort, PIO_OUTPUT_1, \
-                         g_APinDescription[IO].ulPin, g_APinDescription[IO].ulPinConfiguration)
-
-/// Write doesn't work for pullups
-#define _PULLUP(IO, v)  { pinMode(IO, (v!=LOW ? INPUT_PULLUP : INPUT)); }
-
-/// check if pin is an input
+/*
+// check if pin is an input
 #define _GET_INPUT(IO)
-/// check if pin is an output
+
+// check if pin is an output
 #define _GET_OUTPUT(IO)
 
-/// check if pin is an timer
+// check if pin is an timer
 #define _GET_TIMER(IO)
+*/
 
-//  why double up on these macros? see http://gcc.gnu.org/onlinedocs/cpp/Stringification.html
+// set pin as input
+static FORCE_INLINE void SET_INPUT(const uint32_t pin) {
+  pmc_enable_periph_clk(g_APinDescription[pin].ulPeripheralId);
+  PIO_Configure(g_APinDescription[pin].pPort, PIO_INPUT, g_APinDescription[pin].ulPin, 0);
+}
 
-/// Read a pin wrapper
-#define READ(IO)  _READ(IO)
-/// Write to a pin wrapper
-#define WRITE_VAR(IO, v)  _WRITE_VAR(IO, v)
-#define WRITE(IO, v)  _WRITE(IO, v)
+// set pin as output
+static FORCE_INLINE void _SET_OUTPUT(const uint32_t pin) {
+  PIO_Configure(g_APinDescription[pin].pPort, PIO_OUTPUT_1, g_APinDescription[pin].ulPin, g_APinDescription[pin].ulPinConfiguration);
+}
 
-/// toggle a pin wrapper
-#define TOGGLE(IO)  _TOGGLE(IO)
+// Write doesn't work for pullups
+static FORCE_INLINE void PULLUP(const uint32_t pin, uint8_t flag) {
+  pinMode(pin, (flag != LOW ? INPUT_PULLUP : INPUT));
+}
 
-/// set pin as input wrapper
-#define SET_INPUT(IO)  _SET_INPUT(IO)
-/// set pin as input with pullup wrapper
-#define SET_INPUT_PULLUP(IO) do{ _SET_INPUT(IO); _PULLUP(IO, HIGH); }while(0)
-/// set pin as output wrapper
-#define SET_OUTPUT(IO)  do{ _SET_OUTPUT(IO); _WRITE(IO, LOW); }while(0)
+// why double up on these macros? see http://gcc.gnu.org/onlinedocs/cpp/Stringification.html
 
-/// for pullups wrapper
-#define PULLUP(IO, v)  _PULLUP(IO, v)
+/*
+// check if pin is an input wrapper
+#define GET_INPUT(IO) _GET_INPUT(IO)
 
-/// check if pin is an input wrapper
-#define GET_INPUT(IO)  _GET_INPUT(IO)
-/// check if pin is an output wrapper
-#define GET_OUTPUT(IO)  _GET_OUTPUT(IO)
+// check if pin is an output wrapper
+#define GET_OUTPUT(IO) _GET_OUTPUT(IO)
 
-/// check if pin is an timer wrapper
-#define GET_TIMER(IO)  _GET_TIMER(IO)
+// check if pin is an timer wrapper
+#define GET_TIMER(IO) _GET_TIMER(IO)
+*/
+
+// set pin as input with pullup wrapper
+static FORCE_INLINE void SET_INPUT_PULLUP(const uint32_t pin) {
+  SET_INPUT(pin);
+  PULLUP(pin, HIGH);
+}
 
 // Shorthand
-#define OUT_WRITE(IO, v) { SET_OUTPUT(IO); WRITE(IO, v); }
-
-/**
-  ports and functions
-
-  added as necessary or if I feel like it- not a comprehensive list!
-*/
-
-/**
-pins
-*/
-
-#define DIO0_PIN 8
-#define DIO0_WPORT PIOA
-
-#define DIO1_PIN 9
-#define DIO1_WPORT PIOA
-
-#define DIO2_PIN 25
-#define DIO2_WPORT PIOB
-
-#define DIO3_PIN 28
-#define DIO3_WPORT PIOC
-
-#define DIO4_PIN 26
-#define DIO4_WPORT PIOC
-
-#define DIO5_PIN 25
-#define DIO5_WPORT PIOC
-
-#define DIO6_PIN 24
-#define DIO6_WPORT PIOC
-
-#define DIO7_PIN 23
-#define DIO7_WPORT PIOC
-
-#define DIO8_PIN 22
-#define DIO8_WPORT PIOC
-
-#define DIO9_PIN 21
-#define DIO9_WPORT PIOC
-
-#define DIO10_PIN 29
-#define DIO10_WPORT PIOC
-
-#define DIO11_PIN 7
-#define DIO11_WPORT PIOD
-
-#define DIO12_PIN 8
-#define DIO12_WPORT PIOD
-
-#define DIO13_PIN 27
-#define DIO13_WPORT PIOB
-
-#define DIO14_PIN 4
-#define DIO14_WPORT PIOD
-
-#define DIO15_PIN 5
-#define DIO15_WPORT PIOD
-
-#define DIO16_PIN 13
-#define DIO16_WPORT PIOA
-
-#define DIO17_PIN 12
-#define DIO17_WPORT PIOA
-
-#define DIO18_PIN 11
-#define DIO18_WPORT PIOA
-
-#define DIO19_PIN 10
-#define DIO19_WPORT PIOA
-
-#define DIO20_PIN 12
-#define DIO20_WPORT PIOB
-
-#define DIO21_PIN 13
-#define DIO21_WPORT PIOB
-
-#define DIO22_PIN 26
-#define DIO22_WPORT PIOB
-
-#define DIO23_PIN 14
-#define DIO23_WPORT PIOA
-
-#define DIO24_PIN 15
-#define DIO24_WPORT PIOA
-
-#define DIO25_PIN 0
-#define DIO25_WPORT PIOD
-
-#define DIO26_PIN 1
-#define DIO26_WPORT PIOD
-
-#define DIO27_PIN 2
-#define DIO27_WPORT PIOD
-
-#define DIO28_PIN 3
-#define DIO28_WPORT PIOD
-
-#define DIO29_PIN 6
-#define DIO29_WPORT PIOD
-
-#define DIO30_PIN 9
-#define DIO30_WPORT PIOD
-
-#define DIO31_PIN 7
-#define DIO31_WPORT PIOA
-
-#define DIO32_PIN 10
-#define DIO32_WPORT PIOD
-
-#define DIO33_PIN 1
-#define DIO33_WPORT PIOC
-
-#define DIO34_PIN 2
-#define DIO34_WPORT PIOC
-
-#define DIO35_PIN 3
-#define DIO35_WPORT PIOC
-
-#define DIO36_PIN 4
-#define DIO36_WPORT PIOC
-
-#define DIO37_PIN 5
-#define DIO37_WPORT PIOC
-
-#define DIO38_PIN 6
-#define DIO38_WPORT PIOC
-
-#define DIO39_PIN 7
-#define DIO39_WPORT PIOC
-
-#define DIO40_PIN 8
-#define DIO40_WPORT PIOC
-
-#define DIO41_PIN 9
-#define DIO41_WPORT PIOC
-
-#define DIO42_PIN 19
-#define DIO42_WPORT PIOA
-
-#define DIO43_PIN 20
-#define DIO43_WPORT PIOA
-
-#define DIO44_PIN 19
-#define DIO44_WPORT PIOC
-
-#define DIO45_PIN 18
-#define DIO45_WPORT PIOC
-
-#define DIO46_PIN 17
-#define DIO46_WPORT PIOC
-
-#define DIO47_PIN 16
-#define DIO47_WPORT PIOC
-
-#define DIO48_PIN 15
-#define DIO48_WPORT PIOC
-
-#define DIO49_PIN 14
-#define DIO49_WPORT PIOC
-
-#define DIO50_PIN 13
-#define DIO50_WPORT PIOC
-
-#define DIO51_PIN 12
-#define DIO51_WPORT PIOC
-
-#define DIO52_PIN 21
-#define DIO52_WPORT PIOB
-
-#define DIO53_PIN 14
-#define DIO53_WPORT PIOB
-
-#define DIO54_PIN 16
-#define DIO54_WPORT PIOA
-
-#define DIO55_PIN 24
-#define DIO55_WPORT PIOA
-
-#define DIO56_PIN 23
-#define DIO56_WPORT PIOA
-
-#define DIO57_PIN 22
-#define DIO57_WPORT PIOA
-
-#define DIO58_PIN 6
-#define DIO58_WPORT PIOA
-
-#define DIO59_PIN 4
-#define DIO59_WPORT PIOA
-
-#define DIO60_PIN 3
-#define DIO60_WPORT PIOA
-
-#define DIO61_PIN 2
-#define DIO61_WPORT PIOA
-
-#define DIO62_PIN 17
-#define DIO62_WPORT PIOB
-
-#define DIO63_PIN 18
-#define DIO63_WPORT PIOB
-
-#define DIO64_PIN 19
-#define DIO64_WPORT PIOB
-
-#define DIO65_PIN 20
-#define DIO65_WPORT PIOB
-
-#define DIO66_PIN 15
-#define DIO66_WPORT PIOB
-
-#define DIO67_PIN 16
-#define DIO67_WPORT PIOB
-
-#define DIO68_PIN 1
-#define DIO68_WPORT PIOA
-
-#define DIO69_PIN 0
-#define DIO69_WPORT PIOA
-
-#define DIO70_PIN 17
-#define DIO70_WPORT PIOA
-
-#define DIO71_PIN 18
-#define DIO71_WPORT PIOA
-
-#define DIO72_PIN 30
-#define DIO72_WPORT PIOC
-
-#define DIO73_PIN 21
-#define DIO73_WPORT PIOA
-
-#define DIO74_PIN 25
-#define DIO74_WPORT PIOA
-
-#define DIO75_PIN 26
-#define DIO75_WPORT PIOA
-
-#define DIO76_PIN 27
-#define DIO76_WPORT PIOA
-
-#define DIO77_PIN 28
-#define DIO77_WPORT PIOA
-
-#define DIO78_PIN 23
-#define DIO78_WPORT PIOB
-
-#define DIO79_PIN 17
-#define DIO79_WPORT PIOA
-
-#define DIO80_PIN 12
-#define DIO80_WPORT PIOB
-
-#define DIO81_PIN 8
-#define DIO81_WPORT PIOA
-
-#define DIO82_PIN 11
-#define DIO82_WPORT PIOA
-
-#define DIO83_PIN 13
-#define DIO83_WPORT PIOA
-
-#define DIO84_PIN 4
-#define DIO84_WPORT PIOD
-
-#define DIO85_PIN 11
-#define DIO85_WPORT PIOB
-
-#define DIO86_PIN 21
-#define DIO86_WPORT PIOB
-
-#define DIO87_PIN 29
-#define DIO87_WPORT PIOA
-
-#define DIO88_PIN 15
-#define DIO88_WPORT PIOB
-
-#define DIO89_PIN 14
-#define DIO89_WPORT PIOB
-
-#define DIO90_PIN 1
-#define DIO90_WPORT PIOA
-
-#define DIO91_PIN 15
-#define DIO91_WPORT PIOB
-
-#define DIO92_PIN 5
-#define DIO92_WPORT PIOA
-
-#define DIO93_PIN 12
-#define DIO93_WPORT PIOB
-
-#define DIO94_PIN 22
-#define DIO94_WPORT PIOB
-
-#define DIO95_PIN 23
-#define DIO95_WPORT PIOB
-
-#define DIO96_PIN 24
-#define DIO96_WPORT PIOB
-
-#define DIO97_PIN 20
-#define DIO97_WPORT PIOC
-
-#define DIO98_PIN 27
-#define DIO98_WPORT PIOC
-
-#define DIO99_PIN 10
-#define DIO99_WPORT PIOC
-
-#define DIO100_PIN 11
-#define DIO100_WPORT PIOC
-
-// UART
-#define RXD DIO0_PIN
-#define TXD DIO1_PIN
+static FORCE_INLINE void OUT_WRITE(const uint32_t pin, uint8_t flag) {
+  _SET_OUTPUT(pin);
+  WRITE(pin, flag);
+}
+
+// set pin as output wrapper
+static FORCE_INLINE void SET_OUTPUT(const uint32_t pin) {
+  OUT_WRITE(pin, LOW);
+}
 
 #endif // HAL_FASTIO_DUE_H

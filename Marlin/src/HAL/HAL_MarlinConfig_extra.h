@@ -20,17 +20,17 @@
  *
  */
 
-#ifndef MARLIN_CONFIG_EXTRA_H
-#define MARLIN_CONFIG_EXTRA_H
+#ifndef HAL_MARLIN_CONFIG_EXTRA_H
+#define HAL_MARLIN_CONFIG_EXTRA_H
 
-#if !defined(ARDUINO_ARCH_AVR)
-  #define USE_HAL
-  #define ADDITIONAL_EXPERIMENTAL_FEATURES
-  #include "src/HAL/HAL_MarlinConfig_extra.h"
+#if defined(ARDUINO_ARCH_SAM)
+  #include "HAL_DUE/HAL_MarlinConfig_extra_Due.h"
+/*
+#elif defined(ARDUINO_ARCH_AVR)
+  #include "HAL_AVR/HAL_MarlinConfig_extra_AVR.h"
+*/
 #else
-  //#define USE_HAL
-  //#define ADDITIONAL_EXPERIMENTAL_FEATURES
-  //#include "src/HAL/HAL_MarlinConfig_extra.h"
+  #error "Unsupported Platform!"
 #endif
 
-#endif // MARLIN_CONFIG_EXTRA_H
+#endif // HAL_MARLIN_CONFIG_EXTRA_H

@@ -20,17 +20,13 @@
  *
  */
 
-#ifndef MARLIN_CONFIG_EXTRA_H
-#define MARLIN_CONFIG_EXTRA_H
+#ifndef HAL_MARLIN_CONFIG_EXTRA_DUE_H
+#define HAL_MARLIN_CONFIG_EXTRA_DUE_H
 
-#if !defined(ARDUINO_ARCH_AVR)
-  #define USE_HAL
-  #define ADDITIONAL_EXPERIMENTAL_FEATURES
-  #include "src/HAL/HAL_MarlinConfig_extra.h"
-#else
-  //#define USE_HAL
-  //#define ADDITIONAL_EXPERIMENTAL_FEATURES
-  //#include "src/HAL/HAL_MarlinConfig_extra.h"
-#endif
+/**
+ * Defines
+ */
 
-#endif // MARLIN_CONFIG_EXTRA_H
+#define FORCE_INLINE __attribute__((always_inline)) inline
+
+#endif // HAL_MARLIN_CONFIG_EXTRA_DUE_H

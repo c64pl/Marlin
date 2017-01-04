@@ -28,9 +28,9 @@
 #ifndef HAL_DUE_H
 #define HAL_DUE_H
 
-// --------------------------------------------------------------------------
-// Includes
-// --------------------------------------------------------------------------
+/**
+ * Includes
+ */
 
 #include <stdint.h>
 #include "Arduino.h"
@@ -40,13 +40,9 @@
 #include "../HAL_fastio.h"
 #include "HAL_timers_Due.h"
 
-// --------------------------------------------------------------------------
-// Defines
-// --------------------------------------------------------------------------
-
-#define MAX_ANALOG_PIN_NUMBER 11
-
-#define FORCE_INLINE __attribute__((always_inline)) inline
+/**
+ * Defines
+ */
 
 #define CRITICAL_SECTION_START uint32_t primask = __get_PRIMASK(); __disable_irq();
 #define CRITICAL_SECTION_END if (primask == 0) __enable_irq();
@@ -59,51 +55,38 @@
 // Variant files of Alligator Board is old
 #if MB(ALLIGATOR)
   #define strncpy_P(s1, s2, n) strncpy((s1), (s2), (n))
-  #define analogInputToDigitalPin(p)  ((p < 12u) ? (p) + 54u : -1)
+  #define analogInputToDigitalPin(p) ((p < 12u) ? (p) + 54u : -1)
 #endif
 
 // Fix bug in pgm_read_ptr
 #undef pgm_read_ptr
 #define pgm_read_ptr(addr) (*(addr))
 
-#if ENABLED(DELTA_FAST_SQRT)
-  #undef ATAN2
-  #undef FABS
-  #undef POW
-  #undef SQRT
-  #undef CEIL
-  #undef FLOOR
-  #undef LROUND
-  #undef FMOD
-  #define ATAN2(y, x) atan2f(y, x)
-  #define FABS(x) fabsf(x)
-  #define POW(x, y) powf(x, y)
-  #define SQRT(x) sqrtf(x)
-  #define CEIL(x) ceilf(x)
-  #define FLOOR(x) floorf(x)
-  #define LROUND(x) lroundf(x)
-  #define FMOD(x, y) fmodf(x, y)
-#endif
+/**
+ * Public Variables
+ */
+
+constexpr uint8_t MAX_ANALOG_PIN_NUMBER = 11;
 
 // Delays
-#define CYCLES_EATEN_BY_CODE 12
-#define CYCLES_EATEN_BY_E 12
+constexpr uint8_t CYCLES_EATEN_BY_CODE = 12;
+constexpr uint8_t CYCLES_EATEN_BY_E = 12;
 
 // Voltage
-#define LOGIC_VOLTAGE 3.3
+constexpr float LOGIC_VOLTAGE = 3.3;
 
 // reset reason
-#define RST_POWER_ON   1
-#define RST_EXTERNAL   2
-#define RST_BROWN_OUT  4
-#define RST_WATCHDOG   8
-#define RST_JTAG      16
-#define RST_SOFTWARE  32
-#define RST_BACKUP    64
+constexpr uint8_t RST_POWER_ON = 1;
+constexpr uint8_t RST_EXTERNAL = 2;
+constexpr uint8_t RST_BROWN_OUT = 4;
+constexpr uint8_t RST_WATCHDOG = 8;
+constexpr uint8_t RST_JTAG = 16;
+constexpr uint8_t RST_SOFTWARE = 32;
+constexpr uint8_t RST_BACKUP = 64;
 
-// --------------------------------------------------------------------------
-// Public functions
-// --------------------------------------------------------------------------
+/**
+ * Public functions
+ */
 
 // Disable interrupts
 void cli(void);
@@ -117,18 +100,6 @@ void HAL_clear_reset_source(void);
 // reset reason
 uint8_t HAL_get_reset_source(void);
 
-#if 0
-// Delays
-static inline void HAL_delay(millis_t ms) {
-  unsigned int del;
-  while (ms > 0) {
-    del = ms > 100 ? 100 : ms;
-    delay(del);
-    ms -= del;
-  }
-}
-#endif
-
 // return free memory between end of heap (or end bss) and whatever is current
 int freeMemory(void);
 
@@ -141,5 +112,48 @@ uint16_t getAdcFreerun(adc_channel_num_t chan, bool wait_for_conversion = false)
 uint16_t getAdcSuperSample(adc_channel_num_t chan);
 void setAdcFreerun(void);
 void stopAdcFreerun(adc_channel_num_t chan);
+
+#if ENABLED(DELTA_FAST_SQRT)
+  #undef ATAN2
+  #undef FABS
+  #undef POW
+  #undef SQRT
+  #undef CEIL
+  #undef FLOOR
+  #undef LROUND
+  #undef FMOD
+
+  static FORCE_INLINE float ATAN2(float y, float x) {
+    return atan2f(y, x);
+  }
+
+  static FORCE_INLINE float FABS(float x) {
+    return fabsf(x);
+  }
+
+  static FORCE_INLINE float POW(float x, float y) {
+    return powf(x, y);
+  }
+
+  static FORCE_INLINE float SQRT(float x) {
+    return sqrtf(x);
+  }
+
+  static FORCE_INLINE float CEIL(float x) {
+    return ceilf(x);
+  }
+
+  static FORCE_INLINE float FLOOR(float x) {
+    return floorf(x);
+  }
+
+  static FORCE_INLINE long LROUND(float x) {
+    return lroundf(x);
+  }
+
+  static FORCE_INLINE float FMOD(float x, float y) {
+    return fmodf(x, y);
+  }
+#endif
 
 #endif // HAL_DUE_H

@@ -23,7 +23,7 @@
 #define MARLIN_H
 
 #include "MarlinConfig_extra.h" // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
-                              // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
+                                // This line is different from official RCBugFix: search tag: DIFFER_FROM_OFFICIAL
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
