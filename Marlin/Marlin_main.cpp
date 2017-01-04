@@ -2394,9 +2394,15 @@ static void clean_up_after_endstop_or_probe_move() {
           c1 = bed_level_grid[x + xdir][y + ydir], c2 = bed_level_grid[x + xdir * 2][y + ydir * 2];
 
     // Treat far unprobed points as zero, near as equal to far
-    if (a2 == UNPROBED) a2 = 0.0; if (a1 == UNPROBED) a1 = a2;
-    if (b2 == UNPROBED) b2 = 0.0; if (b1 == UNPROBED) b1 = b2;
-    if (c2 == UNPROBED) c2 = 0.0; if (c1 == UNPROBED) c1 = c2;
+    #if defined(ADDITIONAL_EXPERIMENTAL_FEATURES)
+      if (a2 == UNPROBED) { a2 = 0.0; if (a1 == UNPROBED) a1 = a2; }
+      if (b2 == UNPROBED) { b2 = 0.0; if (b1 == UNPROBED) b1 = b2; }
+      if (c2 == UNPROBED) { c2 = 0.0; if (c1 == UNPROBED) c1 = c2; }
+    #else
+      if (a2 == UNPROBED) a2 = 0.0; if (a1 == UNPROBED) a1 = a2;
+      if (b2 == UNPROBED) b2 = 0.0; if (b1 == UNPROBED) b1 = b2;
+      if (c2 == UNPROBED) c2 = 0.0; if (c1 == UNPROBED) c1 = c2;
+    #endif
 
     float a = 2 * a1 - a2, b = 2 * b1 - b2, c = 2 * c1 - c2;
 
