@@ -62,15 +62,15 @@
 #undef pgm_read_ptr
 #define pgm_read_ptr(addr) (*(addr))
 
+// Delays
+#define CYCLES_EATEN_BY_CODE 12
+#define CYCLES_EATEN_BY_E 12
+
 /**
  * Public Variables
  */
 
 constexpr uint8_t MAX_ANALOG_PIN_NUMBER = 11;
-
-// Delays
-constexpr uint8_t CYCLES_EATEN_BY_CODE = 12;
-constexpr uint8_t CYCLES_EATEN_BY_E = 12;
 
 // Voltage
 constexpr float LOGIC_VOLTAGE = 3.3;
